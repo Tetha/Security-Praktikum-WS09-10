@@ -1,0 +1,73 @@
+\documentclass{article}
+
+\begin{document}
+\section{Aufgabe des Programmes}
+  Das im Praktikum zu erstellende Programm hat die Aufgabe, aus 
+den Wortlisten zweier beteiligter Parteien einen Klassifikator 
+f\"ur Spammails zu erzeugen, den jede Partei einzeln verwenden kann.\\
+  Es gibt bei der Verwendung des Programmes genau zwei beteiligte Parteien.
+Diese werden im folgenden als Anwender bezeichnet. Jeder dieser beiden
+Anwender muss fuer das Programm als Eingabe eine Liste von Worten und eine
+Menge von E-Mail Inhalten bereitstellen.
+  Diese Wortlisten enthalten einzelne Worte, welche der entsprechende
+Anwender in der Spamklassifikation verwendet sehen will.
+  Die Menge von Email Inhalten enth\"alt Inhalte von E-Mails, die gesammelt
+und vorklassifiziert wurden.
+  Der berechnete Klassifikator ist in der Lage, Mails in Spam und kein Spam
+einzuteilen und kann von jedem Anwender ohne die anderen Anwender verwendet
+werden.\\
+  Dadurch ist es beispielsweise m\"oglich, dass Betreiber von E-Mail-Servern
+gemeinsam bessere E-Mail-Klassifikatoren berechnen, als jeder einzelne mit
+seinen vorklassifizierten E-Mails es koennte. Danach kann von jedem
+Anwender der berechnete Klassifikator verwendet werden, um den weiteren 
+E-Mailverkehr zu klassifizieren.\\
+  Es bleibt zu kl\"aren, wie die Wortlisten zusammengef\"uhrt werden. 
+  Dann sollte die preisgegebene Information \"uber die Wortliste minimal
+sein, auch wenn im Folgenden demonstriert werden wird, dass keine
+Geheimhaltung der Wortliste garantiert werden kann.\\
+  Es seien oBdA. zwei Anwender beteiligt und \(W_1\) die Wortliste des
+ersten Anwenders und \(W_2\) die Wortliste des zweiten Anwenders und 
+\(join\) sei eine Operation die die beiden Wortlisten zusammenf\"uhrt.
+  Dann sollten sowohl \(join(W_1, W_2) \subseteq W_1\) als auch
+\(join(W_1, W_2) \subseteq W_2\) gelten.
+  Damit ergibt sich der Schnitt der Wortlisten als einfache Implementierung
+von \(join\).
+
+\section{Garantierter Level der Geheimhaltung}
+  Das Programm garantiert in keiner Weise f\"ur die Geheimhaltung der
+Wortliste. Es ist jedoch dem Anwender bekannt, dass die Wortliste publiziert
+werden wird, sodass es jedem Anwender m\"oglich ist, keine geheimzuhaltenden
+Informationen in die Wortliste zu \"ubernehmen.\\
+  Das Programm garantiert nur daf\"ur, dass ueber die Menge der
+vorklassifizierten E-Mail-Inhalte nur soviele Informationen preisgegeben
+werden, wie aus dem resultierenden Klassifikator entnehmbar sind. Da
+wir den ID3-Algorithmus verwenden, ist dies umformulierbar zu: Es wird 
+potentiell f\"ur alle Worte der Wortliste eines einzelnen Anwenders 
+preisgegeben, wie h\"aufig dieses Wort in der Vereinigung beider 
+Mengen von E-Mail Inhalten vorkommt.
+  Da jedoch jeder Benutzer selbst bestimmen kann, welche Worte in der 
+Wortliste auftauchen, wurde dieser Informationsverlust als akzeptabel 
+eingestuft, da er unvermeidbar ist.\\
+  Die Publizierung der Wortliste ist unvermeidbar, da beide Parteien am
+Ende einen Klassifikator erhalten, den sie alleine benutzen.
+Das bedeutet, beide Parteien haben am Ende vollst\"andige Informationen
+\"uber den Klassifikator.
+  In unserem Fall wird ein Entscheidungsbaum berechnet. 
+  Das bedeutet insbesondere, dass die Attribute des Baumes jedem Anwender
+vollst\"andig bekannt sind.
+  Da die Attribute des Baumes aus der Wortliste jedes Anwenders berechnet
+werden, muss somit damit gerechnet werden, dass die vollst\"andige
+Wortliste der Benutzer preisgegeben wird.\\
+  Der Informationsverlust durch den Klassifikator kann ebenfalls nicht 
+weiter reduziert werden.
+  Es ist so, dass in der Lernphase eines Klassifikators Informationen aus
+den Trainingsdaten des Klassifikators in den Klassifikator einkodiert
+werden.
+  Dies ist notwendig, damit der Klassifikator im folgenden ohne die
+Trainingsmenge weiterhin klassifizieren kann.
+  Damit und aus dem Fakt, dass jeder Anwender den Klassifikator alleine
+vollst\"andig verwenden k\"onnen muss, folgt, dass jeder Informationen
+\"uber die Gesamtmenge aller E-Mails enthalten wird, da dies durch die 
+Natur eines Klassifikators und die vollst\"andigen Informationen \"uber
+den Klassifikator impliziert wird.
+\end{document}
