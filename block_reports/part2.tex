@@ -2,10 +2,11 @@
 
 \begin{document}
 
-\section{Sicherheit im ID3$_{\delta}$}
-Die Sicherheit aller Bestandteile des Algotithmus' in dem Sinne, dass man über die Datenbank des Anderen nicht
-mehr erf\"ahrt als der Baum preisgibt, ist im Paper bewiesen. Damit bleibt nur noch zu kl\"aren
-wie die Attribute gefunden werden.
+\section{Sicherheit im \(ID3_\delta\)
+Die Sicherheit aller Bestandteile des Algorithmus' in dem Sinne, dass man \"uber
+die Datenbank des anderen Anwenders nicht mehr erf\"ahrt als der Baum preisgibt,
+ist im Paper bewiesen. Damit bleibt nur noch zu kl\"aren wie die Attribute
+gefunden werden.
 
 \section{Finden der Attribute des Baums}
 Es gab 3 Ans\"atze zum Finden der Attribute:
@@ -16,20 +17,29 @@ Es gab 3 Ans\"atze zum Finden der Attribute:
 \end{itemize}
 
 Bei Option 3 ist das Problem dass der andere eine Vorstellung davon
-gewinnt welche Worte in den Nutzmails oft vorkommen, was vielleicht nicht gew\"unscht ist.\\
-Option 2 hat ein \"ahnliches Problem: werden alle Worte des Buchs genutzt so sind das
-vermutlich auhc alle Worte in den Mails. Was analog zum 2. Fall bedeutet dass man evtl ungewollt
-Informationen preisgibt die man lieber für sich behalten h\"atte.\\
-Bei Option 1 gibt man auch Informationen frei, aber nur solte die man auch rausgeben m\"ochte.\\
-Einen Informationsgewinn des Anderen kann man nicht verhindern, da dieser alle Worte kennen muss
-um das nächste Attribut für den Baum zu bestimmen und daher acuh ne Vorstellung bekommen kann welche
-Attribute die Mails gut klassifizieren.\\
-Generell gilt dass bei jedem Attribut das gew\"ahlt wird der andere Informationen
-über den Inhalt der Mails gewinnt-n\"amlich dass mit hoher Wahrscheinlichkeit das Wort für den anderen
-(auch) wichtig ist. Also k\"onnen wir nur vermeiden dass ungewollt Informationen weitergegeben werden.\\
-Wir definieren privat in dem Sinne dass jeder selbst entscheiden kann welche Informationen weitergegeben werden. Das
-fordert-verglichen mit dem Paper-weniger, sodass die Sicherheit des Id3$_\delta$ nicht neu bewiesen werden muss.\\
-Option 1 erfüllt diese Bedingung; wir gehen im Folgenden davon aus dass beide eine Wortliste aufstellen.
+gewinnt, welche Worte in den Nutzmails oft vorkommen, was vielleicht
+nicht gew\"unscht ist.\\
+Option 2 hat ein \"ahnliches Problem: werden alle Worte des Buchs genutzt,
+so sind das vermutlich auch alle Worte in den Mails. 
+Was analog zum 2. Fall bedeutet dass man evtl ungewollt Informationen preisgibt
+die man lieber f\"ur sich behalten h\"atte.\\
+Bei Option 1 gibt man auch Informationen frei, aber nur solte die man auch
+rausgeben m\"ochte.\\
+Einen Informationsgewinn des Anderen kann man nicht verhindern, da dieser alle 
+Worte kennen muss um das n\"achste Attribut für den Baum zu bestimmen und daher
+auch eine Vorstellung bekommen kann welche Attribute die Mails gut
+klassifizieren.\\
+Generell gilt dass bei jedem Attribut das gew\"ahlt wird der andere
+Informationen \"uber den Inhalt der Mails gewinnt - n\"amlich dass mit hoher
+Wahrscheinlichkeit das Wort für den anderen (auch) wichtig ist. 
+Also k\"onnen wir nur vermeiden dass ungewollt Informationen weitergegeben 
+werden.\\
+Wir definieren privat in dem Sinne dass jeder selbst entscheiden kann welche
+Informationen weitergegeben werden. 
+Das fordert - verglichen mit dem Paper - weniger, sodass die Sicherheit des 
+\(Id3_\delta\) nicht neu bewiesen werden muss.\\
+Option 1 erf\"ullt diese Bedingung; wir gehen im Folgenden davon aus dass
+beide eine Wortliste aufstellen.
 
 \section{Finden der gemeinsamen Wortliste}
   Es bleibt zu kl\"aren, wie die Wortlisten zusammengef\"uhrt werden. 
