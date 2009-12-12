@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 
-\title{L\\"osung des Lernproblems}
+\title{L\"osung des Lernproblems}
 
 \begin{document}
 
@@ -25,15 +25,15 @@ weiter untersucht werden m\"ussen:
 \begin{itemize}
  \item Yaos Protokoll, angewendet f\"ur die maximale Summe, Gleichheit und 
    die Maximum-Gain-Bestimmung
- \item das 'x*ln(x)'-Protokoll
+ \item das `\(x \cdot \ln x\)'-Protokoll
 \end{itemize}
 
 \section{Spam-Klassifikation des ID3-Algorithmus}
 Um mit dem ID3-Algorithmus Spam zu klassifizieren, ist es notwendig, Attribute
 zu finden und mit diesen Attributen dann einen Entscheidungsbaum mit dem
-Ergebnissen ,,Spam'' und ,,kein Spam'' zu konstruieren.
+Ergebnissen,,Spam'' und,,kein Spam'' zu konstruieren.
 
-Ausgehend von ,,Learning Spam'' Ergeben sich unter anderem folgende Features:
+Ausgehend von,,Learning Spam'' Ergeben sich unter anderem folgende Features:
 \begin{enumerate}
 \item Anzahl Vorkommnisse einzelner W\"orter hardkodiert: Diese Variante ist auf
    jeden Fall einfach zu implementieren, hat jedoch das Problem, dass sie
@@ -42,9 +42,9 @@ Ausgehend von ,,Learning Spam'' Ergeben sich unter anderem folgende Features:
 \item Verwendung aller W\"orter, die im Mail-Text vorkommen (nach einer Reduktion
    des Nachrichteninhaltes um F\"ullw\"orter): Dies sollte nicht signifikant
    komplizierter zu implementieren sein wie Variante 1 und liefert laut
-   ,,Learning Spam'' relativ gute Ergebnisse.
+,,Learning Spam'' relativ gute Ergebnisse.
 \item Zusammenfassung \"ahnlicher W\"orter: Variante 2 hatte das Problem, dass in
-   einer Email nur wenige dieser ,,high-gain''-W\"orter vorkommen, sodass die
+   einer Email nur wenige dieser,,high-gain''-W\"orter vorkommen, sodass die
    resultierenden Trainingsvektoren sehr leer waren. Um das zu umgehen, wurden
    W\"orter anhand von Bedeutungen zusammengefasst.
 \end{enumerate}
@@ -59,27 +59,27 @@ In einer zweiten Ueberlegung ergibt sich jedoch, dass Variante 2 unter den
 Apekten der privaten Berechnung problematisch ist: Man nehme einfach mal an,
 dass einer der beiden Admins in einer Forschungsabteilung arbeitet, und es
 werden mehrere wichtige Stichpunkte geheimer Forschungsergebnisse als
-high-gain-Worte erkannt, die Mails sofort als 'kein Spam' klassifizieren. Daher
+high-gain-Worte erkannt, die Mails sofort als `kein Spam' klassifizieren. Daher
 denken wir, es sollte f\"ur eine erste Implementierung der Arbeit ein einfaches
 Z\"ahlen der Vorkomnisse von Worten ausreichen, wobei die Menge der interresanten 
 Worte beispielsweise durch eine Konfigurationsdatei eingegeben werden kann.
 Damit muss jedoch zuvorderst noch ein sicherer Algorithmus gefunden werden, der
 nachpr\"uft, dass beide Benutzer die gleiche Wortliste verwenden. Es verbleibt
-zu entscheiden, was passiert. wenn diese Wortliste nicht gleich sind. Wir denken
+zu entscheiden, was passiert, wenn diese Wortliste nicht gleich sind. Wir denken
 jedoch, dass in diesem Fall der Vorgang abgebrochen werden sollte, da zwei
 ehrliche Benutzer sich vorher auf die gleiche Wortliste einigen und dann die
 gleiche Wortliste verwenden und deswegen Unterschiede in der Wortliste auf einen
 unehrlichen Anwender hindeuten.
 
-\subsection{Behandlung des kontinuierlichen Attributes ,,Wortanzahl''}
+\subsection{Behandlung des kontinuierlichen Attributes,,Wortanzahl''}
 Ein relativ einfacher Weg, kontinuierliche Attribute zu diskretisieren ist eine
 einfache Fuzzifizierung. Wir schlage deswegen vor, dass die Anzahl Vorkommnisse
 eines Wortes durch die Gesamtanzahl Worte dividiert wird, und dann folgende
 Abbildung verwendet wird:
 \begin{itemize}
- \item Falls dieser Wert $<$ \em{s} ist, ist der Attributwert f\"ur das Wort W ,,selten''
- \item Falls dieser Wert $>$ \em{h} ist, ist der Attributwert f\"ur das Wort W ,,h\"aufig''
- \item sonst ist der Attributwert f\"ur das Wort W ,,normal''
+ \item Falls dieser Wert \(<\) \em{s} ist, ist der Attributwert f\"ur das Wort W,,selten''
+ \item Falls dieser Wert \(>\) \em{h} ist, ist der Attributwert f\"ur das Wort W,,h\"aufig''
+ \item sonst ist der Attributwert f\"ur das Wort W,,normal''
 \end{itemize}
 Die Schwellwerte \em{s} und \em{h} m\"ussen dann noch festgelegt werden und
 sollten ebenfalls \"uber eine Konfigurationsdatei festlegbar sein.
@@ -93,7 +93,7 @@ der Implementierung aufbereitet aufzuschreiben:
        Verwendet wird (vmtl ebenfalls ueber Yaos Protokoll)
  \item Yaos Protokoll, angewendet f\"ur die maximale Summe, Gleichheit und 
    die Maximum-Gain-Bestimmung
- \item das 'x*ln(x)'-Protokoll
+ \item das `\(x \cdot \ln (x)\)'-Protokoll
 \end{itemize}
 
 \section{Referenzen}
