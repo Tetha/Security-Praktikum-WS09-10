@@ -1,0 +1,95 @@
+Hallo ihr zwei,
+
+damit das fuer den naechsten Block nicht wieder so eine Hau-Ruck-Aktion
+am Wochenende vorher wird, denke ich, sollten wir uns bereits jetzt grob
+klar werden, wie wir in den letzten 5 Wochen verfahren. Insbesondere denke
+ich, sollten wir uns klar darueber werden, welche Schritte nun noch folgen
+muessen.
+
+Was ich aktuell so sehe ist die formale Absicherung unserer Arbeit dadurch
+gegeben, dass wir uns stark an das Paper halten. Damit muesste die formale
+Verifikation des Entwurfes relativ knapp abgehandelt werden koennen, wenn
+sie denn ueberhaupt noch notwendig ist. Die Implementierung steht dann als
+einziger wichtiger Schritt noch aus.
+
+Fuer die Implementierung bestehen, was ich aktuell so sehe, folgende wichtige
+Fragen:
+ (oo) Welche kryptographischen Primitiven brauchen wir ueberhaupt? Wodrauf bauen
+   die verwendeten Algorithmen und Protokolle auf?
+ (oi) Wo kriegen wir diese kryptographischen Primitiven in einer Implementierung
+   her? Gibt es z.BLibraries, die Yaos Protokoll direkt anbieten und wir 
+   koennen das direkt benutzen, oder muessen wir im anderen Extrem uns mit
+   Sockets hinsetzen und alles durch Bitschieben selber implementieren?
+ (io) Wie wird der Anwender die Applikation verwenden? Was wird er tun, was
+   passiert wann wie, wie ist die Architektur, usw?
+ (ii) Wie setzen wir das ganze dann um?
+
+Fuer Punkt (oo) ist es notwendig, die verwendeten Protokolle zu untersuchen und
+zu verstehen. Dann kann man sie schrittweise dekonstruieren, um eine Uebersicht
+zu erhalten, welche kryptographischen Primitive wir benoetigen. Ich wuerde
+mir fuer jeden Algorithmus am Ende dieser Phase halt so eine Uebersicht
+wuenschen:
+
+(Muenzwurf uebers Telefon)
+ -> (Bit Commitment)
+     -> (Kryptographischer Zufallszahlengenerator) & (Bituebertragung)
+     -> (Oblivious Transfer)
+     -> (One-Way Hashfunktionen)
+
+Dadurch kann man dann relativ einfach feststellen, was wir brauchen und 
+Kryptolibraries evaluieren, wie gut sie zu unseren Anforderungen passen, um
+dann eine gute Auszuwaehlen. Ausserdem wird so eine Uebersicht dann das
+Design wohl wesentlich vereinfachen.
+Falls fuer die Implementierung eines Algorithmus' noch mehr getan werden muss,
+sollte das auch hier in dieser Phase verstanden und geloest werden (Tim hatte
+da ja was mit Yaos Protokoll).
+
+Punkt (oi) ist dann eben das, was im Moment auch im Softwareprojekt passiert:
+Es werden Bibliotheken fuer solche kryptographischen Primitive gesucht,
+untersucht und schlussendlich eine gute Bibliothek auswaehlen. Gut bedeutet
+dabei eben, dass sie unsere Anforderungen auf moeglichst hohem Level 
+erfuellen soll und gut verwendbar ist.
+
+Punkt (io) ist dann ein klassischer Fall der Softwareentwicklung, sobald
+wir Punkt (oi) haben, denn wir muessen dann die einzelnen Bausteine aus
+Punkt (oo) und (oi) zusammenkleben und ein halbwegs sinniges Userinterface
+dadraufbauen. (Dabei denke ich, reicht irgendein Konsolen-Interface mehr als
+aus ;) ).
+Ich denke, wir sollten uns dann, wenn Punkte (oo) und (oi) geklaert sind, 
+einen Nachmittag oder zwei treffen und Usecases und Requirements
+auskluegeln, die man dann in einer CRC-Session in Klassen schiebt. Das
+ist zwar strukturiertes Vorgehen und eigentlich ekelig, aber es zahlt
+sich schlussendlich doch aus.
+
+Zu Punkt (ii) denke ich, dass wir wenig genug Menschen sind, dass man hier
+nicht viel Overhead hat. Wenn das Design steht, wird irgendwo ja stehen,
+welche Klasse was wo wie zu tun hat, und dann nimmt man sich einfach eine
+Klasse, markiert die und setzt das um. Ich denke weiterhin, dass es sich 
+wieder auszahlen wird, wenn man testgetrieben dadrangeht, weil dann die 
+Debug-Hoelle einfach kleiner ist (und man muss sich aus dem Softwareprojekt
+nicht erst noch umgewoehnen ;) ). Ansonsten denke ich, kann man hier
+die Standardtools auffahren, maven, git, Junit4, hamcrest, Easymock und
+ab dafuer.
+
+Damit ergeben sich als Aufgaben eben:
+ - Yaos Protokoll auf Maximale Summe anwendet
+ - Yaos Protokoll auf Maximum Gain anwendet
+ - Yaos Protokoll auf Schnittmenge anwendet
+ - das x*ln(x)-Protokoll
+ - Kryptolibraries finden
+ - Kryptolibraries evaluieren
+ - Treffen fuer Requirements und use cases
+ - Treffen fuer CRC-Karten
+ - Maven einrichten
+ - Fuer jede CRC-Karte: umsetzen
+
+Etwas doof ist im Moment, dass da Weihnachten vor der Tuer steht, da ich
+ansonsten fuer jeden dieser Schritte ca eine Woche ansetzen wollte. Das klappt
+so nur leider nicht so gut. :)
+
+Es stellt sich nun also die Frage: Wollen wir diese Woche ranklotzen, oder wie
+machen wir das zeitlich? Und, stimmt ihr mir ueberhaupt zu dem groben Plan zu
+und was uebersehe ich? ;)
+
+MfG,
+Harald.
