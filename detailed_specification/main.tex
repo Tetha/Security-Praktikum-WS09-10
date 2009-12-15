@@ -1,5 +1,68 @@
 \documentclass{article}
 
+\usepackage{amsthm}
+
+\newcommand{\defined}[1]{{\bf #1}}
+\newcommand{\var}[1]{{\em #1}}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Bemerkung}
 \begin{document}
-cake
+
+\begin{definition}
+Anwender, aktiver Anwender\\
+Die Benutzer des Programmes werden im folgenden als \defined{Anwender} bezeichnet.
+  Im Folgendenden bezeichnen \var{A}, \var{B} zwei Anwender, die das Programm 
+verwenden.\\
+  Aus technischen Gr\"unden wird einer der beiden Anwender als 
+\defined{aktiver Anwender} bezeichnet und der andere der beiden Anwender als
+\defined{passiver Anwender}. Der aktive Anwender ist in der Lage, den Ablauf
+eines Protokolles zu initiieren, w\"ahrend der passive Anwender auf die 
+Initiierung eines Protokolles durch den aktiven Anwender wartet. Es sei im
+folgenden \var{A} der aktive Anwender und \var{B} der passive Anwender.
+\end{definition}
+
+\begin{definition}
+Wissen, Wissen eines Anwenders, gemeinsames Wissen.\\
+Wenn \var{A} ein Anwender ist, so bezeichnen Ausdr\"ucke der Form 
+\defined{\var{A.x}} f\"ur Variablen \var{x} \defined{Wissen des Anwenders}. 
+Auf das Wissen des Anwenders kann nur der Anwender selbst zugreifen.
+Das Wissen eines Anwenders kann \defined{\var{A.x} = \var{e}} erweitert werden.\\
+Wenn ein Ausdruck \var{e} als \defined{gemeinsames Wissen c} bezeichnet wird, 
+so ist dies \"aquivalent dazu, dass f\"ur alle beteiligten Anwender 
+A \var{A.c} = \var{e} ist.
+\end{definition}
+
+\begin{definition}
+Protokoll.\\
+Wir bezeichnen im Folgenden eine Sequenz von NAchrichtenaustauschen zwischen
+zwei Anwendern als \defined{Protokoll}
+\end{definition}
+
+\begin{definition}
+Zwei-Parteien-Berechnung, private Zwei-Parteien-Berechnung, Eingabe, Ausgabe\\
+Gegeben zwei Anwender \var{A}, \var{B} mit Wissen \var{A.i} und \var{B.i}
+und eine Funktion \var{f}, dann wird ein Protokoll als
+\defined{Zwei-Parteien-Berechnung} von Wissen j bezeichnet, wenn nach 
+Ausf\"uhrung des Protokolls  \(A.j = f(A.i, B.i) \wedge B.j = f(A.i, B.i) \)
+gilt. Wir bezeichnen i als \defined{Eingabe} des Protokolles der Anwender
+und j als \defined{Ausgabe} des Protokolles.\\
+Wenn ausserdem gilt, dass \var{A} nur \var{A.j} als Wissen ueber \var{B.i}
+erh\"alt und dass \var{B} nur \var{B.j} als Wissen ueber \var{A.i} erh\"alt,
+dann bezeichnen wir das Zwei-Parteien-Protokoll als \defined{privates
+Zwei-Parteien-Protokoll}.
+\end{definition}
+
+\begin{remark}
+Wenn ein Zwei-Parteien-Protokoll eine Funktion \var{f} berechnen soll,
+die Eingaben \var{X} zus\"atzlich zum Wissen der Benutzer erfordert, 
+kann dies durch Definition einer Funktion \var{f'(i, j) = f(x, i, j)}
+erreicht werden. Dadurch k\"onnen beispielsweise gemeinsames Wissen oder
+zuvor festzulegende Parameter genutzt werden. Damit ist die Definition 4
+ausreichend, um beliebige Funktionen zu beschreiben.
+\end{remark}
+
 \end{document}
