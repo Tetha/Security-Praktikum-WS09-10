@@ -167,4 +167,71 @@ Abbildung ~\ref{fig:vision}.\\
 \label{fig:vision}
 \end{figure}
 
+\subsection{Erstellung des Klassifikators}
+\subsubsection{Verwenden eines nicht verteilten Klassifikators}
+Um das Vorgehen zu verstehen und der Vollst\"andigkeit halber wird die
+M\"oglichkeit aufgef\"uhrt, den Klassifikator nicht verteilt
+zu berechnen. Dazu wird das vollst\"andige Wissen ausgetauscht und 
+dann lokal der Klassifikator berechnet. Dies ist in Abbildung 
+~\ref{fig:local_computation_phase_diagram} dargestellt. Es ist deutlich
+zu erkennen, dass die Eingabe der Anwendung die Klassifikation und die E-Mails
+des Anwenders sind und dass die Ausgabe des Protokolls ein Klassifikator ist.
+Wenn beide Anwender sich an das Protokoll halten, ist dies sogar der gleiche
+Klassifikator f\"ur beide, sodass die Vision durch diese Implementierung
+erf\"ullt wird.
+
+\subsubsection{Bewertung}
+Es gibt in dieser Bewertung keinerlei Geheimhaltung, da alle Eingaben der 
+Anwender an alle anderen Anwender \"ubertragen werden. \\
+Die Implementierung dieses Szenarios ist einfach, da Implementierungen f\"ur
+viele Lernverfahren zu finden sind und die initiale \"Ubertragung einfach
+zu implementieren ist. 
+\begin{figure}
+\begin{tikzpicture}
+[>=stealth',node distance=1cm]
+\node (alice) at (0,0) {Alice};
+\node (bob) at (8,0) {Bob};
+\draw[dashed] (4,0) -- (4, -5);
+\node[wissen] (emails alice) [below right of=alice] {E-Mail Inhalte \(E_A\)};
+\node[wissen] (emails bob) [below right of=bob] {E-Mail Inhalte \(E_B\)};
+\node[wissen] (klassifizierung von alices mails) [below of=emails alice,xshift=0.3cm] {Klassifikation von E-Mails \(K_A\)};
+\node[wissen] (klassifizierung von bobs mails) [below of=emails bob,xshift=-0.3cm] {Klassifikation von E-Mails \(K_B\)};
+\node[wissen] (emails alice bei bob) [below of=klassifizierung von bobs mails] {E-Mail Inhalte \(E_A\) };
+\node[wissen] (klassifizierung von alices mails bei bob) [below of=emails alice bei bob] {Klassifikation von E-Mails \(K_A\)};
+\node[wissen] (emails bob bei alice) [below of=klassifizierung von alices mails] {E-Mail Inhalte \(E_B\) };
+\node[wissen] (klassifizierung von bobs mails bei alice)  [below of=emails bob bei alice] {Klassifikation von E-Mails \(K_B\)};
+\node[wissen] (alle mails bei alice) [below of=klassifizierung von bobs mails bei alice] {Alle E-Mails};
+\node[wissen] (alle mails bei bob) [below of=klassifizierung von alices mails bei bob] {Alle E-Mails};
+\node[wissen] (klassifizierung aller mails bei alice) [below of=alle mails bei alice] {Klassifikation aller E-Mails};
+\node[wissen] (klassifizierung aller mails bei bob) [below of=alle mails bei bob] {Klassifikation aller E-Mails};
+\node[phase] (alice lokal) [below of=klassifizierung aller mails bei alice] {Lokales Lernen};
+\node[phase] (bob lokal) [below of=klassifizierung aller mails bei bob] {Lokales Lernen};
+\node[wissen] (klassifikator alice) [below of=alice lokal] {Klassifikator \(K\)};
+\node[wissen] (klassifikator bob) [below of=bob lokal] {Klassifikator \(K\)};
+
+\draw[->] (emails alice) to (emails alice bei bob);
+\draw[->] (emails bob) to (emails bob bei alice);
+\draw[->] (klassifizierung von alices mails) to (klassifizierung von alices mails bei bob);
+\draw[->] (klassifizierung von bobs mails) to (klassifizierung von bobs mails bei alice);
+\draw[->] (emails alice.west) .. controls (-3,0) and (-3,-5) ..(alle mails bei alice.west);
+\draw[->] (emails bob bei alice.west) .. controls(-3, -3) and (-3, -5) .. (alle mails bei alice.west);
+\draw[->] (emails bob.west) .. controls (5, 0) and (5, -5) .. (alle mails bei bob.west);
+\draw[->] (emails alice bei bob.west) .. controls(5, -3) and (5, -5) .. (alle mails bei bob.west);
+\draw[->] (klassifizierung von bobs mails bei alice) to [bend left=90] (klassifizierung aller mails bei alice);
+\draw[->] (klassifizierung von alices mails) to [bend left=90] (klassifizierung aller mails bei alice);
+\draw[->] (klassifizierung von bobs mails.east) to [bend left=90] (klassifizierung aller mails bei bob.east);
+\draw[->] (klassifizierung von alices mails bei bob.east) to [bend left=90] (klassifizierung aller mails bei bob.east);
+
+\draw[->] (klassifizierung aller mails bei alice) to (alice lokal);
+\draw[->] (alle mails bei alice) .. controls (-3, -5) and (-3, -6) .. (alice lokal);
+
+\draw[->] (klassifizierung aller mails bei bob) to (bob lokal);
+\draw[->] (alle mails bei bob) .. controls (5, -5) and (5, -6) .. (bob lokal);
+
+\draw[->] (alice lokal) to (klassifikator alice);
+\draw[->] (bob lokal) to (klassifikator bob);
+\end{tikzpicture}
+\caption{Lokale Berechnung der Klassifikatoren}
+\label{fig:local_computation_phase_diagram}
+\end{figure}
 \end{document}
