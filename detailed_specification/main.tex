@@ -3,6 +3,11 @@
 \usepackage{amsthm}
 \usepackage{tikz}
 \usetikzlibrary{shapes,positioning,arrows}
+\tikzset {
+wissen/.style={shape=rectangle,draw},
+phase/.style={shape=ellipse,draw,fill=white}
+}
+
 \newcommand{\defined}[1]{{\bf #1}}
 \newcommand{\var}[1]{{\em #1}}
 
@@ -99,9 +104,7 @@ Linie zu einem anderen Wissens-Rechteck. (vgl auch Figure ~\ref{fig:phaseExample
 
 \begin{figure}
 \begin{tikzpicture}
-[>=stealth',
- wissen/.style={shape=rectangle,draw},
- phase/.style={shape=ellipse,draw,fill=white}]
+[>=stealth']
 \draw (0, 0) node {Alice};
 \draw (8, 0) node {Bob};
 \draw[dashed] (4, 0) -- (4, -10);
@@ -137,5 +140,31 @@ vorklassifizierten E-Mails und kenne einen Anwender, der ebenfalls eine Menge
 von vorklassifizierten E-Mails hat und will gemeinsam mit diesem einen 
 Klassifikator fuer Spam und Nicht-Spam berechnen. Dabei will ich jedoch, dass
 er \"uber meine E-Mails nur soviel lernt, wie ich will und wie der Klassifikator
-preisgibt.''.
+preisgibt.''. Wenn wir diese Vision als Phasendiagramm formulieren, ergibt sich 
+Abbildung ~\ref{fig:vision}.\\
+\begin{figure}
+\begin{tikzpicture}
+[>=stealth']
+\node (alice) at (0, 0) {Alice};
+\node (bob) at (8, 0) {Bob};
+\draw[dashed] (4, 0) -- (4, -5);
+\node[wissen] (emails alice) [below right of=alice] {E-Mail Inhalte \(E_A\)};
+\node[wissen] (emails bob) [below right of=bob] {E-Mail Inhalte \(E_B\)};
+\node[wissen] (klassifizierung von alices mails) [below of=emails alice] {Klassifikation von E-Mails \(K_A\)};
+\node[wissen] (klassifizierung von bobs mails) [below of=emails bob] {Klassifikation von E-Mails \(K_B\)};
+\node[phase] (anwendung) [below right=of klassifizierung von alices mails,xshift=-2cm] {Ausf\"uhren der Anwendung};
+\node[wissen] (klassifikator alice) [below left of=anwendung,xshift=-3cm,yshift=-1cm] {Klassifikator \(K\)};
+\node[wissen] (klassifikator bob) [below right of=anwendung,xshift=3cm,yshift=-1cm] {Klassifikator \(K\)};
+
+\draw[->] (emails alice.east) to [bend left=45] (anwendung);
+\draw[->] (klassifizierung von alices mails) to (anwendung);
+\draw[->] (emails bob.west) to [bend right=45] (anwendung);
+\draw[->] (klassifizierung von bobs mails) to (anwendung);
+\draw[->] (anwendung) to (klassifikator alice);
+\draw[->] (anwendung) to (klassifikator bob);
+\end{tikzpicture}
+\caption{Phasendiagramm der Anwendung: Beide haben Inhalte und Vorklassifizierungen und wollen einen Klassifikator}
+\label{fig:vision}
+\end{figure}
+
 \end{document}
