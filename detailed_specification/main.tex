@@ -1,5 +1,6 @@
 \documentclass{article}
 
+\usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{tikz}
 \usetikzlibrary{shapes,positioning,arrows}
@@ -17,6 +18,7 @@ phase/.style={shape=ellipse,draw,fill=white}
 \theoremstyle{remark}
 \newtheorem{remark}{Bemerkung}
 \begin{document}
+\tableofcontents
 
 \section{Grundlagen}
 \begin{definition}
@@ -178,10 +180,8 @@ zu erkennen, dass die Eingabe der Anwendung die Klassifikation und die E-Mails
 des Anwenders sind und dass die Ausgabe des Protokolls ein Klassifikator ist.
 Wenn beide Anwender sich an das Protokoll halten, ist dies sogar der gleiche
 Klassifikator f\"ur beide, sodass die Vision durch diese Implementierung
-erf\"ullt wird.
-
-\subsubsection{Bewertung}
-Es gibt in dieser Bewertung keinerlei Geheimhaltung, da alle Eingaben der 
+erf\"ullt wird.\\
+Es gibt in dieser Vorgehensweise keinerlei Geheimhaltung, da alle Eingaben der 
 Anwender an alle anderen Anwender \"ubertragen werden. \\
 Die Implementierung dieses Szenarios ist einfach, da Implementierungen f\"ur
 viele Lernverfahren zu finden sind und die initiale \"Ubertragung einfach
@@ -191,7 +191,7 @@ zu implementieren ist.
 [>=stealth',node distance=1cm]
 \node (alice) at (0,0) {Alice};
 \node (bob) at (8,0) {Bob};
-\draw[dashed] (4,0) -- (4, -5);
+\draw[dashed] (4.6,0) -- (4.6, -8);
 \node[wissen] (emails alice) [below right of=alice] {E-Mail Inhalte \(E_A\)};
 \node[wissen] (emails bob) [below right of=bob] {E-Mail Inhalte \(E_B\)};
 \node[wissen] (klassifizierung von alices mails) [below of=emails alice,xshift=0.3cm] {Klassifikation von E-Mails \(K_A\)};
@@ -234,4 +234,169 @@ zu implementieren ist.
 \caption{Lokale Berechnung der Klassifikatoren}
 \label{fig:local_computation_phase_diagram}
 \end{figure}
+
+\subsubsection{Verwenden von Entscheidungsb\"aumen}
+\begin{definition} Entscheidungsbaum\\
+Generell lassen sich Entscheidungsb\"aume wie folgt definieren: Es gibt eine
+Menge \(A\) von diskreten Attributen \({A_1, A_2, \dots, A_n}\) mit Werten
+\(values(A_i) = {v^1_i, v^2_i, \dots, v^w_i}\) und es gibt zu erkennde
+Klassen \(K = {K_1, K_2, \dots, K_k}\). Es bezeichne im Folgenden desweiteren
+\(Values = \bigcup_{A_i} values(A_i)\) die Menge aller m\"oglichen 
+Attributwerte (dies vereinfacht einige Definitionen, auch wenn 
+einige Typen etwas ungenauer werden).
+Dann kann die Menge \(T\) von Entscheidungsb\"aumen induktiv definiert werden 
+als:
+\( T = (A \times Values \mapsto T) \cup K\)\\
+Ein Entscheidungsbaum klassifiziert eine Abbildung der Attribute auf Werte.
+Dieser klassifizierungsvorgang ist induktiv definiert. Wenn der
+zu klassifizierende Kandidat mit \(s : A \mapsto Values\)
+bezeichnet wird, dann ergibt sich als Auswertungsfunktion
+\(evaluate : (A \mapsto Values) \times T \mapsto K\):
+
+\begin{align}
+evaluate(s, (A_i, f)) &=& evaluate(s, f(s(A_i)))\\
+evaluate(s, K_i) &=& K_i
+\end{align}
+\end{definition}
+
+Verbal beschrieben besteht ein Entscheidungsbaum also aus Bl\"attern,
+die aussagen, dass alle zu klassifizierenden Objekte, die dieses Blatt 
+,,erreichen'' zu dieser bestimmten Klasse geh\"oren und \"Asten, 
+die mit einem Attribut annotiert sind und zu jedem m\"oglichen 
+Wert des Attributes einen Unterbaum haben. Bei der Klassifizierung 
+werden dann die \"Aste entsprechend der Attributwerte des zu 
+klassifizierenden Objektes traversiert, bis ein Blatt erreicht 
+wird und die Klassifizierung abgeschlossen ist.\\
+Wenn wir beispielsweise annehmen, dass wir uns bei der Spamerkennung dadrauf
+geeinigt haben, dass wir als Attribute verwenden, ob die Worte "Foo" bzw
+"Bar" oft oder selten vorkommen, dann w\"urden die
+E-Mail-Datenbanken transformiert werden zu einem Vektor von Abbildungen
+von Foo und Bar auf oft oder selten:\\
+\begin{tabular}{c c}
+Vorkommnisse Foo & Vorkommnisse Bar \\
+Oft & Oft \\
+Selten & Oft \\
+Selten & Selten \\
+\end{tabular}
+Ein m\"oglicher Entscheidungsbaum ist in Abbildung ~\ref{fig:decision_tree_example} 
+dargestellt, der die Mails in Spam und Nicht Spam klassifiziert. Es ist hier ein
+Baum aufgezeichnet, der prinzipiell nur Mails als ,,Nicht Spam'' klassifiziert,
+wenn sie oft Foo und Bar enthalten. In der Grafik ist zudem illustriert, welche 
+Knoten und damit welche Kanten bei der Auswertung betrachtet wurden.
+\begin{figure}
+\begin{tikzpicture}
+[branch/.style={shape=rectangle,draw},
+ leaf/.style={shape=ellipse,draw},>=stealth']
+\node[branch] (foo) [color=red,dashed] {Vorkommnisse von Foo};
+\node[leaf] (spam1) [below left=of foo] {Spam};
+\node[branch] (bar) [color=red,dashed] [below right=of foo] {Vorkommnisse von Bar};
+\node[leaf] (spam2) [below left=of bar] {Spam};
+\node[leaf] (spam3) [color=red,dashed,below right=of bar] {kein Spam};
+
+\draw[->] (foo) to node[above]{Selten} (spam1);
+\draw[->,dashed,color=red] (foo) to node[above] {Oft} (bar);
+\draw[->] (bar) to node[above] {Selten} (spam2);
+\draw[->,dashed,color=red] (bar) to node[above] {Oft} (spam3);
+\end{tikzpicture}
+\caption{M\"oglicher Entscheidungsbaum, Klassifizierung von 
+,,Foo \(\rightarrow\) Oft, Bar \(\rightarrow\) Oft''}
+\label{fig:decision_tree_example}
+\end{figure}
+
+Ausgehend von dem ausgeteilten Paper gibt es ein privates 2 Parteien Protokoll,
+welches ein Lernverfahren, den ID3-Algorithmus, durchf\"uhrt. Der ID3-Algorithmus
+ist ein heuristisches Verfahren, um aus einer Menge vorklassifizierte Zuordnungen
+einen Entscheidungsbaum zu produzieren. Damit kann man das in Abbildung ~\ref{fig:phase:id3}
+gezeigte Phasendiagramm aufstellen. Es muss somit festgelegt werden, wie die 
+Attribute entstehen und wie die E-Mails diskretisiert werden m\"ussen, um dann den
+ID3-Algorithmus verteilt und privat auszuf\"uhren und somit den Klassifikator zu
+berechnen.
+\(<TODO| ID3 zusammenfassen, verteilung erlaeutern?>\)
+\(<TODO| Bewertung>\)
+\begin{figure}
+\begin{tikzpicture}
+[>=stealth',node distance=1cm]
+\node (alice) at (0,0) {Alice};
+\node (bob) at (8,0) {Bob};
+\draw[dashed] (4.6,0) -- (4.6, -8);
+\node[wissen] (alice attribute) [below of=alice] {Attribute \(A\)};
+\node[wissen] (alice emails) [below of=alice attribute] {Diskretisierte E-Mails \(E'_B\)};
+\node[wissen] (bob attribute) [below of=bob] {Attribute \(A\)};
+\node[wissen] (bob emails) [below of=bob attribute] {Diskretisierte E-Mails \(E'_B\)};
+\node[phase] (ID3) [below left of=bob emails,xshift=-2.6cm] {ID3};
+\node[wissen] (alice klassifikator) [below left=of ID3] {Klassifikator \(K\)};
+\node[wissen] (bob klassifikator) [below right=of ID3] {Klassifikator \(K\)};
+
+\draw[->] (alice attribute.east) to [bend left=15] (ID3);
+\draw[->] (bob attribute.west) to [bend right=15] (ID3);
+\draw[->] (alice emails) to (ID3);
+\draw[->] (bob emails) to (ID3);
+\draw[->] (ID3) to (alice klassifikator);
+\draw[->] (ID3) to (bob klassifikator);
+\end{tikzpicture}
+\caption{Phasendiagramm bei Verwendung von Entscheidungsb\"aumen und dem ID3-Algorithmus}
+\label{fig:phase:id3}
+\end{figure}
+
+\subsection{Festlegen der Attribute, Transformieren der E-Mails}
+Da wir keine Attributsvektoren als Eingaben haben, sondern nur Texte ist es
+notwendig, M\"oglichkeiten der Transformation zu untersuchen. 
+
+\subsubsection{Berechnung einer Wahrscheinlichkeit und Diskretisierung}
+Eine gute M\"oglichkeit, derartige Vektoren zu erzeugen ist es, Vorkommnisse
+irgendeiner Form zu z\"ahlen, in Relation mit einer Gesamtanzahl zu setzen und 
+danach dieses Verh\"ahltnis zu diskretisieren. Damit gibt es zwei weitere 
+Unterprobleme: Wie bekommen wir diese Wahrscheinlichkeit, und wie diskretisieren
+wir sie?\\
+Prinzipiell gibt es f\"ur die Diskretisierung zwei grosse Fragen: Wieviele 
+Wertebereiche verwenden wir und wer bestimmt die Schwellwerte zwischen den
+Wertebereichen? Dies ist eine Entscheidung, die der Kunde treffen muss. Es muss
+hier bedacht werden, dass zuwenige Wertebereiche sehr grob sind (bei 
+nur einem Wertebereich gibt es nur die Aussage, dass das Attribut betrachtet
+wurde, bei nur zwei Wertebereichen gibt es nur eine binaere Aussage) und dass
+zuviele Wertebereiche Probleme haben zu abstrahieren (Bei
+1024 Wertebereichen abstrahiert man kaum noch von den eigentlichen
+Daten, weil (etwas dramatisiert) fast jeder Datenpunkt seinen 
+eigenen Wertebereich hat. Damit w\"are der Klassifikator dann praktisch
+nur auswendig gelerntes Wissen).\\
+F\"ur das Festlegen der Schwellwerte gibt es mehr Freiraum. Die erste Variante
+besteht darin, {\em den Nutzer die Werte eingeben zu lassen}. Dies erfordert dann
+eine Syncronisierung der Werte beider Anwender, ist dann jedoch maximal
+flexibel, da der Anwender alle M\"oglichkeiten hat, diese Schwellwerte zu 
+bestimmen (neuartige Mustererkennungsalgorithmen, stundenlanges tunen der
+Werte).\\
+Die zweite Variante besteht darin, dass {\em das Programm diese Werte selbst 
+bestimmt}. Eine M\"oglichkeit hierzu besteht darin, das Histogramm der 
+Wahrscheinlichkeitsverteilung zu betrachten und dann die Werte so zu platizeren,
+dass die Integrale in den Teilintervallen m\"oglichst gleich gross sind. Das
+sollte dann die Information der einzelnen diskreten Werte maximieren. Der
+Vorteil hier besteht darin, dass dann die Werte nicht vom Anwender eingegeben
+werden m\"ussen. Der Nachteil besteht darin, dass so keine M\"oglichkeit besteht,
+einen anderen, besseren Algorithmus zu verwenden. (Man beachte auch, dass man
+mit Variante 1 implementieren kann und dann Variante 2 durch Variante 1
+implementiert mitliefern kann).\\
+Fuer die Syncronisierung der Werte kann man praktisch beliebige Funktionen
+verwenden, die zwei Sequenzen von reellen Zahlen auf eine Sequenz reeller
+Zahlen abbildet. Damit ist es etwas aufw\"andig, alle M\"oglichkeiten
+aufzuz\"ahlen. Eine Variante, die sich jedoch anbietet, ist das punktweise
+Arithmetische Mittel zu bilden, da hier die von beiden Nutzern verwendeten
+Schwellwerte zu gleichen Teilen beruecksichtigt werden. Zudem ist die
+Implementierung denkbar einfach, da der punktweise Mittelwert zweier 
+streng monoton steigender Folgen streng monoton steigend ist und somit 
+der punktweise Mittelwert von zwei Vektoren von Hysteresepunkten wieder
+ein Vektor von Hysteresepunkten ist. \\
+F\"ur die Berechnung von Wahrscheinlichkeiten gibt es ebenfalls mehrere
+M\"oglichkeiten. Die erste Klasse von Berechnungen drehen sich alle um 
+die Anzahl der Vorkomnisse von Wortmengen. Es wird hierzu eine Menge von Mengen
+von Strings definiert und f\"ur jede dieser Stringmengen untersucht, welcher
+Prozentsatz der Worte in einer E-Mail in jeder dieser Stringmengen liegt.
+Wenn der Inhalt einer E-Mail beispielsweise "Foo Bar Baz" ist, und die
+Wortmengen \(\{"Foo", "Bar"\}\), \(\{"Bar", "Baz"\}\), \(\{"Baz"\}\), dann sind
+die Vorkommnisse \(\frac{2}{3}, \frac{2}{3}, \frac{1}{3}\). (Dies ist eine
+Generalisierung des vorherigen Ansatzes der Wortliste. Die Wortliste vom
+letzten Mal ist im Endeffekt eine solche Stringmenge, in der alle Mengen
+nur ein einzelnes Element enthalten).
+\(<TODO|Bewertung>\)
+\(<TODO|Phasendiagramm>\)
+
 \end{document}
