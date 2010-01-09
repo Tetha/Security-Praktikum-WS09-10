@@ -35,18 +35,15 @@ folgenden \var{A} der aktive Anwender und \var{B} der passive Anwender.
 \end{definition}
 
 \begin{definition}
-Wissen, Wissen eines Anwenders, gemeinsames Wissen.\\
-Wenn \var{A} ein Anwender ist, so bezeichnen Ausdr\"ucke der Form 
-\defined{\var{A.x}} f\"ur Variablen \var{x} \defined{Wissen des Anwenders}. 
-Auf das Wissen des Anwenders kann nur der Anwender selbst zugreifen.
-Das Wissen eines Anwenders kann \defined{\var{A.x} = \var{e}} erweitert werden.\\
-Wenn ein Ausdruck \var{e} als \defined{gemeinsames Wissen c} bezeichnet wird, 
-so ist dies \"aquivalent dazu, dass f\"ur alle beteiligten Anwender 
-A \var{A.c} = \var{e} ist.
+Wissen, Wissen eines Anwenders, gemeinsames Wissen\\
+Wenn \var{A} ein Anwender ist, so gibt es \defined{Wissen des Anwenders}.
+uf das Wissen des Anwenders kann nur der Anwender selbst zugreifen.
+Wenn ein Ausdruck als \defined{gemeinsames Wissen c} bezeichnet wird, 
+so ist dies \"aquivalent dazu, dass c im Wissen aller Anwender vorkommt.
 \end{definition}
 
 \begin{definition}
-Protokoll.\\
+Protokoll\\
 Wir bezeichnen im Folgenden eine Sequenz von Nachrichtenaustauschen zwischen
 zwei Anwendern als \defined{Protokoll}
 \end{definition}
@@ -150,8 +147,8 @@ Abbildung ~\ref{fig:vision}.\\
 \node (alice) at (0, 0) {Alice};
 \node (bob) at (8, 0) {Bob};
 \draw[dashed] (4, 0) -- (4, -5);
-\node[wissen] (emails alice) [below right of=alice] {E-Mail Inhalte \(E_A\)};
-\node[wissen] (emails bob) [below right of=bob] {E-Mail Inhalte \(E_B\)};
+\node[wissen] (emails alice) [below right of=alice] {E-Mail-Inhalte \(E_A\)};
+\node[wissen] (emails bob) [below right of=bob] {E-Mail-Inhalte \(E_B\)};
 \node[wissen] (klassifizierung von alices mails) [below of=emails alice] {Klassifikation von E-Mails \(K_A\)};
 \node[wissen] (klassifizierung von bobs mails) [below of=emails bob] {Klassifikation von E-Mails \(K_B\)};
 \node[phase] (anwendung) [below right=of klassifizierung von alices mails,xshift=-2cm] {Ausf\"uhren der Anwendung};
@@ -192,8 +189,8 @@ zu implementieren ist.
 \node (alice) at (0,0) {Alice};
 \node (bob) at (8,0) {Bob};
 \draw[dashed] (4.6,0) -- (4.6, -8);
-\node[wissen] (emails alice) [below right of=alice] {E-Mail Inhalte \(E_A\)};
-\node[wissen] (emails bob) [below right of=bob] {E-Mail Inhalte \(E_B\)};
+\node[wissen] (emails alice) [below right of=alice] {E-Mail-Inhalte \(E_A\)};
+\node[wissen] (emails bob) [below right of=bob] {E-Mail-Inhalte \(E_B\)};
 \node[wissen] (klassifizierung von alices mails) [below of=emails alice,xshift=0.3cm] {Klassifikation von E-Mails \(K_A\)};
 \node[wissen] (klassifizierung von bobs mails) [below of=emails bob,xshift=-0.3cm] {Klassifikation von E-Mails \(K_B\)};
 \node[wissen] (emails alice bei bob) [below of=klassifizierung von bobs mails] {E-Mail Inhalte \(E_A\) };
@@ -310,9 +307,53 @@ einen Entscheidungsbaum zu produzieren. Damit kann man das in Abbildung ~\ref{fi
 gezeigte Phasendiagramm aufstellen. Es muss somit festgelegt werden, wie die 
 Attribute entstehen und wie die E-Mails diskretisiert werden m\"ussen, um dann den
 ID3-Algorithmus verteilt und privat auszuf\"uhren und somit den Klassifikator zu
-berechnen.
-\(<TODO| ID3 zusammenfassen, verteilung erlaeutern?>\)
-\(<TODO| Bewertung>\)
+berechnen.\\
+Der ID3-Algorithmus ist ein heuristischer Greedy-Algorithmus. Er nimmt an, dass
+es optimal ist, lokal die Entropie zu minimieren und so den Informationsgewinn
+zu maximieren. \\
+Formal definieren wir f\"ur die Ausgaben \(K_1, K_2, \dots, K_k\) und eine
+Datenmenge D die funktion \(elements(D, K_i)\), welche die Menge von Werten in D
+liefert, die Ausgabe \(K_i\) haben. Analog definieren wir fuer das Attribut
+\(A_i\) mit Werten \(v^1_i, v^2_i, \dots v^w_i\) die Funktion 
+\(elements(D, A_i, v^j_i)\), welche die Elemente von D liefert, die f\"ur das 
+Attribut \(A_i\) den Wert \(v^j_i\) haben. Dann definieren wir die 
+Entropie einer Menge D als\\
+\begin{equation}
+  Entropy(D) := \sum_{K_i} \frac{|elements(D,K_i)|}{|D|} 
+\cdot 
+  \log \frac{|elements(D,K_i)|}{|D|}
+\end{equation}
+Davon ausgehend definieren wir nun die Information, die wir erhalten, wenn wir
+eine Datenmenge D an einem Attribut \(A_i\) aufteilen:
+\begin{equation}
+Gain(D, A_i) :=
+ Entropy(D) - \sum_{v^j_i} Entropy(elements(D, A_i, v^j_i))
+\end{equation}
+
+Danach w\"ahlt der Algorithmus bei der Erzeugung eines Astes durch 
+vollst\"andige Suche das Attribut aus, bei dem \(Gain(D, A_i)\) maximal ist. Die
+einzelnen Partitionen der Datenmenge, gegeben durch die Werte des Attributes,
+werden dann rekursiv behandelt.\\
+Dieser Algorithmus wurde dann verteilt und privat berechnet. Dazu ist es 
+notwendig, \(D = E_A \cup E_B\) zu definieren und die einzelnen
+Schritte des Algorithmus' (alle Ausgaben gleich?
+Maximum Gain?) als private Zwei-Parteien-Protokolle zu implementieren. \\
+Es bleibt zu untersuchen, wieviele Informationen durch den ausgegebenen
+Klassifkator verloren werden. Prinzpiell kann aus dem Klassifikator immer
+nur entnommen werden, dass ein bestimmtes Attribut eine kleinere Entropie hatte
+als andere Attribute. Es ist damit nicht m\"oglich, auszusagen, wie gross diese
+Entropie war, oder um wieviel gr\"osser sie war als die anderen Entropien.
+Anhand der Bl\"atter kann geschlussfolgert werden, dass zu diesem Zeitpunkt
+alle Attribute verbraucht waren (formal: dass die Sequenz der annotierten
+Attribute auf dem Pfad von der Baumwurzel zum Blatt alle Attribute enth\"alt)
+und somit in der dann resultierenden Menge die Annotation des Blattes am
+h\"aufigsten war oder dass nun die Daten ,,einstimmig'' waren. Es ist damit
+nicht offensichtlich, wie \"uber die Attribute hinaus einfach auswertbare
+Informationen preisgegeben werden.\\
+Der berechnete Klassifikator gibt somit nicht auf offensichtliche Weise wichtige
+Informationen preis und laut dem Paper ist das Protokoll ebenfalls privat,
+d.h., das Protokoll gibt nur soviele Informationen preis wie die Ausgabe
+\"uber die Eingabe preisgibt.\\
 \begin{figure}
 \begin{tikzpicture}
 [>=stealth',node distance=1cm]
@@ -396,7 +437,15 @@ die Vorkommnisse \(\frac{2}{3}, \frac{2}{3}, \frac{1}{3}\). (Dies ist eine
 Generalisierung des vorherigen Ansatzes der Wortliste. Die Wortliste vom
 letzten Mal ist im Endeffekt eine solche Stringmenge, in der alle Mengen
 nur ein einzelnes Element enthalten).
-\(<TODO|Bewertung>\)
+\(<TODO|Bewertung>\)\\
 \(<TODO|Phasendiagramm>\)
+
+\subsection{Berechnung der Wortmengen}
+Die einfachste Variante, die Wortmengen zu berechnen ist die {\em statische
+Wortliste}. Hier wird die Wortliste statisch in das Programm einkodiert
+und beide verwenden diese statische Wortliste. Der Vorteil dieser
+Variante ist, dass so keine Syncronisierung der Wortlisten erforderlich ist
+und die preisgegebenen Informationen durch die Attribute des Baumes
+sehr einfach abzusch\"atzen sind, da man Attributliste definitiv kennt.
 
 \end{document}
