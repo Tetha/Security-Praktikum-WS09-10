@@ -468,4 +468,24 @@ Die Syncronisierung der Wortmengen besteht prinzipiell in einem Protokoll,
 welches als Eingabe 2 solche Wortmengen-Mengen erh\"alt und garantiert, dass
 nach Ablauf des Protokolles beide Anwender die gleiche Wortmengen-Menge 
 wissen. Danach kann man dann diese Wortmengen als Attribute verwenden.\\
+Ein einfacher Ansatz ist, dass als Eingaben genau zwei Wortlisten gegeben
+sind und auf diese eine Mengenoperation angewendet wird, um die
+resultierende Wortmengen zu bestimmen. Verwendet man den {\em Schnitt} 
+der Wortmengen, so hat dies den Vorteil, dass garantiert ist, dass die 
+eingegebenen Wortmengen auf jeden Fall eine Obermenge der schlussendlich
+ausgegebenen Wortmengen sein werden. Dadurch kann die Geheimhaltung
+besser gew\"ahrleistet werden, da so jeder Anwender genau weiss, welche
+Attribute es maximal geben kann (n\"amlich seine eigene eingegebene
+Wortliste).\\
+Verwendet man die {\em Vereinigung}, so kann dem Anwender
+nicht mehr garantiert werden, welche Attribute verwendet werden. Es
+kann dann jedoch garantiert werden, dass jeder Anwender alle Wortmengen,
+die ihm wichtig sind, in der Klassifizierung ber\"ucksichtigt sieht.\\
+Man kann den Ansatz der Vereinigung noch etwas erweitern um das potentielle
+Problem der Geheimhaltung l\"osen, indem man die {\em Vereinigung mit
+Blacklist} verwendet. Hierzu kann jeder Anwender neben der anders
+bestimmten Wortmenge noch eine Liste von W\"ortern angeben, welche
+auf gar keinen Fall in einer der Wortmengen auftreten darf. Diese werden
+dann nach der Vereinigung der Wortmengen in einem zweiten Schritt 
+entfernt werden, um die schlussendliche Wortmenge zu erhalten.
 \end{document}
