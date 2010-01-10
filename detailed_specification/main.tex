@@ -446,6 +446,26 @@ Wortliste}. Hier wird die Wortliste statisch in das Programm einkodiert
 und beide verwenden diese statische Wortliste. Der Vorteil dieser
 Variante ist, dass so keine Syncronisierung der Wortlisten erforderlich ist
 und die preisgegebenen Informationen durch die Attribute des Baumes
-sehr einfach abzusch\"atzen sind, da man Attributliste definitiv kennt.
+sehr einfach abzusch\"atzen sind, da man Attributliste definitiv kennt.\\
+Die zweite Variante, die Wortmengen zu berechnen ist die {\em Eingabe
+vom Benutzer}. Dies hat den Vorteil, dass die L\"osung sehr flexibel ist,
+da der Anwender bei jeder Anwendung eine an die Situation angepasste
+Wortliste verwenden kann. Diese Variante erfordert jedoch eine Syncronisation
+der Wortlisten beider Anwender, damit eine eindeutige Liste von Attributen
+f\"ur den ID3-Algorithmus berechnet werden kann.\\
+Die dritte Variante, die Wortmengen zu berechnen ist die {\em Verwendung
+eines Algorithmus'} innerhalb der Software. Es ist interresant zu bemerken,
+dass die erste Variante eigentlich nur ein Spezialfall dieser Variante ist,
+in der nur statisch eine Liste ausgegeben wird. Die zweite Variante kann
+durch externe Programme so erweitert werden, dass die dritte Variante erreicht
+wird. Soll dagegen die dritte Variante mit einem einzelnen Algorithmus
+implementiert werden, muss wieder untersucht werden, wie die beiden
+berechneten Wortlisten syncronisiert werden und welcher Algorithmus verwendet
+werden kann.\\
 
+\subsection{Syncronisierung der Wortmengen}
+Die Syncronisierung der Wortmengen besteht prinzipiell in einem Protokoll,
+welches als Eingabe 2 solche Wortmengen-Mengen erh\"alt und garantiert, dass
+nach Ablauf des Protokolles beide Anwender die gleiche Wortmengen-Menge 
+wissen. Danach kann man dann diese Wortmengen als Attribute verwenden.\\
 \end{document}
