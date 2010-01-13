@@ -4,12 +4,13 @@
 \usetikzlibrary{arrows,decorations.pathmorphing}
 
 % =============== PHASES ===============
+\newcounter{ycounter}{}
 \newenvironment{phases}
 {
-\newcounter{ycounter}{}
 \setcounter{ycounter}{-1}
 \begin{tikzpicture}[node distance=3cm,text width=3cm,
-    box/.style={shape=rectangle,draw}]}
+    box/.style={shape=rectangle,draw}]
+}
 {\end{tikzpicture}}
 
 \newcommand{\nomoreheaders} {
@@ -25,7 +26,7 @@
 
 \newcommand{\aliceknowledge}[2][0]{
 \node[box]
-    at (-4+#1, \theycounter) 
+    at (-4+#1, \theycounter)
     {#2}
 }
 \newcommand{\bobknowledge}[2][0]{
@@ -34,9 +35,9 @@
     {#2}
 }
 
-\newcommand{\symmetricknowledge}[1]{
-\aliceknowledge{#1};
-\bobknowledge{#1};
+\newcommand{\symmetricknowledge}[2][0]{
+\aliceknowledge{#2};
+\bobknowledge[#1]{#2};
 }
 
 
@@ -50,59 +51,147 @@
 % =============== PHASES ================
 
 \begin{document}
+\listoftodos
+\pagebreak
 \tableofcontents
 \pagebreak
 \section{Einleitung}
 \subsection{Begriffe}
-\todo[inline]{Definition: 'Eigen'}
-\todo[inline]{Definiton: 'Gesamt'}
-\todo[inline]{Definition: 'Gemeinsam'}
-
+\todo[inline]{Definition: 'Eigen' := "das des anwenders"}
+\todo[inline]{Definiton: 'Gesamt' := "das aller anwender"}
+\todo[inline]{Definition: 'Gemeinsam' := "etwas, was beide anwender haben und gleich ist"}
+\todo[inline]{Definition: Vorwissen := "Wissen aus vorherigen Phasen"}
+\subsection{Annahmen}
+\todo[inline]{Annahme: ehrliche anwender := "handeln nach protokoll"}
 \subsection{Phasen der Anwendung}
-\begin{figure}
+\begin{figure}[htb]
 \centering
 \begin{phases}
 \aliceheader{Alice};
 \bobheader{Bob};
 \nomoreheaders
-\aliceknowledge[-2]{E-Mails von Alice};
-\bobknowledge[-2]{E-Mails von Bob};
+\aliceknowledge[-2]{eigene E-Mails};
+\bobknowledge[-2]{eigene E-Mails};
 
-\aliceknowledge[2]{Einordnung von Alice's E-Mails als Spam, Nicht Spam};
-\bobknowledge[2]{Einordnung von Bob's E-Mails als Spam, Nicht Spam};
+\aliceknowledge[2]{Einordnung von eigenen E-Mails als Spam, Nicht Spam};
+\bobknowledge[2]{Einordnung von eigenen E-Mails als Spam, Nicht Spam};
 
 \phase{Phase 1: Finden der gemeinsamen Wortliste};
 
-\symmetricknowledge{Wortliste};
+\symmetricknowledge{Gemeinsame Wortliste};
 
 \phase{Phase 2: Finden der gemeinsamen Schwellwerte};
 
-\symmetricknowledge{Attribute = Liste von (Wort + Schwellwerte)};
-\phase{Phase 3: Diskretisieren der E-Mails};
+\symmetricknowledge{Gemeinsame Attribute = Liste von (Wort + Schwellwerte)};
+\phase{Phase 3: Diskretisieren der eigenene E-Mails};
 
-\aliceknowledge{Diskretisierte E-Mails von Alice};
-\bobknowledge{Diskretisierte E-Mails von Bob};
+\symmetricknowledge{Eigene diskretisierte E-Mails};
 
-\phase{Phase 4: Lernen der E-Mails};
+\phase{Phase 4: Lernen der gesamten E-Mails};
 
-\symmetricknowledge{Klassifikator};
+\symmetricknowledge{Gemeinsamer Klassifikator};
 \end{phases}
 \caption{Phasen der Anwendung}
 \end{figure}
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Finden der gemeinsamen Wortliste}
-\missingfigure{\"Ubersicht \"uber Phase I}
+\todo[inline]{Einleitung, Verweisen auf Figure f\"ur gemeinsame Wortliste}
+\begin{figure}[htb]
+\begin{phases}
+\aliceheader{Alice};
+\bobheader{Bob};
+\nomoreheaders
+
+\aliceknowledge[-2]{eigene E-Mails};
+\bobknowledge[-2]{eigene E-Mails};
+
+\aliceknowledge[2]{Einordnung von eigenen E-Mails als Spam, Nicht Spam};
+\bobknowledge[2]{Einordnung von eigenen E-Mails als Spam, Nicht Spam};
+\phase{Phase 1.1: Berechnung der Vorkommnisse der Worte in eigenen Spam/Nicht Spam E-Mails};
+\symmetricknowledge[1]{Liste von (Wort + Anteil der Vorkomnisse eines Wortes an allen eigenen Worten)};
+\phase{Phase 1.2: Sortierung der eigenen Worte nach Informationsheuristik, Auswahl der N besten eigenen Worten};
+\symmetricknowledge{Eigene Wortliste}
+\phase{Phase 1.3: Synchronisierung der Wortlisten}
+\symmetricknowledge{Gemeinsame Wortliste}
+\end{phases}
+\caption{Schritte zum Berechnen der gemeinsamen Wortliste}
+\end{figure}
+
+\todo[inline]{F\"ur section-Titel besseren Begriff f\"ur "Vorkomnisse der Worte in eigenen Spam/Nicht Spam E-Mails" finden}
+\subsection{Berechnung der Vorkomnisse}
+\todo[inline]{Content}
+\subsection{Sortierung der Worte nach Informationsheuristik}
+\todo[inline]{Content}
+\subsection{Syncronisierung der Wortlisten}
+\todo[inline]{Content}
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Finden der gemeinsamen Schwellwerte}
-\missingfigure{\"Uberischt \"uber Phase II}
+\todo[inline]{Einleitung, auf Figure f\"ur Schwellwerte verweisen}
+
+\begin{figure}[htb]
+\begin{phases}
+\aliceheader{Alice};
+\bobheader{Bob};
+\nomoreheaders
+
+\aliceknowledge[-2]{Vorwissen};
+\aliceknowledge[2]{Gemeinsame Wortliste};
+
+\bobknowledge[-2]{Vorwissen};
+\bobknowledge[2]{Gemeinsame Wortliste};
+\phase{Phase 2.1: Berechnung der Vorkommnisse der Worte in eigenen Spam/Nicht Spam E-Mails};
+\symmetricknowledge[1]{Eigene Liste von (Wort + Anteil der Vorkomnisse eines Wortes an Spam/Nicht-Spam Worten)};
+\phase{Phase 2.2: Bestimmung eines Schwellwertes, der Spam, Nicht-Spam Anteile m\"oglichst halbiert};
+\symmetricknowledge{Eigene Liste von (Wort + Schwellwert)};
+\phase{Phase 2.3: Synchronisierung der Schwellwerte};
+\symmetricknowledge{Gemeinsame Liste von (Wort + Schwellwerte)};
+\end{phases}
+\end{figure}
+\todo[inline]{F\"ur section-Titel besseren Begriff f\"ur "Vorkomnisse der Worte in eigenen Spam/Nicht Spam E-Mails" finden}
+\subsection{Berechnung der Vorkomnisse}
+\todo[inline]{Content}
+\subsection{Bestimmung der eigenen Schwellwerte}
+\todo[inline]{Content}
+\subsection{Syncronisierung der Schwellwerte}
+\todo[inline]{Content}
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Diskretisieren der eigenen E-Mails}
-\missingfigure{\"Ubersicht \"uber Phase III}
+\todo[inline]{Einleitung, Figure referenzieren}
+\todo[inline]{Content}
+\begin{figure}[htb]
+\begin{phases}
+\aliceheader{Alice};
+\bobheader{Bob};
+\nomoreheaders;
+\aliceknowledge[-2]{Vorwissen};
+\aliceknowledge[2]{Gemeinsame Attribute = Liste von (Wort + Schwellwerte)};
+
+\bobknowledge[-2]{Vorwissen};
+\bobknowledge[2]{Gemeinsame Attribute = Liste von (Wort + Schwellwerte)};
+
+\phase{Phase 3: Diskretisieren der eigenene E-Mails};
+\symmetricknowledge{Eigene diskretisierte E-Mails};
+\end{phases}
+\end{figure}
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Lernen der gesamten E-Mails}
-\missingfigure{\"Ubersicht \"uber Phase IV}
+\todo[inline]{verteiltes ID3 beschreiben}
+\begin{figure}[htb]
+\begin{phases}
+\aliceknowledge[-2]{Vorwissen};
+\aliceknowledge[2]{Eigene diskretisierte E-Mails};
+
+\bobknowledge[-2]{Vorwissen};
+\bobknowledge[2]{Eigene diskretisierte E-Mails};
+
+\phase{Phase 4: Lernen der gesamten E-Mails, Magic, papergenauer angucken};
+
+\symmetricknowledge{Gemeinsamer Klassifikator};
+\end{phases}
+\end{figure}
+\todo[inline]{Paper lesen, phase 4 genauer aufspalten}
 \end{document}
