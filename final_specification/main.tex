@@ -1,0 +1,108 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{todonotes}
+\usetikzlibrary{arrows,decorations.pathmorphing}
+
+% =============== PHASES ===============
+\newenvironment{phases}
+{
+\newcounter{ycounter}{}
+\setcounter{ycounter}{-1}
+\begin{tikzpicture}[node distance=3cm,text width=3cm,
+    box/.style={shape=rectangle,draw}]}
+{\end{tikzpicture}}
+
+\newcommand{\nomoreheaders} {
+    \addtocounter{ycounter}{-1}
+}
+
+\newcommand{\aliceheader}[1] {
+\node at (-4,\theycounter) {#1}
+}
+\newcommand{\bobheader}[1] {
+\node at (4,\theycounter) {#1}
+}
+
+\newcommand{\aliceknowledge}[2][0]{
+\node[box]
+    at (-4+#1, \theycounter) 
+    {#2}
+}
+\newcommand{\bobknowledge}[2][0]{
+\node[box]
+    at (4+#1, \theycounter)
+    {#2}
+}
+
+\newcommand{\symmetricknowledge}[1]{
+\aliceknowledge{#1};
+\bobknowledge{#1};
+}
+
+
+\newcommand{\phase}[1]{
+\addtocounter{ycounter}{-1};
+\draw[->,decorate,decoration={snake,amplitude=1mm,post length=2mm}]
+    (0,\theycounter) -- ++(0,-2)
+    node [right,midway,xshift=3mm] {#1};
+\addtocounter{ycounter}{-3};
+}
+% =============== PHASES ================
+
+\begin{document}
+\tableofcontents
+\pagebreak
+\section{Einleitung}
+\subsection{Begriffe}
+\todo[inline]{Definition: 'Eigen'}
+\todo[inline]{Definiton: 'Gesamt'}
+\todo[inline]{Definition: 'Gemeinsam'}
+
+\subsection{Phasen der Anwendung}
+\begin{figure}
+\centering
+\begin{phases}
+\aliceheader{Alice};
+\bobheader{Bob};
+\nomoreheaders
+\aliceknowledge[-2]{E-Mails von Alice};
+\bobknowledge[-2]{E-Mails von Bob};
+
+\aliceknowledge[2]{Einordnung von Alice's E-Mails als Spam, Nicht Spam};
+\bobknowledge[2]{Einordnung von Bob's E-Mails als Spam, Nicht Spam};
+
+\phase{Phase 1: Finden der gemeinsamen Wortliste};
+
+\symmetricknowledge{Wortliste};
+
+\phase{Phase 2: Finden der gemeinsamen Schwellwerte};
+
+\symmetricknowledge{Attribute = Liste von (Wort + Schwellwerte)};
+\phase{Phase 3: Diskretisieren der E-Mails};
+
+\aliceknowledge{Diskretisierte E-Mails von Alice};
+\bobknowledge{Diskretisierte E-Mails von Bob};
+
+\phase{Phase 4: Lernen der E-Mails};
+
+\symmetricknowledge{Klassifikator};
+\end{phases}
+\caption{Phasen der Anwendung}
+\end{figure}
+
+\pagebreak % XXX: if possible, kill this pagebreak
+\section{Finden der gemeinsamen Wortliste}
+\missingfigure{\"Ubersicht \"uber Phase I}
+
+\pagebreak % XXX: if possible, kill this pagebreak
+\section{Finden der gemeinsamen Schwellwerte}
+\missingfigure{\"Uberischt \"uber Phase II}
+
+\pagebreak % XXX: if possible, kill this pagebreak
+\section{Diskretisieren der eigenen E-Mails}
+\missingfigure{\"Ubersicht \"uber Phase III}
+
+\pagebreak % XXX: if possible, kill this pagebreak
+\section{Lernen der gesamten E-Mails}
+\missingfigure{\"Ubersicht \"uber Phase IV}
+\end{document}
