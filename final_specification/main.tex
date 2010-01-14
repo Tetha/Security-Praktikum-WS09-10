@@ -4,6 +4,21 @@
 \usetikzlibrary{arrows,decorations.pathmorphing}
 
 \hyphenation{Schwell-werte}
+% =============== Definitionen =========
+\newenvironment{definition}
+    [1]
+    {
+        {\b Definition:} #1\\
+    }
+    {}
+
+\newcommand{\defined}
+    [1]
+    {
+        {\bf #1}
+    }
+% ======================================
+
 % =============== PHASES ===============
 \newcounter{ycounter}{}
 \newenvironment{phases}
@@ -49,7 +64,7 @@
     node [right,midway,xshift=3mm] {#1};
 \addtocounter{ycounter}{-3};
 }
-% =============== PHASES ================
+% ======================================
 
 \begin{document}
 \listoftodos
@@ -59,12 +74,25 @@
 \section{Einleitung}
 \todo[inline]{Struktur vom Dokument erl\"autern}
 \subsection{Begriffe}
-\todo[inline]{Definition: 'Eigen' := "das des anwenders"}
-\todo[inline]{Definiton: 'Gesamt' := "das aller anwender"}
+\begin{definition}{Eigenes,Gesamtes}
+\(M\) sei eine Menge von Elementen, die in zwei Teilmengen \(M_A\)
+und \(M_B\) zerf\"allt, sodass \(M = M_A \cup M_B\) ist. Wir nehmen
+desweiteren an, dass Alice \(M_A\) kennt, aber weder \(M\) noch \(M_B\)
+und dass Bob \(M_B\) kennt, aber weder \(M\) noch \(M_A\). Dann bezeichnen
+wir:
+\begin{itemize}
+\item \(M\) als \defined{gesamtes} Wissen
+\item \(M_A\) als das \defined{eigene} Wissen von Alice
+\item \(M_B\) als das \defined{eigene} Wissen von Bob
+\item \(M_B\) als das \defined{andere} Wissen von Alice
+\item \(M_A\) als das \defined{andere} Wissen von Bob
+\end{itemize}
+\end{definition}
 \todo[inline]{Definition: 'Gemeinsam' := "etwas, was beide anwender haben und gleich ist"}
 \todo[inline]{Definition: Vorwissen := "Wissen aus vorherigen Phasen"}
 \todo[inline]{Definition: Entscheidungsbaum}
 \todo[inline]{Definition: Attribut}
+\todo[inline]{Schaltkreis}
 \subsection{Annahmen}
 \todo[inline]{Annahme: ehrliche anwender := "handeln nach protokoll"}
 
@@ -204,12 +232,65 @@
 \bobknowledge[-2]{Vorwissen};
 \bobknowledge[2]{Eigene diskretisierte E-Mails};
 
-\phase{Phase 4: Lernen der gesamten E-Mails, Magic, papergenauer angucken};
+\phase{Phase 4.1: Feststellen der dominierenden Ausgabe};
 
-\symmetricknowledge{Gemeinsamer Klassifikator};
+\symmetricknowledge{gemeinsamer Blattknoten mit dominierender Ausgabe};
 \end{phases}
+\caption{ID3-Algorithmus, Fall 1: Keine Attribute mehr vorhanden}
 \end{figure}
-\todo[inline]{Paper lesen, phase 4 genauer aufspalten}
+
+\begin{figure}[htb]
+\begin{phases}
+\aliceknowledge[-2]{Vorwissen};
+\aliceknowledge[2]{Eigene diskretisierte E-Mails};
+
+\bobknowledge[-2]{Vorwissen};
+\bobknowledge[2]{Eigene diskretisierte E-Mails};
+
+\phase{Phase 4.2: Feststellen ob Ausgabe eindeutig}
+
+\symmetricknowledge{gemeinsamer Blattknoten mit eindeutiger Ausgabe}
+\end{phases}
+\caption{ID3-Algorithmus, Fall 2: Ausgabe eindeutig}
+\end{figure}
+
+\begin{figure}[htb]
+\begin{phases}
+\aliceknowledge[-2]{Vorwissen};
+\aliceknowledge[2]{Eigene diskretisierte E-Mails};
+
+\bobknowledge[-2]{Vorwissen};
+\bobknowledge[2]{Eigene diskretisierte E-Mails};
+
+\phase{Phase 4.3: Berechnen der Entropien}
+
+\symmetricknowledge{Gemeinsame Entropien}
+
+\phase{Phase 4.4: Attribut mit maximalem Informationsgewinn finden}
+
+\symmetricknowledge{Gemeinsames bestes aktuelles Attribut}
+
+\phase{Phase 4: Rekursion}
+
+\symmetricknowledge{gemeinsamer Klassifikator}
+\end{phases}
+\caption{ID3-Algorithmus, Fall 3: Erzeugung eines Astes}
+\end{figure}
+\todo[inline]{Yaos algorithmus grundlegend zusammenfassen (garbled decision table, garbled gate, garbled circuit}
+\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
+
+
+\subsection{Feststellen der dominierenden Ausgabe}
+\todo[inline]{Schaltkreis designen: Maximum von Summen von positiven Zahlensequenzen}
+
+\subsection{Feststellen ob Ausgabe eindeutig}
+\todo[inline]{Schaltkreis designen: Gleichheit.}
+
+\subsection{Das Entropien-Protokoll}
+\todo[inline]{Schaltkreis f\"ur x * log x -Protokoll aus dem Paper zusammenfassen}
+
+\subsection{Attribut mit maximalem Informationsgewinn finden}
+\todo[inline]{Vorgheen zusammenfassen, Schaltkreis aus dominierender Ausgabe wiederverwenden}
 
 \pagebreak  %XXX: if  possible, kill this pagebreak
 \section{Verwenden des Klassifikators}
