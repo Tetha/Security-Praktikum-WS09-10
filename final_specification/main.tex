@@ -224,6 +224,34 @@ wir:
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Lernen der gesamten E-Mails}
 \todo[inline]{verteiltes ID3 beschreiben}
+
+\subsection{Yaos Protokoll}
+\begin{figure}[htb]
+\begin{phases}
+\aliceheader{Alice};
+\bobheader{Bob};
+\nomoreheaders
+\symmetricknowledge{Eigene Eingabe};
+\phase{Y.1: Konstruktion des entstellten Schaltkreises und \"Ubertragung};
+\aliceknowledge[-2]{Eingabekodierung};
+\aliceknowledge[2]{Schaltkreis};
+\bobknowledge{Schaltkreis};
+\phase{Y.3 Alice schickt kodierte Eingabe an Bob};
+\bobknowledge{Alice' kodierte Eingabe};
+\phase{Y.4 Via Oblivious Transfer wird Bob's Eingabe kodiert};
+\bobknowledge{Bob's kodierte Eingabe};
+\phase{Y.5 Bob wertet Schaltkreis aus und sendet die Ausgabe an Alice};
+\symmetricknowledge{Ausgabe} ;
+\end{phases}
+\caption{Yaos Algorithmus}
+\end{figure}
+\todo[inline]{Yaos algorithmus grundlegend zusammenfassen (garbled decision table, garbled gate, garbled circuit)}
+\todo[inline]{Verschl\"usselung f\"ur die garbled Circuits festlegen (RSA?)}
+\todo[inline]{1-2 Oblivious Transfer festlegen (mit RSA?)}
+\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
+
+
+\subsection{Feststellen der dominierenden Ausgabe}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -238,7 +266,9 @@ wir:
 \end{phases}
 \caption{ID3-Algorithmus, Fall 1: Keine Attribute mehr vorhanden}
 \end{figure}
+\todo[inline]{Schaltkreis designen: Maximum von Summen von positiven Zahlensequenzen}
 
+\subsection{Feststellen ob Ausgabe eindeutig}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -253,7 +283,12 @@ wir:
 \end{phases}
 \caption{ID3-Algorithmus, Fall 2: Ausgabe eindeutig}
 \end{figure}
+\todo[inline]{Schaltkreis designen: Gleichheit.}
 
+\subsection{Das Entropien-Protokoll}
+\todo[inline]{Schaltkreis f\"ur x * log x -Protokoll aus dem Paper zusammenfassen}
+
+\subsection{Attribut mit maximalem Informationsgewinn finden}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -276,20 +311,6 @@ wir:
 \end{phases}
 \caption{ID3-Algorithmus, Fall 3: Erzeugung eines Astes}
 \end{figure}
-\todo[inline]{Yaos algorithmus grundlegend zusammenfassen (garbled decision table, garbled gate, garbled circuit}
-\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
-
-
-\subsection{Feststellen der dominierenden Ausgabe}
-\todo[inline]{Schaltkreis designen: Maximum von Summen von positiven Zahlensequenzen}
-
-\subsection{Feststellen ob Ausgabe eindeutig}
-\todo[inline]{Schaltkreis designen: Gleichheit.}
-
-\subsection{Das Entropien-Protokoll}
-\todo[inline]{Schaltkreis f\"ur x * log x -Protokoll aus dem Paper zusammenfassen}
-
-\subsection{Attribut mit maximalem Informationsgewinn finden}
 \todo[inline]{Vorgheen zusammenfassen, Schaltkreis aus dominierender Ausgabe wiederverwenden}
 
 \pagebreak  %XXX: if  possible, kill this pagebreak
