@@ -222,8 +222,21 @@ E & 0.9 & 0.2
 \end{tabular}
 dann werden als Wortliste D und E gew\"ahlt.}
 
-\subsection{Syncronisierung der Wortlisten}
-\todo[inline]{Content}
+\subsection{Zusammenfassen der Wortlisten}
+Wir haben nun zwei separate, lokale Wortlisten berechnet. Diese m\"ussen nun
+zusammengefasst werden zu einer gemeinsamen Wortliste. Da wir annehmen, dass
+die Benutzer ehrlich sind, k\"onnen wir annehmen, dass die Benutzer als
+Eingabe dieses Protokolles keine beliebige Liste festlegen und auch ihre
+Daten nicht so manipulieren, dass eine bestimmte Wortliste versendet wird.
+Deswegen k\"onnen wir die Wortlisten durch eine einfache Vereinigung der
+separaten Wortlisten zu einer gesamten Wortliste vereinigen. Da die Wortliste
+nach dem Zusammenfassen beiden Anwendern bekannt ist, wird das Zusammenfassen
+der Wortliste implementiert, indem beide Anwender ihre lokale Wortliste an
+den jeweils anderen Anwender versenden und dann beide Anwender lokal die
+Wortlisten vereinigen. Damit ergeben sich folgende Akzeptanzkriterien:\\
+\requirement{Wenn Alice die Wortliste A, B, C berechnet hat, und Bob die
+Wortliste C, D, E berechnet hat, dann muss die zusammengefasste Wortliste
+A, B, C, D, E sein.} 
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Finden der gemeinsamen Schwellwerte}
