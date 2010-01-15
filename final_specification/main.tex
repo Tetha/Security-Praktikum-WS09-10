@@ -166,8 +166,19 @@ gefordert, dass \(l \leq h\) ist.
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Finden der gemeinsamen Wortliste}
-\todo[inline]{Einleitung, Verweisen auf Figure f\"ur gemeinsame Wortliste}
-\begin{figure}[htb]
+In dieser Phase berechnen die beiden Parteien aus den gesamten E-Mails
+eine gemeinsame Wortliste, die mit grosser Wahrscheinlichkeit 
+aussagekr\"aftige Attribute f\"ur den Entscheidungsbaum liefert. 
+Die Phase besteht aus zwei Schritten.
+Im ersten Schritt berechnen beide Parteien getrennt eine eigene Wortliste.
+Jedes Wort auf dieser Liste hat in den eigenen E-Mails hat eine starke 
+ Aussagekraft \"uber die Klassifikation der E-Mails, die das Wort
+ oft enthalten.
+Im zweiten Schritt vereinen beide Parteien ihre eigenen Wortlisten, um 
+ die gemeinsame Wortliste zu berechnen. 
+Dieser Vorgang ist in Abbildung ~\ref{fig:phase:two} illustriert.
+
+\begin{figure}[h!tb]
 \begin{phases}
 \aliceheader{Alice};
 \bobheader{Bob};
@@ -178,62 +189,92 @@ gefordert, dass \(l \leq h\) ist.
 
 \aliceknowledge[2]{Einordnung von eigenen E-Mails als Spam, Nicht Spam};
 \bobknowledge[2]{Einordnung von eigenen E-Mails als Spam, Nicht Spam};
-\phase{Phase 1.1: Berechnung der Vorkommnisse der Worte in eigenen Spam/Nicht Spam E-Mails};
+\phase{Phase 1.1.1: Berechnung der Anteile der Worte in eigenen Spam/Nicht Spam E-Mails};
 \symmetricknowledge[1]{Liste von (Wort + Anteil der Vorkomnisse eines Wortes an allen eigenen Worten)};
-\phase{Phase 1.2: Auswahl der eigenen Worte nach Informationsheuristik, Auswahl der N besten eigenen Worten};
+\phase{Phase 1.1.2: Auswahl der N besten eigenen Worten nach Informationsheuristik};
 \symmetricknowledge{Eigene Wortliste}
-\phase{Phase 1.3: Synchronisierung der Wortlisten}
+\phase{Phase 1.2: Synchronisierung der Wortlisten}
 \symmetricknowledge{Gemeinsame Wortliste}
 \end{phases}
 \caption{Schritte zum Berechnen der gemeinsamen Wortliste}
+\label{fig:phase:two}
 \end{figure}
 
-\todo[inline]{F\"ur section-Titel besseren Begriff f\"ur "Vorkomnisse der Worte in eigenen Spam/Nicht Spam E-Mails" finden}
-\subsection{Berechnung der Vorkomnisse}
-\todo[inline]{Content}
+\subsection{Berechnung der Anteile an den Wortmengen}
+Wir verwenden eine Heuristik f\"ur den Informationsgehalt des Vorkommens eines
+Wortes in einer E-Mail, die auf dem Verh\"altnis der Vorkommnisse des 
+Wortes zu der Gesamtanzahl Worte in einer Klasse basiert. 
+Um diese zu berechnen werden konzeptionell alle Worte in E-Mails einer Klasse 
+ zu einer Multimenge hinzugef\"ugt. 
+F\"ur jedes Wort in dieser Multimenge ist das Verh\"altnis der
+Vielfachheit des Wortes zur M\"achtigkeit der Multimenge das gesuchte
+Verh\"altnis.
+Damit ergibt sich folgendes Akzeptanzkriterium:\\
+\requirement{Wenn die Spam-Mails die Mails "Foo Bar", "Foo Bar", "Foo Foo"
+und "Foo" sind und die Nicht-Spam-Mails "Bar Bar", "Foo" und "Bar", 
+dann muss diese Phase die folgende Tabelle berechnen:\\
+\begin{center}
+\begin{tabular}{c c c}
+Wort & Spam-Anteil & Nicht-Spam-Anteil \\
+Foo & \(\frac{5}{7}\) & \(\frac{1}{4}\) \\
+Bar & \(\frac{2}{7}\) & \(\frac{3}{4}\)
+\end{tabular}
+\end{center}
+Eine Approximation der Werte durch Flieskommazahlen ist
+ebenfalls akzeptabel.}
+
 \subsection{Auswahl der Worte nach Informationsheuristik}
-Wir wollen nun Worte ausw\"ahlen, die m\"oglichst viel \"uber die Klasse
-der E-Mail aussagen, damit wir m\"oglichst aussagekr\"aftige Attribute
-f\"ur den Baum verwenden. Wir verwenden die Heuristik, dass ein Wort
-mehr \"uber die Klasse der E-Mail aussagt, wenn die Wahrscheinlichkeit,
-dass das Wort in einer der beiden Klassen mit signifikant gr\"osserer
-Wahrscheinlichkeit auftritt. Das bedeutet, wir wollen Worte selektieren,
-bei denen die Wahrscheinlichkeiten, in Spam-E-Mails bzw in Nicht-Spam-E-Mails
-sich drastisch unterscheiden. Eine m\"ogliche Quantifizierung dieser 
-Unterschiedlichkeit ist \(\Delta(x, y) = \|x - y\|\). \(\Delta\) hat die
-Eigenschaft, f\"ur x = 1 und y = 0 bzw x = 0 und y = 1 maximal 1 zu sein,
-und f\"ur identische x und y 0 zu sein. Da x und y f\"ur die Belegung
-(0, 1) bzw (1, 0) wirklich maximal weit auseinander liegen und bei 
-gleichen Werten wirklich die gerinstm\"ogliche Aussage \"uber die Klasse
-der Mail getroffen wird, ist dies wirklich eine Quantifizierung der
-Aussagekraft, die wir anstreben. Daher w\"ahlen wir die m\"oglichst
-aussagekr\"aftigen E-Mails aus, indem wir alle Worte nach 
+Wir wollen nun Worte ausw\"ahlen, deren h\"aufiges Vorkommen in einer
+ E-Mail viel \"uber die Klasse der E-Mail aussagen.
+Wir verwenden dabei eine deduktive Heuristik, die annimmt, dass die
+ Wahrscheinlichkeit, dass eine E-Mail zu einer Klasse geh\"ort, direkt
+ mit den Wahrscheinlichkeiten zusammenh\"angt, dass die W\"orter in
+ dieser E-Mail zu dieser Klasse geh\"oren. 
+Das bedeutet, wir wollen Worte selektieren, bei denen genau eine 
+ Wahrscheinlichkeit, zu einer Klasse zu geh\"oren, drastisch unterschiedlich
+ ist.\\
+Eine m\"ogliche Quantifizierung dieser Unterschiedlichkeit ist im bin\"aren
+ Fall \(\Delta(x, y) = \|x - y\|\).
+Diese Quantifizierung hat die Eigenschaft, f\"ur 
+ x = 1 und y = 0 bzw x = 0 und y = 1 maximal 1 zu sein, und f\"ur identische 
+ x und y 0 zu sein. 
+Da x und y f\"ur die Belegung (0, 1) bzw (1, 0) wirklich maximal weit 
+ auseinander liegen und bei gleichen Werten wirklich die gerinstm\"ogliche
+ Aussage \"uber die Klassezugeh\"origkeit eines Wortes getroffen wird, 
+ ist dies wirklich eine Quantifizierung der Aussagekraft, die wir anstreben. 
+Damit w\"ahlen wir die aussagekr\"aftigstenen Worte aus, indem wir alle Worte 
+    nach 
 \(\Delta(\mathrm{Vorkommen~in~Spam-E-Mails}, 
          \mathrm{Vorkommen~in~Nicht-Spam-E-Mails})\) 
-absteigend sortieren und die ersten N Worte w\"ahlen. Damit ergeben
-sich folgende Akzeptanzkriterien:\\
-\requirement{Wenn N = 2 ist, und als Worte gegeben sind:
+ absteigend sortieren und die ersten N Worte w\"ahlen. 
+Damit ergibt sich folgendes Akzeptanzkriterium:\\
+\requirement{Wenn N = 2 ist, und als Worte mit Vorkomnissen gegeben sind:
+\begin{center}
 \begin{tabular}{c c c}
+Wort & Vorkomnisse in Spam-E-Mails & Vorkommnisse in Nicht-Spam-Emails \\
 A & 0.5 & 0.5 \\
 B & 0.2 & 0.2 \\
 C & 0.3 & 0.5 \\
 D & 0.2 & 0.8 \\
 E & 0.9 & 0.2
 \end{tabular}
+\end{center}
 dann werden als Wortliste D und E gew\"ahlt.}
 
 \subsection{Zusammenfassen der Wortlisten}
-Wir haben nun zwei separate, lokale Wortlisten berechnet. Diese m\"ussen nun
+Wir haben nun zwei separate, lokale Wortlisten berechnet. Diese m\"ussen
 zusammengefasst werden zu einer gemeinsamen Wortliste. Da wir annehmen, dass
 die Benutzer ehrlich sind, k\"onnen wir annehmen, dass die Benutzer als
 Eingabe dieses Protokolles keine beliebige Liste festlegen und auch ihre
 Daten nicht so manipulieren, dass eine bestimmte Wortliste versendet wird.
+Zudem werden die Attribute des Baumes \"offentlich sein, sodass eine
+Geheimhaltung der Wortlisten keinen Sinn macht.
 Deswegen k\"onnen wir die Wortlisten durch eine einfache Vereinigung der
-separaten Wortlisten zu einer gesamten Wortliste vereinigen. Da die Wortliste
-nach dem Zusammenfassen beiden Anwendern bekannt ist, wird das Zusammenfassen
-der Wortliste implementiert, indem beide Anwender ihre lokale Wortliste an
-den jeweils anderen Anwender versenden und dann beide Anwender lokal die
-Wortlisten vereinigen. Damit ergeben sich folgende Akzeptanzkriterien:\\
+separaten Wortlisten zu einer gesamten Wortliste vereinigen. Deswegen wird 
+das Zusammenfassen der Wortliste implementiert, indem beide Anwender ihre
+lokale Wortliste an den jeweils anderen Anwender versenden und beide 
+Anwender lokal die Wortlisten vereinigen. Damit ergibt sich folgendes
+Akzeptanzkriterium:\\
 \requirement{Wenn Alice die Wortliste A, B, C berechnet hat, und Bob die
 Wortliste C, D, E berechnet hat, dann muss die zusammengefasste Wortliste
 A, B, C, D, E sein.} 
