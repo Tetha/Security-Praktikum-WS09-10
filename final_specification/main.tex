@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{tikz}
 \usepackage{todonotes}
+\usepackage{amssymb}
 \usetikzlibrary{arrows,decorations.pathmorphing}
 
 \hyphenation{Schwell-werte}
@@ -8,7 +9,7 @@
 \newenvironment{definition}
     [1]
     {
-        {\b Definition:} #1\\
+        {\bf Definition:} #1\\
     }
     {}
 
@@ -78,7 +79,7 @@
 \(M\) sei eine Menge von Elementen, die in zwei Teilmengen \(M_A\)
 und \(M_B\) zerf\"allt, sodass \(M = M_A \cup M_B\) ist. Wir nehmen
 desweiteren an, dass Alice \(M_A\) kennt, aber weder \(M\) noch \(M_B\)
-und dass Bob \(M_B\) kennt, aber weder \(M\) noch \(M_A\). Dann bezeichnen
+und dass foo Bob \(M_B\) kennt, aber weder \(M\) noch \(M_A\). Dann bezeichnen
 wir:
 \begin{itemize}
 \item \(M\) als \defined{gesamtes} Wissen
@@ -88,20 +89,38 @@ wir:
 \item \(M_A\) als das \defined{andere} Wissen von Bob
 \end{itemize}
 \end{definition}
-\todo[inline]{Definition: 'Gemeinsam' := "etwas, was beide anwender haben und gleich ist"}
-\todo[inline]{Definition: Vorwissen := "Wissen aus vorherigen Phasen"}
+\begin{definition}{Gemeinsam}
+Wenn beide Anwender das gleiche Wissen w haben, dann bezeichnen wir w
+als \defined{gemeinsames Wissen}. 
+\end{definition}\\
+\begin{definition}{Vorwissen}
+Wenn Anwender verschiedene Phasen hintereinander ausf\"uhren, dann bezeichnen
+wir das Wissen aus den bereits ausgef\"uhrten Phasen als \defined{Vorwissen}.
+\end{definition}\\
 \todo[inline]{Definition: Entscheidungsbaum}
-\todo[inline]{Definition: Attribut}
+\begin{definition}{Attribut}
+Wir definieren eine Menge von Wahrscheinlichkeiten 
+\(P = [0, 1] \subset \mathbb{R}\) und eine Menge von Buchstaben 
+\(\Sigma = \{a, b, \dots, z, A, B, \dots, Z\}\).
+Damit definieren wir ein \defined{Attribut} als 
+\(\Sigma^+ \times P \times P\). Wenn ein Attribut \(A = (w, l, h)\) gegeben ist,
+bezeichnen wir w als \defined{Wort}, l als \defined{unterer Schwellwert} und h
+als \defined{oberer Schwellwert}. Es wird desweiteren von allen Attributen
+gefordert, dass \(l \leq h\) ist.
+\end{definition}\\
 \todo[inline]{Definition: Schaltkreis}
 \todo[inline]{Definition: Entstellter Schaltkreis}
 \subsection{Annahmen}
 \todo[inline]{Annahme: ehrliche anwender := "handeln nach protokoll"}
 
+\pagebreak
 \section{Grundlagen der Anwendung}
 \todo[inline]{Vision der Anwendung}
 
 \subsection{Form der Benutzereingabe}
 \todo[inline]{Festlegen, wie die E-Mails ins Programm kommen}
+\todo[inline]{Festlegen: rechnen mit rationalen Zahlen zwecks Genauigkeit und
+              einfacherem Parsen spaeter}
 
 \subsection{Interaktion der verteilten Programme}
 \todo[inline]{Festlegen, wie das Programm verteilt wird und die Teile kommunizieren}
@@ -318,7 +337,57 @@ wir:
 \section{Verwenden des Klassifikators}
 \todo[inline]{Einleitung: Wir brauchen ein Programm, was den Klassifkator auf eine MAil oder Mails anwendet}
 \subsection{Eingabe des Klassifikators}
-\todo[inline]{Anhand der Definition von Attributen und Entscheidungsb\"aumen beschreibungssprache fuer Entscheidungsbaum herleiten}
+Ausgehend von den Definitionen eines Attributes und eines Entscheidungsbaumes
+kann leicht eine Grammatik erzeugt werden, welche die Form des eingegebenen
+Klassifikators eindeutig bestimmt. Wir notieren diese Grammatik in BNF. Diese
+ist so gew\"ahlt, dass sie eine LL(1)-Grammatik ist, d.h., sie ist besonders
+einfach zu parsen.\\
+\begin{verbatim}
+tree -> `Decide' `(' attribute (`,' tree)+ `)'
+      | `Output' `(' class `)'.
+class -> `Spam' | `Not Spam'.
+attribute -> `(' word `,' probability `,' probabilty `)'.
+word ->   (`a' | `b' | ... | `z' | `A' | ... | `Z')+
+probability -> number `/' number .
+number -> (`0' | `1' | ... | `9')+.
+\end{verbatim}
+
+Somit w\"are ein kodierter Klassifikationsbaum beispielsweise:
+\begin{verbatim}
+Decide((Foo, 1/3, 2/3),
+        Output(Spam), 
+        Decide((Bar, 1/2, 2/3), 
+                Output(Spam), 
+                Output(Not Spam)
+              )
+      )
+\end{verbatim}
+
+Da die Wahrscheinlichkeiten in den Attributen berechnet werden als
+Verh\"altnis der Anzahl der E-Mails mit einer bestimmten Eigenschaft
+zu der Gesamtanzahl aller E-Mails, ist die Darstellung einer
+Wahrscheinlichkeit in einem Attribut durch ein Paar von nat\"urlichen
+Zahlen ausreichend, um alle m\"oglichen Wahrscheinlichkeiten darzustellen.
+Da die Buchstabenmenge als die lateinischen Klein- und Grossbuchstaben
+definiert ist und ein Wort definiert ist als Sequenz dieser Zeichen,
+ist die Produktion ,,word''  ausreichend, um alle m\"oglichen Worte
+darzustellen. Damit ergibt sich, dass die Produktion 
+,,attribute'' in der Lage ist, alle Attribute, die in dieser
+Anwendung auftreten k\"onnen, darzustellen.\\
+Es gibt desweiteren bei uns nur die Ausgaben ,,Spam'' und ,,Nicht Spam''.
+Damit ist die Produktion ,,class'' ausreichend, um alle 
+m\"oglichen Ausgaben des Baumes darzustellen. Daraus folgt, dass die
+zweite Produktion von tree in der Lage ist, alle m\"oglichen Bl\"atter
+darzustellen. Desweiteren folgt induktiv aus der Vollst\"andigkeit der
+Produktion ,,attribute'' und der Darstellbarkeit der Bl\"atter als
+Induktionsanfang, dass die erste Produktion von tree in der Lage ist,
+alle m\"oglichen auszugebenden Entscheidungsb\"aume darzustellen. Damit
+ist die Grammatik m\"achtig genug f\"ur unsere Zwecke.\\
+Es ist weiterhin zu bemerken, dass eine semantische Validierung notwendig
+ist, da in der Grammatik weder gefordert ist, dass der untere Schwellwert
+eines Attributes wirklich kleiner ist als der obere Schwellwert 
+eines Attributes, noch dass die Wahrscheinlichkeiten wohldefiniert sind,
+d.h., dass der Nenner ungleich 0 ist.
 \subsection{Arbeitsweise des Klassifikators}
 \todo[inline]{Arbeitsweise des Klassifikators erkl\"aren}
 \end{document}
