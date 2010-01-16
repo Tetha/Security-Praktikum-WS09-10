@@ -116,6 +116,30 @@ bezeichnen wir w als \defined{Wort}, l als \defined{unterer Schwellwert} und h
 als \defined{oberer Schwellwert}. Es wird desweiteren von allen Attributen
 gefordert, dass \(l \leq h\) ist.
 \end{definition}\\
+\begin{definition}{Wahrheitstafel}
+F\"ur eine boolsche Funktion ist eine \defined{Wahrheitstafel} eine Tabelle,
+die f\"ur jede Kombination der Eingaben genau eine Ausgabe der beschriebenen
+Funktion definiert.
+\end{definition}\\
+\begin{definition}{entstellte Wahrheitstafel}
+Gegeben sei eine Wahrheitstafel mit Eingabevariablen 
+\(\{i_1, i_2, \dots, i_n\) und Ausgabevariable o und wir 
+ stellen f\"ur jede Variable v eine bijektive
+ Verschleierung \(f_v : {0, 1} \mapsto \mathbb{Z}\) auf. 
+Dann entsteht eine entstellte Wahrheitstafel f\"ur W, wenn
+wir jeden Wert der Eingangsvariablen verschleiern und den
+Wert der Ausgabevariablen mit einer symmetrischen Verschl\"usselung
+und den Werten der Eingangsvariablen als Sch\"ussel in mehreren
+Stufen verschl\"usseln.\\
+Dadurch kann die Wahrheitstafel noch immer korrekt berechnet werden,
+wenn die Eingaben der Berechnung durch die Verschleierung abgebildet
+wurden (es kann ohne die Verschleierung zu kennen jedoch das Ergebnis
+nicht genutzt werden). Es ist dem Auswerter zwar m\"oglich, eine andere
+Ausgabe zu produzieren, indem er anhand der Eingangsvariablen einfach
+eine andere Ausgabe dekodiert, allerdings ist die dann gew\"ahlte Ausgabe
+rein zuf\"allig, wenn der Auswerter die Verschleierungsfunktionen nicht
+kennt, da die verwendeten Werte der Verschleierung gleichverteilt sind.
+\end{definition}
 \todo[inline]{Definition: Schaltkreis}
 \todo[inline]{Definition: Entstellter Schaltkreis}
 \subsection{Annahmen}
@@ -220,7 +244,7 @@ Foo & \(\frac{5}{7}\) & \(\frac{1}{4}\) \\
 Bar & \(\frac{2}{7}\) & \(\frac{3}{4}\)
 \end{tabular}
 \end{center}
-Eine Approximation der Werte durch Flieskommazahlen ist
+Eine Approximation der Werte durch Fliesskommazahlen ist
 ebenfalls akzeptabel.}
 
 \subsection{Auswahl der Worte nach Informationsheuristik}
