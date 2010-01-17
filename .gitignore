@@ -4,3 +4,4 @@
 *.aux
 *.tdo
 *.toc
+!final_specification/final.pdf

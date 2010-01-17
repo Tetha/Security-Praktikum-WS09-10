@@ -127,21 +127,38 @@ Gegeben sei eine Wahrheitstafel mit Eingabevariablen
  stellen f\"ur jede Variable v eine bijektive
  Verschleierung \(f_v : {0, 1} \mapsto \mathbb{Z}\) auf. 
 Dann entsteht eine entstellte Wahrheitstafel f\"ur W, wenn
-wir jeden Wert der Eingangsvariablen verschleiern und den
-Wert der Ausgabevariablen mit einer symmetrischen Verschl\"usselung
-und den Werten der Eingangsvariablen als Sch\"ussel in mehreren
-Stufen verschl\"usseln.\\
-Dadurch kann die Wahrheitstafel noch immer korrekt berechnet werden,
-wenn die Eingaben der Berechnung durch die Verschleierung abgebildet
-wurden (es kann ohne die Verschleierung zu kennen jedoch das Ergebnis
-nicht genutzt werden). Es ist dem Auswerter zwar m\"oglich, eine andere
-Ausgabe zu produzieren, indem er anhand der Eingangsvariablen einfach
-eine andere Ausgabe dekodiert, allerdings ist die dann gew\"ahlte Ausgabe
-rein zuf\"allig, wenn der Auswerter die Verschleierungsfunktionen nicht
-kennt, da die verwendeten Werte der Verschleierung gleichverteilt sind.
+ wir f\"ur jede Zeile in der Wahrheitstafel die Ausgabe
+ durch die Werte der Eingangsvariablen mit einer symmetischen
+ Verschluesselung verschl\"usseln.
+Es ist notwendig zu bemerken, dass eine Implementierung
+ einen Weg anbieten muss, eine sinnlose Verschl\"usselung
+ zu erkennen. 
+\end{definition}\\
+\begin{definition}{Schaltkreis}
+Wir definieren einen \defined{Schaltkreis} als einen gerichteten azyklischen 
+ Graphen.
+Die Knoten dieses Graphen sind annotiert mit Wahrheitstafeln. 
+Die Kanten sind eingeteilt in \defined{Eingabekanten}, \defined{innere Kanten} 
+ und \defined{Ausgangskanten}.
+Der Wert einer Eingabekante wird vom Anwender zu Beginn festgelegt. 
+Der Wert einer inneren Kante oder einer Ausgangskante ergibt sich durch
+ anwenden der Wahrheitstafel auf die Eingangskanten. 
+Da wir nur boolsche Schaltkreise mit den Knotenannotationen ,,and'',
+ ,,or'', ,,xor'' und ,,not'' brauchen und all diese Funktionen entweder
+ un\"ar oder kommutativ sind, brauchen wir keine Ordnung der Eingabekanten
+ festlegen.
+\end{definition}\\
+\begin{definition}{Entstellter Schaltkreis}
+Ein \defined{entstellter Schaltkreis} entsteht aus einem normalen Schaltkreis,
+ indem jede an einen Knoten annotierte Wahrheitstafel entstellt wird, wenn
+ dabei garantiert wird, dass f\"ur die Verbindung einer Ausgangsvariablen
+ o mit einer Eingangsvariablen i auf beide Variablen die gleiche
+ Verschleierung angewendet wird.\\
+Desweiteren wird f\"ur jede Eingabekante die Verschleierungsfunktion
+ gespeichert, um die Eingabe des Schaltkreises kodieren zu k\"onnen und
+ f\"ur jede Ausgangskante die Inversion der Verschleierungsfunktion
+ gespeichert, um die Ausgabe dekodieren zu k\"onnen.
 \end{definition}
-\todo[inline]{Definition: Schaltkreis}
-\todo[inline]{Definition: Entstellter Schaltkreis}
 \subsection{Annahmen}
 \todo[inline]{Annahme: ehrliche anwender := "handeln nach protokoll"}
 
@@ -364,11 +381,16 @@ A, B, C, D, E sein.}
 \aliceheader{Alice};
 \bobheader{Bob};
 \nomoreheaders
-\symmetricknowledge{Eigene Eingabe};
+\aliceknowledge[-2]{Eigene Eingabe};
+\aliceknowledge[2]{Schaltkreis};
+
+\bobknowledge[-2]{Eigene Eingabe};
+\bobknowledge[2]{Schaltkreis};
+
 \phase{Y.1: Konstruktion des entstellten Schaltkreises und \"Ubertragung};
 \aliceknowledge[-2]{Eingabekodierung};
-\aliceknowledge[2]{Schaltkreis};
-\bobknowledge{Schaltkreis};
+\aliceknowledge[2]{entstellter Schaltkreis};
+\bobknowledge{entstellter Schaltkreis};
 \phase{Y.3 Alice schickt kodierte Eingabe an Bob};
 \bobknowledge{Alice' kodierte Eingabe};
 \phase{Y.4 Via Oblivious Transfer wird Bob's Eingabe kodiert};
@@ -376,15 +398,79 @@ A, B, C, D, E sein.}
 \phase{Y.5 Bob wertet Schaltkreis aus und sendet die Ausgabe an Alice};
 \symmetricknowledge{Ausgabe} ;
 \end{phases}
-\caption{Yaos Algorithmus}
+\caption{Yaos Protokoll}
 \end{figure}
-\todo[inline]{Yaos algorithmus grundlegend zusammenfassen (garbled decision table, garbled gate, garbled circuit)}
-\todo[inline]{Verschl\"usselung f\"ur die garbled Circuits festlegen (RSA?)}
-\todo[inline]{1-2 Oblivious Transfer festlegen (mit RSA?)}
-\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
+Die Eingabe jedes Anwenders f\"ur Yaos Protokoll ist eine Eingabe, und nach
+Kerckhoffs Prinzip auch der auszuf\"uhrende Schaltkreis in Reinform. Einer
+der beiden Anwender, ohne Beeintraechtigung der Allgemeinheit Alice, muss
+nun aus diesem Schaltkreis einen enstellten Schaltkreis konstruieren. Dies
+kann am einfachsten passieren, indem der Schaltkreis in einer Breitensuche
+traversiert wird und die Kanten verschleiert werden. Das bedeutet, dass
+in einem Schritt die zusammenh\"angenden Eingangs- und Ausgangsvariablen 
+verschleiert werden. Dadurch werden die Anforderungen aus der Definition
+der entstellten Schaltkreise erf\"ullt. Dabei kann dann auch erkannt
+werden, dass eine Eingangsvariable bzw Ausgabevariable kein ,,anderes
+Ende'' hat, d.h. diese Verschleierung in die Eingabekodierung bzw
+Ausgabekodierung geschrieben werden muss. Dieser Schaltkreis und die
+Ausgangskodierung wird dann an Bob \"ubertragen, w\"ahrend die
+Eingangskodierung bei Alice verbleibt.\\
+Bei der Verschl\"usselung der Ausgaben verwenden wir ein einfaches XOR.
+Um zu garantieren, dass wir Unsinnige Verschl\"usselungen erkennen k\"onnen,
+erweitern wir jeden Tabelleneintrag um eine zweiten Tabelleneintrag, der 
+aus einem analog zum Nutzeintrag verschl\"usselten Nutzeintrag verschl\"usselt
+wird, allerdings der Nullvektor ist. Wir bezeichnen diesen Eintrag als
+Markierungseintrag. Dann ist es m\"oglich, diesen Eintrag
+zu entschl\"usseln, zu \"uberpr\"ufen, ob dies der 0-Vektor ist und falls dies
+der Fall ist, den Nutzeintrag zu entschl\"usseln. Der einzige Fall, wo dies
+Probleme bereitet ist, wenn die bei zwei Eingaben die Verschleierungen 
+genau kontr\"ar sind, da dann \(a \oplus b = 0 = b \oplus a\) gilt
+und somit die Eingabe (0,1) und (1,0) die gleiche Ausgabe liefert. Dies
+muss also beim Verschleiern verhindert werden, was jedoch kein Problem ist.\\
+Bob muss nun noch die Belegung der Eingangskanten lernen. Die
+Eingabevariablen, die von Alice Eingabe belegt werden m\"ussen werden
+belegt, indem Alice anhand der Eingangskodierung ihre Eingabe kodiert
+und diesen String an Bob versendet. Da Bob keine Informationen dar\"uber
+hat, welcher der beiden Verschleierungswerte f\"ur 0 oder f\"ur 1 steht,
+erh\"alt Bob damit keine Informationen \"uber Alice Eingabe.\\
+F\"ur die Kodierung von Bob's Eingabe muss etwas mehr Aufwand getrieben
+werden, da weder Bob die Eingabekodierung lernen darf (weil er sonst
+Alice Eingabe lernt), noch Alice Bob's Eingabe lernen darf (indem z.B.
+Bob seine Eingabe an Alice schickt, damit Alice die Eingabe kodieren kann).
+Daher wird dies durch eine Anwendung des 1-2-Oblivious-Transfers gel\"ost:
+Alice bietet f\"ur jede von Bob zu belegende Eingabevariable die Werte
+f\"ur 0 bzw 1 an, und Bob w\"ahlt mithilfe seines Eingabebits den richtigen
+Wert aus. Aus den Eigenschaften von OT folgt, dass Alice nicht weiss, welchen
+der beiden Werte Bob gew\"ahlt hat, und dass Bob den nicht gew\"ahlten Wert
+nicht kennt. Somit ist die Sicherheit von Bobs Eingabe gegeben und 
+sichergestellt, dass Bob wirklich seine Eingabe verwendet.\\
+Wir implementieren den 1-2 Oblivious Transfer mittels RSA. Die Eingabe
+von Alice seien \(m_1\), \(m_2\) und die Eingabe von Bob sei \(b\).
+Alice ein Schl\"usselpaar, den privaten Exponenten e, den
+\"offentlichen Exponenten d und sendet den Modulus N, d und zwei zuf\"allige
+Nachrichten \(x_1\) und \(x_2\) an Bob. Bob w\"ahlt eine zuf\"allige Nachricht
+k, verschl\"usselt k zu \(k'\) und sendet \(v = x_b + k' mod N\) an Alice. 
+Alice berechnet nun \(k_0\) als Entschl\"usselung von \(v - x_0\) und 
+\(k_1\) als Entschl\"usselung von \(v - x_1\) und sendet \(m_0 + k_0\) und
+\(m_1 + k_1\) an Bob. Wenn Bob b = 0 gew\"ahlt hatte, kann Bob \(m_0\)
+durch Subtraktion von \(k'\) von Alice erster Nachricht berechnen, und wenn
+Bob b = 1 gew\"ahlt hatte, kann Bob \(m_1\) durch Subtraktion von \(k'\) von
+Alice zweiter Nachricht berechnen. Das folgt (oBdA f\"ur b = 0) aus
+\(m_0 + k_0 - k' = m_0 + D(v - x_0) - k' = m_0 + k' - k' = m_0\). Falls b 
+nicht 0 war, heben sich in der Entschl\"usselung die Faktoren \(x_0\) und
+\(x_1\) nicht auf und ein undefinierter Wert wird berechnet. \\
+Danach kann Bob den Schaltkreis auswerten, indem er immer f\"ur eine 
+Entscheidungstabelle, deren Eingabevariablen vollst\"andig belegt sind,
+denjenigen Eintrag sucht, indem f\"ur jeden Eintrag der Markierungseintrag
+entschl\"usselt wird und falls das Ergebnis 0 ist, der Nutzeintrag
+entschl\"usselt wird und der Wert entsprechend weiterverwendet wird. Sobald
+alle Ausgangsvariablen des gesamten Schaltkreises bekannt sind, kann anhand
+der Ausgabedekodierung die Ausgabe in Klartext berechnet werden und Alice 
+zugeschickt werden. (Hier wird wieder die Annahme des ehrlichen Anwenders
+getroffen).
 
 
 \subsection{Feststellen der dominierenden Ausgabe}
+\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -402,6 +488,7 @@ A, B, C, D, E sein.}
 \todo[inline]{Schaltkreis designen: Maximum von Summen von positiven Zahlensequenzen}
 
 \subsection{Feststellen ob Ausgabe eindeutig}
+\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -422,6 +509,7 @@ A, B, C, D, E sein.}
 \todo[inline]{Schaltkreis f\"ur x * log x -Protokoll aus dem Paper zusammenfassen}
 
 \subsection{Attribut mit maximalem Informationsgewinn finden}
+\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
