@@ -2,7 +2,8 @@
 \usepackage{tikz}
 \usepackage{todonotes}
 \usepackage{amssymb}
-\usetikzlibrary{arrows,decorations.pathmorphing}
+\usepackage{amsmath}
+\usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart}
 
 \hyphenation{Schwell-werte}
 % =============== Definitionen =========
@@ -179,6 +180,7 @@ Desweiteren wird f\"ur jede Eingabekante die Verschleierungsfunktion
 
 \subsection{Interaktion der verteilten Programme}
 \todo[inline]{Festlegen, wie das Programm verteilt wird und die Teile kommunizieren}
+\todo[inline]{Austauschen der Anzahl der E-Mails}
 
 \subsection{Phasen der Anwendung}
 \todo[inline]{Kurz die Einzelnen phasen der Anwendung beschreiben}
@@ -485,9 +487,7 @@ der Ausgabedekodierung die Ausgabe in Klartext berechnet werden und Alice
 zugeschickt werden. (Hier wird wieder die Annahme des ehrlichen Anwenders
 getroffen).
 
-
 \subsection{Feststellen der dominierenden Ausgabe}
-\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -502,10 +502,86 @@ getroffen).
 \end{phases}
 \caption{ID3-Algorithmus, Fall 1: Keine Attribute mehr vorhanden}
 \end{figure}
-\todo[inline]{Schaltkreis designen: Maximum von Summen von positiven Zahlensequenzen}
+Da die Menge der Attribute \"offentlich ist und die Menge der bereits
+verwendeten Attribute ebenfalls \"offentlich ist, k\"onnen beide
+Parteien erkennen, dass sie nun einen Blattknoten mit der dominierenden
+Ausgabe konstruieren m\"ussen. Dazu ist es notwendig, zu erkennen,
+ob in den verbleibenden E-Mails mehr Spam-E-Mails oder mehr Nicht-Spam-E-Mails
+vorhanden sind. Dazu muss ein Schaltkreis designed werden, welcher als Eingabe
+zwei Paare von Zahlen erh\"ahlt und als Ausgabe den Index der maximalen Summe
+liefert. Da hierzu die Summe gebildet werden muss, muss hierzu die verwendete
+Bitbreite bestimmt werden. Da jedoch beide Anwender die Anzahlen der von
+ihnen verwendeten E-Mail-Mengen preisgegeben haben, kann jedoch die Summe
+der verbleibenden Teilmengen abgesch\"atzt werden durch die Summe der
+Anzahlen der gesamten E-Mails und somit kann die geasmte Bitbreite der
+zu addierenden Zahlen abgesch\"atzt werden als Logarithmus dieser
+Gesamtanzahl.\\
+Dadurch verbleibt es dann, einen Schaltkreis zu designen, welcher zwei
+Zahlen bekannter Bitbreite addiert und 0 bzw 1 ausgibt, wenn die erste
+bzw zweite Zahl gr\"osser ist.
+Da Effizienz erst einmal sekund\"ar ist, kann die Addition der Zahlen
+ durch einen einfachen Riple-Carry-Adder vollzogen werden.\\
+Die Maximumsbestimmung von zwei bin\"aren Zahlen ist dann die Frage,
+ welche der beiden Zahlen die hoechstwertige 1 hat.
+Wenn wir zudem definieren, dass die Ausgabe 0 bedeutet, dass die erste
+ Zahl in den Paaren die kleinere ist und die Ausgabe 1 die zweite, dann
+ vereinfacht sich die Maximumsbestimmung noch weiter zum finden der
+ h\"ochstwertigen Stelle, die sich unterscheidet und dem zur\"uckgeben
+ des Bits in der ersten Zahl. Dies ist in Abbildung ~\ref{fig:circuit:max sum}
+ angedeutet.\\
+Formal gilt also:
+ \(lt(a, b) = b_i \Leftrightarrow a_i \neq b_i \wedge \forall k = i+1,\dots,n: a_k = b_k\)
+Der Allquantor ist als Kaskade von Und-Gattern implementierbar und die Gleichheit
+ bzw Ungleichheit als Negation bzw direkte Verwendung des XOR-Gatters implementierbar,
+ damit kann diese Formel einfach in einen Schaltkreis \"uberf\"uhrt werden.
+\begin{figure}[htb]
+\centering
+\begin{tikzpicture}
+[>=stealth']
+\node at (-4, 5) {Alice: Spam E-Mails, Nicht-Spam E-Mails};
+\node at (4, 5) {Bob: Spam E-Mails, Nicht-Spam E-Mails};
+\node[shape=circle,draw] (spamaddition) at (-1, 2) {+};
+\node[shape=circle,draw] (useaddition) at (1, 2) {+};
+\node (spamvector) [rectangle split, rectangle split parts=4, draw] at (-1, 0)
+{
+MSB
+\nodepart{second}
+0
+\nodepart{third}
+1
+\nodepart{fourth}
+\(\vdots\)
+};
+\node at (-3.2,0) {Anzahl Spam-Mails};
+
+\node(usevector) [rectangle split, rectangle split parts=4, draw] at (1, 0)
+{
+MSB
+\nodepart{second}
+0
+\nodepart{third}
+0
+\nodepart{fourth}
+\(\vdots\)
+};
+\node at (3.6,0) {Anzahl Nicht-Spam-Mails};
+
+\draw[->] (spamaddition) to (spamvector);
+\draw[->] (useaddition) to (usevector);
+\draw (-5, 4.8) -- (-5, 3) -- (3, 3) -- (3, 4.8);
+\draw (-3, 4.8) -- (-3, 4) -- (5, 4) -- (5, 4.8);
+\draw[->] (-1, 3) to (spamaddition);
+\draw[->] (1, 4) to (useaddition);
+\draw (-0.8, -0.1) -- (0.8, -0.1);
+
+\draw[->] (0,-0.1) -- (0,-1.8);
+\node at (0,-2) {Anzahl Spam-Mails \(\leq\) Anzahl Nicht-Spam-Mails};
+\end{tikzpicture}
+\caption{High-Level Struktur des Dominierende-Ausgabe-Schaltkreises}
+\label{fig:circuit:max sum}
+\end{figure}
 
 \subsection{Feststellen ob Ausgabe eindeutig}
-\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -520,7 +596,55 @@ getroffen).
 \end{phases}
 \caption{ID3-Algorithmus, Fall 2: Ausgabe eindeutig}
 \end{figure}
-\todo[inline]{Schaltkreis designen: Gleichheit.}
+Es muss ein Schaltkreis designed werden, der Feststellt, ob alle Elemente
+einer Menge eindeutig sind und dann entweder das Klassenlabel oder ein 
+Fehlersymbol ausgibt. Die Eingabe ist somit f\"ur jede E-Mail eine
+Kodierung f\"ur Spam, Nicht Spam oder Abwesenheit, die Anzahl der Eingaben
+ist bekannt und durch die Gesamtanzahl der E-Mails beschr\"ankt.\\
+Wir implementieren diesen Schaltkreis dann als Zustandsmaschine, die die
+internen Zust\"ande ,,Alles bis hier Spam'', ,,Alles bis hier kein Spam''
+und ,,Bereits uneindeutig'' hat. Wenn dann 
+\(T \colon \mathrm{State} \times \mathrm{Mailtype}\) ist, muss folgende
+Zustands\"ubergangstabelle implementiert werden:\\
+\begin{center}
+\begin{tabular}{c c c c}
+T & Alles bis hier Spam & Alles bis hier kein Spam & Bereits uneindeutig\\
+Spam & Alles bis hier Spam & Alles bis hier kein Spam & Bereits Uneindeutig \\
+Nicht Spam & Alles bis hier kein Spam & Alles bis hier kein Spam & Bereits Uneindeutig \\
+Abwesenheit & Alles bis hier Spam & Alles bis hier kein Spam & Bereits uneindeutig
+\end{tabular}
+\end{center}
+Zudem w\"are es sehr angenehm, wenn die Kodierung von Spam und 
+,,Alles bis hier Spam'' und von ,,Nicht Spam'' und ,,Alles bis hier kein Spam''
+gleich sind, da dies den Anfangsfall vereinfacht.\\
+Wenn wir nun ,,Bereits uneindeutig'' durch 11 kodieren und 
+,,Alles bis hier Spam'' mit 01 kodieren und ,,Alles bis hier kein Spam''
+mit 00 kodieren und davon ausgehend ,,Spam'' als 01 kodieren und
+,,Nicht Spam'' als 00 und ,,Abwesenheit'' als 11, dann muss folgende
+Zustands\"ubergangstabelle gelten:\\
+\begin{center}
+\begin{tabular}{c c c c}
+T & 01 & 00 & 11\\
+01 & 01 & 11 & 11\\
+00 & 11 & 00 & 11\\
+11 & 01 & 00 & 11
+\end{tabular}
+\end{center}
+
+Durch Anwenden von KV-Diagrammen ergeben sich als Zustands\"ubergangsgleichungen
+somit, mit \(s_0, s_1\) als Bits des vorherigen Zustandes, \(e_0, e_1\) als Bits
+der E-Mail Kodierung und \(s_0', s_1'\) als Bits des neuen Zustandes:
+\begin{align*}
+s_0' &=& s_0 \vee \overline{s_1} \overline{e_0} e_1
+           \vee s_1 \overline{e_0} \overline{e_1}\\
+s_1' &=& s_1 \vee s_0 \vee \overline{e_0} e_1
+\end{align*}
+Der Anfangszustand des Automatens ist die Kodierung der Klasse der ersten E-Mail.
+Es muss dann nur noch f\"ur jede E-Mail das beschriebene Zustands\"ubergangsnetz
+von den vorherigen Zust\"anden und der Kodierung der Klasse der aktuellen
+E-Mail implementiert werden. Das Fehlersymbol, das ausgegeben wird, ist 11,
+andernfalls ist die Klasse im zweiten Ausgabebit Kodiert, wobei Spam als 1 
+kodiert ist und Nicht Spam als 0.
 
 \subsection{Das Entropien-Protokoll}
 \todo[inline]{Schaltkreis f\"ur x * log x -Protokoll aus dem Paper zusammenfassen}
