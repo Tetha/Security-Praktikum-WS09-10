@@ -123,22 +123,24 @@ Funktion definiert.
 \end{definition}\\
 \begin{definition}{entstellte Wahrheitstafel}
 Gegeben sei eine Wahrheitstafel mit Eingabevariablen 
-\(\{i_1, i_2, \dots, i_n\) und Ausgabevariable o und wir 
+\(\{i_1, i_2, \dots, i_n\}\) und Ausgabevariable o und wir 
  stellen f\"ur jede Variable v eine bijektive
  Verschleierung \(f_v : {0, 1} \mapsto \mathbb{Z}\) auf. 
 Dann entsteht eine entstellte Wahrheitstafel f\"ur W, wenn
- wir f\"ur jede Zeile in der Wahrheitstafel die Ausgabe
- durch die Werte der Eingangsvariablen mit einer symmetischen
- Verschluesselung verschl\"usseln.
+ wir f\"ur jede Zeile in der Wahrheitstafel die verschleierte Ausgabe
+ mittels einer symmetrischen Verschl\"usselung mit den 
+ verschleierten Werte der Eingangsvariablen in einem 
+ Verschl\"usselungsschritt pro Eingangsvariable verschl\"usseln.
 Es ist notwendig zu bemerken, dass eine Implementierung
  einen Weg anbieten muss, eine sinnlose Verschl\"usselung
  zu erkennen.\\
 Wenn also beispielsweise in einer Wahrheitstafel die Eingaben 
  1 und 1 auf 1 abgebildet werden und die erste Eingabevariable
  verschleiert 1 als 23, die zweite Eingabevariable verschleiert
- 1 als 49 und die Ausgabevariable verschleiert 1 als 12, dann
+ 1 als 49 und die Ausgabevariable verschleiert 1 als 12 und E
+ ist die symmetrische Verschlueselung, dann
  ist das daraus entstehende Element der entstellten Wahrheitstafel
- \(E_{49}(E_{23}(12))\)
+ \(E_{f_{i_1}(1)}(E_{f_{i_2}(1)}(f_o(1))) = E_{49}(E_{23}(12))\)
 \end{definition}\\
 \begin{definition}{Schaltkreis}
 Wir definieren einen \defined{Schaltkreis} als einen gerichteten azyklischen 
@@ -350,12 +352,21 @@ A, B, C, D, E sein.}
 \end{phases}
 \end{figure}
 \todo[inline]{F\"ur section-Titel besseren Begriff f\"ur "Vorkomnisse der Worte in eigenen Spam/Nicht Spam E-Mails" finden}
-\subsection{Berechnung der Vorkomnisse}
-\todo[inline]{Content}
+\subsection{Berechnung der Anteile}
+\todo[inline]{Content: Mittlwerte ausrechnen}
 \subsection{Bestimmung der eigenen Schwellwerte}
-\todo[inline]{Content}
+Es muss nun f\"ur ein Wort \(w\) eine Schwelle gefunden werden, ab wann das
+Wort w in einer E-Mail oft vorkommt. Wir w\"ahlen hierzu den Mittelwert
+der Vorkomnisse des Wortes in allen eigene E-Mails eines Anwenders, da wir
+dann die Begriffe ,,\"uberdurchschnittlich oft'' bzw ,,unterdurchschnittlich 
+oft''als eigenen Schwellwert quantifizieren.
+Damit ergibt sich folgendes Akzeptanzkriterium:\\
+\requirement{Wenn die E-Mails "A A A", "A B B", "A C C" und "A A C" sind, dann
+muss die Software als eigenen Mittelwert f\"ur das Wort A 
+\(\frac{1}{4} \cdot (1 + \frac{1}{3} + \frac{1}{3} + \frac{2}{3}) = \frac{7}{12}\) bestimmen.}
 \subsection{Syncronisierung der Schwellwerte}
-\todo[inline]{Content}
+\todo[inline]{Content: Alice a, Bob b -> <a, b>, unter dem minimum der beiden werte def. selten,
+ueber dem max der werte def. oft und dazischen keine ahnugn. Implementierung als simples herumschicken}
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Diskretisieren der eigenen E-Mails}
@@ -423,8 +434,8 @@ Eingangskodierung bei Alice verbleibt.\\
 Bei der Verschl\"usselung der Ausgaben verwenden wir ein einfaches XOR.
 Um zu garantieren, dass wir Unsinnige Verschl\"usselungen erkennen k\"onnen,
 erweitern wir jeden Tabelleneintrag um eine zweiten Tabelleneintrag, der 
-aus einem analog zum Nutzeintrag verschl\"usselten Nutzeintrag verschl\"usselt
-wird, allerdings der Nullvektor ist. Wir bezeichnen diesen Eintrag als
+aus einem analog zum Nutzeintrag verschl\"usselten Nullvektor besteht.
+Wir bezeichnen diesen Eintrag als
 Markierungseintrag. Dann ist es m\"oglich, diesen Eintrag
 zu entschl\"usseln, zu \"uberpr\"ufen, ob dies der 0-Vektor ist und falls dies
 der Fall ist, den Nutzeintrag zu entschl\"usseln. Der einzige Fall, wo dies
