@@ -357,7 +357,6 @@ A, B, C, D, E sein.}
 \symmetricknowledge{Gemeinsame Liste von (Wort + Schwellwerte)};
 \end{phases}
 \end{figure}
-\todo[inline]{F\"ur section-Titel besseren Begriff f\"ur "Vorkomnisse der Worte in eigenen Spam/Nicht Spam E-Mails" finden}
 \subsection{Bestimmung der eigenen Schwellwerte}
 Es muss nun f\"ur ein Wort \(w\) eine Schwelle gefunden werden, ab wann das
 Wort w in einer E-Mail oft vorkommt. Wir w\"ahlen hierzu den Mittelwert
@@ -369,8 +368,27 @@ Damit ergibt sich folgendes Akzeptanzkriterium:\\
 muss die Software als eigenen Mittelwert f\"ur das Wort A 
 \(\frac{1}{4} \cdot (1 + \frac{1}{3} + \frac{1}{3} + \frac{2}{3}) = \frac{7}{12}\) bestimmen.}
 \subsection{Syncronisierung der Schwellwerte}
-\todo[inline]{Content: Alice a, Bob b -> <a, b>, unter dem minimum der beiden werte def. selten,
-ueber dem max der werte def. oft und dazischen keine ahnugn. Implementierung als simples herumschicken}
+Wir haben nun von Alice und Bob jeweils einen Schwellwert a und einen
+Schwellwert b, sodass Alice der Meinung ist, dass ein Wort \(w\)
+selten vorkommt, wenn der Anteil an Vorkomnissen unter a liegt und
+Bob der Meinung ist, dass das Wort selten vorkommt, wenn der Anteil an
+Vorkommnissen unter b liegt. Wir syncronisieren dann die Werte zu einem
+aufsteigend sortierten Paar von schwellwerten (a, b) bzw (b, a). oBdA sei
+\(a \leq b\). Dann gilt, dass bei weniger Vorkommnissen als a beide Anwender
+sich einig sind, dass das Wort selten vorkommt, w\"ahrend bei mehr Vorkommnissen
+als b beide Anwender sich einig sind, dass das Wort oft vorkommt. Dazwischen 
+herrscht uneinigkeit und es wird angenommen, dass die weiter Klassifikation
+durch einen Entscheidungsbaum diese Uneinigkeit aufl\"osen kann.\\
+Damit ergeben sich als Akzeptanzkriterien:\\
+\requirement{Wenn a = 0.2 ist und b = 0.4, dann ist das Schwellwertpaar
+(0.2, 0.4)}\\
+\requirement{Wenn a = 0.5 ist und b = 0.4, dann ist das Schwellwertpaar
+(0,4, 0.5)}\\
+\requirement{Wenn a = b = 0.5 ist, dann ist das resultierende Schwellwertpaar
+(0.5, 0.5)}\\
+Da die Attribute am Ende \"offentlich bekannt sind, implementieren wir
+dies, indem sich beide Anwender die eigenen Schwellwerte f\"ur die Worte
+zuschicken und dann lokal die Syncronisierung berechnen.
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Diskretisieren der eigenen E-Mails}
