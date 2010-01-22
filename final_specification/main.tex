@@ -609,8 +609,8 @@ Zustands\"ubergangstabelle implementiert werden:\\
 \begin{center}
 \begin{tabular}{c c c c}
 T & Alles bis hier Spam & Alles bis hier kein Spam & Bereits uneindeutig\\
-Spam & Alles bis hier Spam & Alles bis hier kein Spam & Bereits Uneindeutig \\
-Nicht Spam & Alles bis hier kein Spam & Alles bis hier kein Spam & Bereits Uneindeutig \\
+Spam & Alles bis hier Spam & Uneindeutig & Bereits Uneindeutig \\
+Nicht Spam & Uneindeutig & Alles bis hier kein Spam & Bereits Uneindeutig \\
 Abwesenheit & Alles bis hier Spam & Alles bis hier kein Spam & Bereits uneindeutig
 \end{tabular}
 \end{center}
@@ -637,7 +637,7 @@ der E-Mail Kodierung und \(s_0', s_1'\) als Bits des neuen Zustandes:
 \begin{align*}
 s_0' &=& s_0 \vee \overline{s_1} \overline{e_0} e_1
            \vee s_1 \overline{e_0} \overline{e_1}\\
-s_1' &=& s_1 \vee s_0 \vee \overline{e_0} e_1
+s_1' &=& s_1 \vee \overline{e_0} e_1
 \end{align*}
 Der Anfangszustand des Automatens ist die Kodierung der Klasse der ersten E-Mail.
 Es muss dann nur noch f\"ur jede E-Mail das beschriebene Zustands\"ubergangsnetz
@@ -647,10 +647,90 @@ andernfalls ist die Klasse im zweiten Ausgabebit Kodiert, wobei Spam als 1
 kodiert ist und Nicht Spam als 0.
 
 \subsection{Das Entropien-Protokoll}
-\todo[inline]{Schaltkreis f\"ur x * log x -Protokoll aus dem Paper zusammenfassen}
+Es muss in diesem Teilschritt im Kern \(x\cdot \ln x\) berechnet werden und
+danach das Maximum dieser Werte bestimmen.
+Um den ersten Schritt mit Yaos Algorithmus zu berechnen, m\"ussen
+wir einige Teilprobleme l\"osen. Es muss zum einen ein Weg gefunden
+werden, durch den man mit Yaos Protokoll f\"ur beide Anwender
+verschiedene Ausgaben produziert werden k\"onnen und zum zweiten muss
+ein Weg gefunden werden, eine Zahl in zwei Shares zu zerlegen, sodass die
+Summe der Shares wieder die Zahl ist.\\
+Betrachten wir das erste Teilproblem, separate Ausgaben f\"ur die Anwender
+zu erzeugen. Dies ist ein Problem, da Yaos Protokoll fuer die private 
+zwei Parteien berechnung einer Funktion eben eine Funktion berechnet, d.h.
+genau einen Wert, der dann beiden Parteien bekannt gegeben wird. 
+Um dies zu l\"osen, nehmen wir an, dass i und j die Eingaben von Alice
+und Bob sind und der evaluierte Schaltkreis \(f(i, j) = A \& B\) berechnet,
+wobei \(\&\) die Konkatenation von Bin\"arsequenzen bezeichne.
+Falls die Ausgabe nicht derartig sortiert ist, muss dies in einem separaten
+Schaltkreis vor der Ausgabe passieren. Wir erweitern dann die Eingabe i
+von Alice um \(\|A\|\) Zufallsbits zu \(i \& C_A\) und analog die Eingabe
+j von Bob um \(\|B\|\) Zufallsbits zu \(j \& C_B\) und erweitern den 
+Schaltkreis am Ende, sodass er 
+\(f'(i\&C_A, j\&C_B) = A \oplus C_A \& B \oplus C_B\) berechnet, wobei
+\(\oplus\) das bitweise XOR von zwei Bin\"arsequenzen beschreibe. Da \(C_A\)
+und \(C_B\) im eigentlichen Schaltkreis zur Berechnung von A und B nicht
+verwendet werden und zuf\"allig sind und dem jeweils anderen Anwender 
+unbekannt sind, ist dies also \"aquivalent zu einer 
+One-Time-Pad-Verschl\"usselung der Ergebnisse mit einem Sch\"ussel, den
+nur der Anwender kennt, der diese Ausgabe wisssen soll.\\
+Zum zweiten muss ein bin\"arkodierter Integer \(S\) in zwei zuf\"allige Shares 
+\(S_A, S_B\) zerlegt werden, sodass \(S_A + S_B = S\) ist. Da unsere
+Schaltkreise deterministisch sind, bedeutet das, dass wir Zufallsbits als 
+Eingabe hinzugeben m\"ussen, um eine zuf\"allige Aufteilung zu erreichen.
+Wir l\"osen dieses Problem dann so, dass wir einen Verteilungsvektor \(V\)
+berechnen mit \(\|V\| = \|S\|\) und kopieren das Bit i in Alice' Share \(S_A\),
+falls \(V^i = 1\) ist, andernfalls kopieren wir das Bit i in Bobs Share \(S_B\).
+Das Kopieren kann implementiert werden, indem \(S_A^i = S^i \wedge V^i\) und
+\(S_B^i = S^i \wedge \overline{V^i}\) implementiert wird.\\
+Die Summe der beiden Shares ist dann wieder S, weil die Shares den Wert von
+S als zwei disjunkte Mengen von Zweierpotenzen darstellen, sodass die Addition
+keinen Carry erfordert, sondern einfach eine Veroderung der beiden Shares ist.
+Somit wird S wieder entstehen, wenn jedes Bit in \(S_A\) oder in \(S_B\) zu
+finden ist. Das ist nach Konstruktion aequivalent dazu, dass jedes Bit in V
+entweder 0 oder 1 ist. Bleibt die Frage, wieviele Informationen aus dem Share
+gewonnen werden kann. Es gilt, dass eine 0 eine Unsicherheitsquelle ist, da
+die 0 entweder eine 0 sein kann, die enstanden ist, weil der Verteilungsvektor
+an dieser Position ung\"unstig war oder weil wirklich im Share eine 0 war.
+Wenn wir eine 1 sehen, wissen wir auf jeden Fall, dass in \(S\) an dieser
+Position 1 war. Da wir jedoch als Menge aufzuteilender Werte zum einen den
+Wert \(2^N \cdot n \cdot \ln 2\) haben f\"ur eine Konstante \(N\) und zum
+anderen \(\epsilon \cdot 2^N\) f\"ur ein beiden Parteien unbekanntes
+Epsilon, sind die vorkommenden Bitmuster so \"uberlappend, dass nur aus der
+Position einiger 1en nicht geschlossen werden kann, welcher Wert aufgetreten 
+ist. Wenn zudem der Verteilungsvektor unbekannt ist, ist somit aus dem Share
+auf jeden Fall nicht ausreichend Informationen abzuleiten, um das Geheimnis
+zu lernen.\\
+Es bleibt nun V zu berechnen. Da die Bitbreite von \(S\) abgesch\"atzt werden
+kann, definieren wir, dass Alice und Bob zwei weitere Vektoren \(V_A\) und
+\(V_B\) eingeben und definieren \(V = V_A \oplus V_B\). Dadurch kann keiner
+der beiden Anwender alleine den Wert von V zu seinem Vorteil beeinflussen.\\
+Im \(x \cdot \ln x\) Entropienprotokoll wird nun eine Taylorreihe aufgestellt,
+anhand derer festgestellt werden kann, das zwei Werte berechnet werden m\"ussen:
+\(2^N \cdot n \cdot \ln 2\) und \(\epsilon \cdot 2^N\), wobei x die
+Summe der Anwendereingaben ist und \(x = 2^n\cdot(1+\epsilon)\) mit 
+\(-\frac{1}{2} \leq \epsilon \leq \frac{1}{2}\) und N eine obere Schranke
+f\"ur n ist. Der erste Wert ist kein Integer, kann jeoch auf einen Integer
+gerundet werden, ohne dass die Genauigkeit einbricht, da er nur als
+Anfangsann\"aherung dient, der zweite Wert ist ein Integer.\\
+Der erste Wert wird in einem Schaltkreis berechnet, indem das n berechnet wird
+und die m\"oglichen Werte des Ausdruckes in einer hardkodierten Tabelle
+nachgesehen werden. Das n wird berechnet, indem der Index des signifikantesten
+Bits von x berechnet wird. Der zweite Ausdruck wird berechnet, indem 
+\(\epsilon \cdot 2^N = 2^(N-n) \cdot \epsilon \cdot 2^n = 2^(N-n) \cdot (x - 2^n)\) 
+festgestellt wird. Das bedeutet, man muss das signifikanteste Bit von x 
+l\"oschen und das Ergebnis davon um N-n bit nach links shiften. Der Wert
+von N wird vorher berechnet und hardkodiert.Die Lookuptable und der 
+parametrierte Shift werden wieder \"uber vollst\"andige Suchen implementiert,
+da so nur der (relativ einfache) Vergleich implementiert werden muss.
+Danach sind diese beiden Werte berechnet und ausgehend von der Vor\"uberlegung
+muss noch die Aufteilung beider Werte in Shares sowie die Verschleierung der
+Ausgaben f\"ur die beiden Anwender orthogonal hinzugef\"ugt werden.
+\todo[inline]{Verbesserung der Approximation}
+\todo[inline]{Private Multiplikation zm Berechnen von x * ln x}
+\todo[inline]{Schaltkreis f\"ur x * ln x -Protokoll aus dem Paper zusammenfassen}
 
 \subsection{Attribut mit maximalem Informationsgewinn finden}
-\todo[inline]{Feststellung der benoetigten Bytezahl beschreiben}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -673,7 +753,8 @@ kodiert ist und Nicht Spam als 0.
 \end{phases}
 \caption{ID3-Algorithmus, Fall 3: Erzeugung eines Astes}
 \end{figure}
-\todo[inline]{Vorgheen zusammenfassen, Schaltkreis aus dominierender Ausgabe wiederverwenden}
+\todo[inline]{Entropien berechnen}
+\todo[inline]{Index der maximalen Summe der Shares finden, verwenden vom Schaltkris aus dominierender Ausgabe}
 
 \pagebreak  %XXX: if  possible, kill this pagebreak
 \section{Verwenden des Klassifikators}
