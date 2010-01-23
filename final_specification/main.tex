@@ -3,7 +3,7 @@
 \usepackage{todonotes}
 \usepackage{amssymb}
 \usepackage{amsmath}
-\usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart}
+\usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart,automata}
 
 \hyphenation{Schwell-werte}
 % =============== Definitionen =========
@@ -367,6 +367,7 @@ Damit ergibt sich folgendes Akzeptanzkriterium:\\
 \requirement{Wenn die E-Mails "A A A", "A B B", "A C C" und "A A C" sind, dann
 muss die Software als eigenen Mittelwert f\"ur das Wort A 
 \(\frac{1}{4} \cdot (1 + \frac{1}{3} + \frac{1}{3} + \frac{2}{3}) = \frac{7}{12}\) bestimmen.}
+
 \subsection{Syncronisierung der Schwellwerte}
 Wir haben nun von Alice und Bob jeweils einen Schwellwert a und einen
 Schwellwert b, sodass Alice der Meinung ist, dass ein Wort \(w\)
@@ -412,8 +413,29 @@ zuschicken und dann lokal die Syncronisierung berechnen.
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Lernen der gesamten E-Mails}
-\todo[inline]{verteiltes ID3 beschreiben}
-
+Das verteilte Lernen der gesamten E-Mails ist bei weitem der komplexeste
+Schritt in der Anwendung. Auf einer sehr abstrakten Ebene ist dieser
+Schritt jedoch eine direkte Umsetzung des ID3-Algorithmus' auf den
+privaten, verteilten Fall. Das bedeutet, der Algorithmus arbeitet
+rekursiv auf einer Menge von Daten und einer Menge von verbleibenden
+Attributen und unterscheidet dann drei F\"alle:
+\begin{itemize}
+\item Es gibt keine weiteren Attribute. In diesem Fall wird die
+ein Blatt mit der dominierenden Ausgabe erzeugt Dies ist in
+Abbildung \ref{fig:id3:case1} illustriert und in Sektion 
+\ref{sec:id3:case1} genauer spezifiziert.
+\item Alle Datens\"atze sind sich bez\"uglich der Ausgabe einig.
+In diesem Fall wird ein Blattknoten mit der eindeutigen Ausgabe
+erzeugt. Dies ist in Abbildung \ref{fig:id3:case2} illustriert und in 
+Sektion \ref{sec:id3:case2} genauer spezifiziert.
+\item Es herrscht noch Uneinigkeit bez\"uglich der Ausgabe
+und es gibt noch weitere verwendbare Attribute. In diesem Fall
+muss die Datenmenge anhand der Attributwerte eines Attributes
+partitioniert werden, sodass der Informationsgewinn maximal ist
+und die partitionen dann rekursiv behandelt werden. Dies ist in
+Abbildung \ref{fig:id3:case3} illustiert und in Sektion \ref{sec:id3:case3} genauer
+spezifiziert.
+\end{itemize}
 \subsection{Yaos Protokoll}
 \begin{figure}[htb]
 \begin{phases}
@@ -438,7 +460,11 @@ zuschicken und dann lokal die Syncronisierung berechnen.
 \symmetricknowledge{Ausgabe} ;
 \end{phases}
 \caption{Yaos Protokoll}
+\label{fig:yao}
 \end{figure}
+\paragraph{Generelles Vorgehen}
+Der grobe Ablauf von Yaos Protokoll f\"ur die private zwei-Parteien Berechnung
+ist in Abbidlung \ref{fig:yao} skizziert.
 Die Eingabe jedes Anwenders f\"ur Yaos Protokoll ist eine Eingabe, und nach
 Kerckhoffs Prinzip auch der auszuf\"uhrende Schaltkreis in Reinform. Einer
 der beiden Anwender, ohne Beeintraechtigung der Allgemeinheit Alice, muss
@@ -452,7 +478,8 @@ werden, dass eine Eingangsvariable bzw Ausgabevariable kein ,,anderes
 Ende'' hat, d.h. diese Verschleierung in die Eingabekodierung bzw
 Ausgabekodierung geschrieben werden muss. Dieser Schaltkreis und die
 Ausgangskodierung wird dann an Bob \"ubertragen, w\"ahrend die
-Eingangskodierung bei Alice verbleibt.\\
+Eingangskodierung bei Alice verbleibt.
+\paragraph{Verschleierung der Wahrheitstabellen}
 Bei der Verschl\"usselung der Ausgaben verwenden wir ein einfaches XOR.
 Um zu garantieren, dass wir Unsinnige Verschl\"usselungen erkennen k\"onnen,
 erweitern wir jeden Tabelleneintrag um eine zweiten Tabelleneintrag, der 
@@ -464,13 +491,16 @@ der Fall ist, den Nutzeintrag zu entschl\"usseln. Der einzige Fall, wo dies
 Probleme bereitet ist, wenn die bei zwei Eingaben die Verschleierungen 
 genau kontr\"ar sind, da dann \(a \oplus b = 0 = b \oplus a\) gilt
 und somit die Eingabe (0,1) und (1,0) die gleiche Ausgabe liefert. Dies
-muss also beim Verschleiern verhindert werden, was jedoch kein Problem ist.\\
+muss also beim Verschleiern verhindert werden, was jedoch kein Problem ist.
+\paragraph{Belegung der Eingangskanten}
+\subparagraph{Alice Eingabe}
 Bob muss nun noch die Belegung der Eingangskanten lernen. Die
 Eingabevariablen, die von Alice Eingabe belegt werden m\"ussen werden
 belegt, indem Alice anhand der Eingangskodierung ihre Eingabe kodiert
 und diesen String an Bob versendet. Da Bob keine Informationen dar\"uber
 hat, welcher der beiden Verschleierungswerte f\"ur 0 oder f\"ur 1 steht,
-erh\"alt Bob damit keine Informationen \"uber Alice Eingabe.\\
+erh\"alt Bob damit keine Informationen \"uber Alice Eingabe.
+\subparagraph{Bobs Eingabe}
 F\"ur die Kodierung von Bob's Eingabe muss etwas mehr Aufwand getrieben
 werden, da weder Bob die Eingabekodierung lernen darf (weil er sonst
 Alice Eingabe lernt), noch Alice Bob's Eingabe lernen darf (indem z.B.
@@ -481,7 +511,8 @@ f\"ur 0 bzw 1 an, und Bob w\"ahlt mithilfe seines Eingabebits den richtigen
 Wert aus. Aus den Eigenschaften von OT folgt, dass Alice nicht weiss, welchen
 der beiden Werte Bob gew\"ahlt hat, und dass Bob den nicht gew\"ahlten Wert
 nicht kennt. Somit ist die Sicherheit von Bobs Eingabe gegeben und 
-sichergestellt, dass Bob wirklich seine Eingabe verwendet.\\
+sichergestellt, dass Bob wirklich seine Eingabe verwendet.
+
 Wir implementieren den 1-2 Oblivious Transfer mittels RSA. Die Eingabe
 von Alice seien \(m_1\), \(m_2\) und die Eingabe von Bob sei \(b\).
 Alice ein Schl\"usselpaar, den privaten Exponenten e, den
@@ -507,7 +538,7 @@ der Ausgabedekodierung die Ausgabe in Klartext berechnet werden und Alice
 zugeschickt werden. (Hier wird wieder die Annahme des ehrlichen Anwenders
 getroffen).
 
-\subsection{Feststellen der dominierenden Ausgabe}
+\subsection{Feststellen der dominierenden Ausgabe}\label{sec:id3:case1}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -521,6 +552,7 @@ getroffen).
 \symmetricknowledge{gemeinsamer Blattknoten mit dominierender Ausgabe};
 \end{phases}
 \caption{ID3-Algorithmus, Fall 1: Keine Attribute mehr vorhanden}
+\label{fig:id3:case1}
 \end{figure}
 Da die Menge der Attribute \"offentlich ist und die Menge der bereits
 verwendeten Attribute ebenfalls \"offentlich ist, k\"onnen beide
@@ -600,8 +632,10 @@ MSB
 \caption{High-Level Struktur des Dominierende-Ausgabe-Schaltkreises}
 \label{fig:circuit:max sum}
 \end{figure}
+\requirement{Dieser Schaltkeris f\"ur die dominierende Ausgabe 
+kann generiert werden}
 
-\subsection{Feststellen ob Ausgabe eindeutig}
+\subsection{Feststellen ob Ausgabe eindeutig}\label{sec:id3:case2}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -615,6 +649,7 @@ MSB
 \symmetricknowledge{gemeinsamer Blattknoten mit eindeutiger Ausgabe}
 \end{phases}
 \caption{ID3-Algorithmus, Fall 2: Ausgabe eindeutig}
+\label{fig:id3:case2}
 \end{figure}
 Es muss ein Schaltkreis designed werden, der Feststellt, ob alle Elemente
 einer Menge eindeutig sind und dann entweder das Klassenlabel oder ein 
@@ -667,14 +702,17 @@ andernfalls ist die Klasse im zweiten Ausgabebit Kodiert, wobei Spam als 1
 kodiert ist und Nicht Spam als 0.
 
 \subsection{Das Entropien-Protokoll}
-Es muss in diesem Teilschritt im Kern \(x\cdot \ln x\) berechnet werden und
-danach das Maximum dieser Werte bestimmen.
+Es muss in diesem Teilschritt f\"ur jeden Anwender ein Share von
+ \(x\cdot \ln x\) berechnet werden, sodass die Summe der Shares
+ ca \(x \cdot \ln x\) ist.
 Um den ersten Schritt mit Yaos Algorithmus zu berechnen, m\"ussen
 wir einige Teilprobleme l\"osen. Es muss zum einen ein Weg gefunden
 werden, durch den man mit Yaos Protokoll f\"ur beide Anwender
 verschiedene Ausgaben produziert werden k\"onnen und zum zweiten muss
 ein Weg gefunden werden, eine Zahl in zwei Shares zu zerlegen, sodass die
-Summe der Shares wieder die Zahl ist.\\
+Summe der Shares wieder die Zahl ist.
+
+\subsubsection{Erweiterung von Yaos Protokoll:  Separate Ausgaben}
 Betrachten wir das erste Teilproblem, separate Ausgaben f\"ur die Anwender
 zu erzeugen. Dies ist ein Problem, da Yaos Protokoll fuer die private 
 zwei Parteien berechnung einer Funktion eben eine Funktion berechnet, d.h.
@@ -694,6 +732,10 @@ verwendet werden und zuf\"allig sind und dem jeweils anderen Anwender
 unbekannt sind, ist dies also \"aquivalent zu einer 
 One-Time-Pad-Verschl\"usselung der Ergebnisse mit einem Sch\"ussel, den
 nur der Anwender kennt, der diese Ausgabe wisssen soll.\\
+\requirement{Es ist m\"oglich, einen Schaltkreis so zu erweitern}
+
+\subsubsection{Erweiterung von Yaos Protokoll: Zerlegung der Ausgabe in zuf\"allige Shares}
+\paragraph{Die Problemstellung}
 Zum zweiten muss ein bin\"arkodierter Integer \(S\) in zwei zuf\"allige Shares 
 \(S_A, S_B\) zerlegt werden, sodass \(S_A + S_B = S\) ist. Da unsere
 Schaltkreise deterministisch sind, bedeutet das, dass wir Zufallsbits als 
@@ -702,7 +744,9 @@ Wir l\"osen dieses Problem dann so, dass wir einen Verteilungsvektor \(V\)
 berechnen mit \(\|V\| = \|S\|\) und kopieren das Bit i in Alice' Share \(S_A\),
 falls \(V^i = 1\) ist, andernfalls kopieren wir das Bit i in Bobs Share \(S_B\).
 Das Kopieren kann implementiert werden, indem \(S_A^i = S^i \wedge V^i\) und
-\(S_B^i = S^i \wedge \overline{V^i}\) implementiert wird.\\
+\(S_B^i = S^i \wedge \overline{V^i}\) implementiert wird.
+
+\paragraph{Unsere L\"osung}
 Die Summe der beiden Shares ist dann wieder S, weil die Shares den Wert von
 S als zwei disjunkte Mengen von Zweierpotenzen darstellen, sodass die Addition
 keinen Carry erfordert, sondern einfach eine Veroderung der beiden Shares ist.
@@ -720,7 +764,9 @@ Epsilon, sind die vorkommenden Bitmuster so \"uberlappend, dass nur aus der
 Position einiger 1en nicht geschlossen werden kann, welcher Wert aufgetreten 
 ist. Wenn zudem der Verteilungsvektor unbekannt ist, ist somit aus dem Share
 auf jeden Fall nicht ausreichend Informationen abzuleiten, um das Geheimnis
-zu lernen.\\
+zu lernen.
+
+\paragraph{Berechnung des Verteilungsvektors}
 Es bleibt nun V zu berechnen. Da die Bitbreite von \(S\) abgesch\"atzt werden
 kann, definieren wir, dass Alice und Bob zwei weitere Vektoren \(V_A\) und
 \(V_B\) eingeben und definieren \(V = V_A \oplus V_B\). Dadurch kann keiner
@@ -732,7 +778,10 @@ Summe der Anwendereingaben ist und \(x = 2^n\cdot(1+\epsilon)\) mit
 \(-\frac{1}{2} \leq \epsilon \leq \frac{1}{2}\) und N eine obere Schranke
 f\"ur n ist. Der erste Wert ist kein Integer, kann jeoch auf einen Integer
 gerundet werden, ohne dass die Genauigkeit einbricht, da er nur als
-Anfangsann\"aherung dient, der zweite Wert ist ein Integer.\\
+Anfangsann\"aherung dient, der zweite Wert ist ein Integer.
+\requirement{Es ist m\"oglich, einen Schaltkreis so zu erweitern}
+
+\subsubsection{Berechnung der Anfangsapproximation}
 Der erste Wert wird in einem Schaltkreis berechnet, indem das n berechnet wird
 und die m\"oglichen Werte des Ausdruckes in einer hardkodierten Tabelle
 nachgesehen werden. Das n wird berechnet, indem der Index des signifikantesten
@@ -746,11 +795,175 @@ da so nur der (relativ einfache) Vergleich implementiert werden muss.
 Danach sind diese beiden Werte berechnet und ausgehend von der Vor\"uberlegung
 muss noch die Aufteilung beider Werte in Shares sowie die Verschleierung der
 Ausgaben f\"ur die beiden Anwender orthogonal hinzugef\"ugt werden.
-\todo[inline]{Verbesserung der Approximation}
-\todo[inline]{Private Multiplikation zm Berechnen von x * ln x}
-\todo[inline]{Schaltkreis f\"ur x * ln x -Protokoll aus dem Paper zusammenfassen}
+\requirement{Dieser Schaltkreis zur Berechnung der Shares der
+ersten Approximation kann generiert werden}
 
-\subsection{Attribut mit maximalem Informationsgewinn finden}
+\subsubsection{Verbesserung der ersten Approximation}
+\paragraph{Vorgehensweise}
+Um dann die Anfangsapproximation zu verbessern, wird die Taylorreihe bis auf
+das k. Element berechnet, wobei k ein Praezisionsparameter ist. Das Paper
+w\"ahlt hierzu eine zuf\"allige Zahl \(z_1\) und definiert das Polynom:
+\begin{equation}
+Q(z) = 
+    \mathrm{lcm}(2,\dots,k)
+    \cdot
+    \sum_{i=1}^k 
+    \frac{(-1)^{i-1}}{2^{N \cdot (i-1)}}
+    \cdot
+    \frac{(\alpha_1+z)^i}{i}
+    - z_1
+\end{equation}
+F\"ur die Implementierung wird der binomische Term aufgel\"ost und die Formel
+etwas umgestell:
+\begin{equation}
+Q(z) =
+    \mathrm{lcm}(2, \dots, k)
+    \cdot
+    \sum
+        _{
+            i=1
+        }
+        ^k
+    \sum
+        _{
+            x=1
+        }
+        ^i
+    \frac
+        {
+            (-1)
+                ^{
+                    i-1
+                }
+        }
+        {
+            2
+                ^{
+                    N \cdot (i-1)
+                }
+            \cdot 
+            i
+        }
+    \cdot
+    {i \choose x}
+    \cdot
+    \alpha_1
+        ^{i-x}
+    \cdot
+    z
+        ^x
+    - z_1
+\end{equation}
+In dieser Form kann prinzipiell ein Array mit den Koeffizienten als Eintr\"age
+verwendet werden und immer an der Stelle x wird der entsprechende Faktor
+addiert.
+\paragraph{Geheime Auswertung von Q}
+\subparagraph{Die Problemstellung}
+Die Auswertung von Q im Punkt \(\alpha_2\) ergibt dann ein zweites Share 
+\(z_2\) mit der Eigenschaft, dass 
+\(z_1 + z_2 + lcm(2,\dots,k)\cdot(\beta_1+\beta_2) \approx 
+lcm(2,\dots,k)\cdot 2^N \cdot \ln x\). Die Gleichheit gilt nur ungef\"ahr,
+da die Taylorapproximation nur teilweise berechnet wurden, jedoch kann
+die Genauigkeit durch den Parameter k (zu Lasten der Laufzeit, da k der Grad
+des auszuwertenden Polynoms ist)  beliebig verbessert werden.\\
+Da Q einen geheimen Share von Alice enth\"ahlt und \(\alpha_2\) ein
+geheimer Share von Bob ist, brauchen wir einen Algorithmus zur
+geheimen Auswertung von Polynomen, sodass Bob zwar \(Q(\alpha_2)\) lernt, 
+aber nicht Q und dass Alice nichts \"uber \(\alpha_2\) erf\"ahrt.
+\subparagraph{Das verwendete Protokoll}
+Das dazu verwendete Protokoll arbeitet wie folgt:
+Alice w\"ahlt ein zuf\"alliges bivariates Polynom \(R(x, y)\) mit den 
+Eigenschaften:  
+ (1) Der Grad \(d_y\) von y ist der Grad von Q
+ (2) \(R(0,\cdot) = Q(\cdot)\),
+ (3) Der Grad von x in Q ist ein Parameter \(d_{R,x}\).
+So ein Polynom kann gew\"ahlt werden, indem wir mit dem Polynom Q
+anfangen und dann Zufallskoeffizienten f\"ur Terme, die den Parameter
+x enthalten, w\"ahlen, bis der Grad in x gross genug ist. Dadurch
+kann durch setzen von x = 0 direkt das Polynom Q rekonstruiert werden,
+da nur die Faktoren aus Q keinen Anteil am x haben. Wenn wir desweiteren
+keine zu grossen Potenzen von y einf\"ugen ist die 1. Bedingung ebenfalls
+direkt erf\"ullt.  Die dritte Bedingung ist nach Konstruktion erf\"ullt.\\
+Bob w\"ahlt ein weiteres univariates Polynom S mit der Eigenschaft, dass
+\(S(0) = \alpha_2\) ist und der Grad des Polynoms ist \(\frac{d_{R,x}}{d_Q}\),
+wobei \(d_Q\) der Grad von Q ist. Dies kann konstruiert werden, indem 
+der konstante Faktor des Polynoms auf \(\alpha_2\) gesetzt wird und
+die restlichen Faktoren zuf\"allig gew\"ahlt werden.
+
+Der Plan ist nun, ein Polynom \(T(0) = R(0,S(0)) = P(S(0)) = P(\alpha_2)\)
+auszuwerten, damit Bob den gesuchten Wert lernen kann. um T rekonstruieren
+zu k\"onnen muss Bob dementsprechend 
+\(d_T + 1 = d_{R,x} + d_Q \cdot d_s +1= 2\cdot d_{R,x}+1\) 
+Punkte von T erfahren,
+um T zu rekonstruieren und \(T(0)\) auswerden zu k\"onnen. (Die verschiedenen
+\(d_p\) bzw \(d_{p,v}\) bezeichnen den Grad des Polynoms p, eventuell in der
+Variablen v). Um dies geheim durchzuf\"uhren, w\"ahlt Bob \(n = 2 \cdot d_{R,x}+1\)
+verschiedene Punkte verschieden von 0. F\"ur jeden Punkt \(x_i\) dieser Punkte
+sendet Bob eine Liste von m-1 zuf\"alligen Punkten und dem Wert \(S(x_i)\) 
+in zuf\"alliger Reihenfolge an Alice sowie den Punkt \(x_i\) selbst.
+Via 1-m-Oblivious-Transfer kann nun Alice den Wert \(R(x_i, \cdot)\) f\"ur jeden
+der zuf\"alligen Punkte anbieten und Bob kann -- da er die Reihenfolge der
+Punkte und damit die Position von \(S(x_i)\) kennt -- den Wert \(R(x_i, S(x_i))\)
+lernen. Alice lernt dabei die Position nicht und deswegen den Wert \(S(x_i)\)
+nicht und Bob erf\"ahrt keinen der anderen Werte. Danach interpoliert Bob T und berechnet 
+\(T(0)\)
+
+Um zu rekapitulieren, Alice und Bob kennen nun beide Shares \(\beta_1, z_1\) bzw 
+\(\beta_2, z_2\), sodass 
+\((z_1 + lcm(2,\dots,k)\cdot\beta_1) + (z_2 + lcm(2,\dots,k)\cdot\beta_2)
+ = lcm(2,\dots,k)\cdot2^N\cdot\ln x\) ist.
+\requirement{Dieses Protokoll zur Polynomauswertung kann ausgef\"uhrt werden.}
+
+\subsubsection{Private Multiplikation}
+\paragraph{Die Problemstellung}
+Wir definieren nun ein Protokoll, welches f\"ur die Eingaben \(i_A, i_B\) 
+zuf\"allige Shares \(o_A, o_B\) produziert, sodass \(o_A + o_B = i_A \cdot i_B\)
+gilt. Dadurch kann
+\(x \cdot \ln x = E_A \cdot \ln (E_A + E_B) + E_B \cdot \ln (E_A + E_B)\) berechnet
+werden, wenn \(E_A\) die Anzahl E-Mails von Alice ist und \(E_B\) die Anzahl E-Mails
+von Bob, was insgesamt dann die gesuchte Entropie ist.
+
+\paragraph{Das verwendete Protokoll}
+Alice definiert das Polynom \(Q(z) = i_A \cdot z + r_A\) f\"ur einen
+zuf\"allig gew\"ahlten Wert \(r_A\). Beide wenden nun die geheime 
+Polynomauswertung an, sodass Bob \(Q(i_B)\) berechnet. Wir definieren
+dann \(o_A = r_A\) und \(o_B = Q(i_B)\). Es gilt dann direkt, dass
+\(o_A + o_B = r_A + i_A \cdot i_B + r_A = i_A \cdot i_B\) ist und
+\(o_A, o_B\) sind wirklich zuf\"allig und geheim, da zum Berechnen von 
+(beispielsweise) \(o_B\) aus \(i_A\) und \(o_A\) eine Gleichung
+mit zwei Unbekannten \(Q(a_2), a_2\) gel\"ost werden m\"usste, was
+nicht eindeutig m\"oglich ist und der Privatheit der Polynomauswertung.
+\requirement{Dieses Protokoll zur Multiplikation kann ausgef\"uhrt werden}
+
+\subsubsection{Das gesamte Protokoll}
+Das komplette Protokoll zum berechnen f\"ur \(x \cdot \ln x\) mit 
+Eingaben \(i_A, i_B\) und \(x = i_A + i_B\) besteht nun aus
+drei Phasen: Wir berechnen zuerst die Shares \(l_A, l_B\) von 
+\(\ln x\) nach dem ersten Teilprotokoll. 
+Wir wenden dann das zweite Teilprotokoll zur Multiplikation zweimal
+an, einmal auf die Eingabe \(l_A, i_B\) und einmal auf der Eingabe
+\(l_B, i_A\) und erhalten die Shares \(m_A^1, m_A^2, m_B^1\) und \(m_B^2\)
+mit \(m_A^1 + m_B^1 = l_A \cdot i_B\) und 
+\(m_A^2 + m_B^2 = l_B \cdot i_A\). Wir definieren dann Alice Ausgabe des
+gesamten \(x \cdot \ln x\)-Protokolls als 
+\(o_A =  m_A^1 + m_A^2 + l_A \cdot i_A\) und Bobs Ausgabe analog als
+\(o_B = m_B^1 + m_B^2 + l_B \cdot i_B\). Es gilt dann:
+\begin{align*}
+o_A + o_B &=& m_A^1 + m_A^2 + l_A \cdot i_A + m_B^1 + m_B^2 + l_B \cdot i_B\\
+          &=& l_A \cdot i_B + l_B \cdot i_A + l_A \cdot i_A + l_B \cdot i_B\\
+          &=& i_A \cdot (l_A + l_B) + i_B \cdot ( l_A + l_B )\\
+          &=& (i_A + i_B) \cdot \ln (i_A + i_B)
+\end{align*}
+Zeile 2 folgt aus Zeile 1 durch ersetzen von \(m_A^1 + m_B^1\)
+bzw \(m_A^2 + m_B^2\), die restlichen Zeilen ergeben sich durch 
+wiederholtes Ausklammern. Somit ist die Korrektheit des Protokolles
+gezeigt. Die Privatheit des Protokolles folgt aus der Privatheit
+der einzelnen Schritte sowie der Undurchsichtigkeit der 
+berechneten Shares.
+\requirement{Die Entropie-Shares k\"onnen anhand diesse Protokolles berechnet
+werden}
+
+\subsection{Attribut mit maximalem Informationsgewinn finden}\label{sec:id3:case3}
 \begin{figure}[htb]
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
@@ -772,9 +985,110 @@ Ausgaben f\"ur die beiden Anwender orthogonal hinzugef\"ugt werden.
 \symmetricknowledge{gemeinsamer Klassifikator}
 \end{phases}
 \caption{ID3-Algorithmus, Fall 3: Erzeugung eines Astes}
+\label{fig:id3:case3}
 \end{figure}
-\todo[inline]{Entropien berechnen}
-\todo[inline]{Index der maximalen Summe der Shares finden, verwenden vom Schaltkris aus dominierender Ausgabe}
+\paragraph{Problemstellung}
+Gegeben das obige Protokoll kann nun die Berechnung des Attributes
+mit dem maximalen Informationsgewinn einfach durchgef\"uhrt werden.
+Es wird f\"ur jedes Attribut das Entropienprotokoll angewendet. Wir
+erhalten dadurch einen Vektor von Shares 
+\(s_A^{a_1}, s_A^{a_2}, \dots, s_A^{a_k}\) f\"ur Alice und einen 
+Vektor von Shares \(S_B^{a_1}, S_B^{a_2}, \dots, s_B^{a_k}\) f\"ur
+Bob, wobei \(a_1, a_2, \dots, a_k\) die Attribute sind. Wir m\"ussen
+nun in diesem Vektor den Index mit der minimalen Summe finden, denn wenn
+die Reihenfolge der Attribute fix und \"offentlich ist, kann durch
+diesen Index bestimmt werden, welches Attribut die geringste Entropie
+und damit den gr\"ossten Informationsgewinn hat.\\
+\paragraph{Unsere L\"osung}
+Wir verwenden erneut einen Automaten, der die einzelnen Shares 
+sequentiell abarbeitet und dessen interner Zustand der Index und der
+Wert des aktuell besten Shares ist. Die Eingabe des Automaten sind
+immer ein Paar von Shares f\"ur das gleiche Attribut sowie der
+Index dieses Attributes. Wenn \(S_m, i_m\) der interne Zustand
+des Automaten ist, wobei \(S_m\) die bisher minimale Summe von
+Shares ist und \(i_m\) der Index dieser Shares und \(S_A, S_B\)
+die aktuellen Eingabeshares sind und \(i\) der Index der aktuellen
+Eingabe ist, dann muss der Automat folgenden Zustands\"ubergang
+implementieren:
+\begin{align*}
+S_m' &=& \:\mathrm{if} \: S_A + S_B < S_m \: \mathrm{then} \: S_A + S_B \: \mathrm{else} \: S_m \\
+i_m' &=& \: \mathrm{if} \: S_A + S_B < S_m \: \mathrm{then} \: i \: \mathrm{ else } \: i_m
+\end{align*}
+Wenn wir dies als einen Schaltkreis implementieren k\"onnen, 
+k\"onnen wir diesen Zustands\"ubergangschaltkreis f\"ur alle
+eingegebenen Shares wiederholen. Der Anfangszustand ist
+das erste Paar Shares.
+
+\subparagraph{Bedingte Zuweisung}
+Gegeben die Zuweisung 
+\begin{equation}
+x = \: \mathrm{if} \: b \: \mathrm{then} \: t \: \mathrm{else} \: f
+\end{equation}
+und den Fakt, dass ein Schaltkreis \(B\) mit einer Ausgabe
+\(o_B\) existiert, sodass \(o_B = 1\) ist genau dann wenn
+b wahr ist, dann kann  die Zuweisung implementiert werden
+durch:
+\begin{equation}
+x = t \wedge o_B \vee f \wedge \overline{o_B}
+\end{equation}
+Im Fall dass b wahr ist, ist \(o_B = 1\) und somit
+gilt \(f \wedge \overline{o_B} = 0\) und damit gilt
+insgesamt \(x = t\). Im Fall, dass b falsch ist, ist
+\(o_B = 0\) und somit gilt \(t \wedge o_B = 0\) und
+insgesamt gilt \(x = f\). Somit ist dieser Teilschaltkreis
+korrekt. Desweiteren werden wir die Indizes der Attribute
+hart in den Schaltkreis kodieren. 
+
+\subparagraph{Vergleichen}
+F\"ur bin\"arkodierte Integer a, b gilt, dass \(a \le b\) gilt,
+wenn im ersten unterschiedlichen Bit von a und b in der Stelle von b eine 1 
+und in der Stelle von a eine 0 steht. Damit kann dies erneut einfach als
+Automat implementiert werden, der die Zahlen a, b vom signifikantesten
+Bit zum wenigsten signifikanten Bit liest und die Zust\"ande 
+,,unentschieden'', ,,Ergebnis positiv'' und ,,Ergebnis negativ'' besitzt.
+Die Eingabe des Automaten sind die 2 Bits von a, b. Die Zustands\"ubergangstabelle
+ist somit:
+\begin{center}
+\begin{tabular}{r|c c c c}
+\(a_i, b_i \rightarrow \) & 1, 1 & 1, 0 & 0, 1 & 0, 0\\
+\hline
+unentschieden & unentschieden & Ergebnis negativ & Ergebnis positiv & unentschieden \\
+Ergebnis positiv & Ergebnis positiv & Ergebnis positiv & Ergebnis postiv & Ergebnis positiv \\
+Ergebnis negativ & Ergebnis negativ & Ergebnis negativ & Ergebnis negativ & Ergebnis positiv 
+\end{tabular}
+\end{center}
+
+Wir kodieren dann ,,unentschieden'' mit 00, ,,Ergebnis negativ'' mit 10 und
+,,Ergebnis positiv'' mit 11. Damit ergibt sich die bin\"are Zustands\"ubergangstabelle:\\
+\begin{center}
+\begin{tabular}{c|c c c c}
+\(a_i, b_i \rightarrow\) & 11 & 10 & 01 & 00 \\
+00 & 00 & 10 & 11 & 00 \\
+11 & 11 & 11 & 11 & 11 \\
+10 & 10 & 10 & 10 & 10 \\
+\end{tabular}
+\end{center}
+Wenn nun \(s_0, s_1\) die Zustandsbits des Automaten sind, ergeben sich
+als Zustands\"ubergangsgleichungen die Gleichungen:
+\begin{align}
+s_0' &=& s_0 \vee a_i \oplus b_i\\
+s_1' &=& s_1 \vee \overline{s_0} \wedge \overline{s_1} \wedge \overline{a_i} \wedge b_i\\
+\end{align}
+Diese Gleichungen machen Sinn, da \(s_0\) kodiert, ob bereits
+ein Ergebnis gespeichert wird und wenn ein Ergebnis vorhanden
+ist oder \(a_i\) und \(b_i\) unterschiedlich sind, bleibt ein
+Ergebnis gesetzt. Im zweiten Zustandsbit ist kodiert,
+ob das Ergebnis positiv oder negativ ist. Es wird entweder einfach
+kopiert oder gesetzt, wenn der Zustand vorher ,,unentschieden'' war
+und \(a_i\) 0 ist und \(b_i\) 1. Der Anfangszustand ist \(s_0 = s_1 = 0\).
+Diese Zustands\"ubergangsgleichungen k\"onnen nun durch ein
+einfaches Schaltnetz implementiert werden und einfach f\"ur alle
+Attribute wiederholt werden.
+
+\subparagraph{Summieren}
+Wir berechnen die Summe wieder durch einen einfachen Ripple-Carry-Adder.
+
+\requirement{Dieses Protokoll kann implementiert werden}
 
 \pagebreak  %XXX: if  possible, kill this pagebreak
 \section{Verwenden des Klassifikators}
