@@ -4,10 +4,12 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{hyperref}
-\usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart,automata}
+\usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart,automata,positioning,shapes}
 
 \hyphenation{Schwell-werte}
 % =============== Definitionen =========
+\newcommand{\var}[1]{{\em #1}}
+
 \newenvironment{definition}
     [1]
     {
@@ -77,13 +79,24 @@
 }
 % ======================================
 
+\author{Gudrun Amedick, Tim Kunold, Harald Kr\"amer}
+\title{Spezifikation des verteilten, privaten Lerners}
+\date{}
 \begin{document}
-\listoftodos
+\maketitle
 \pagebreak
 \tableofcontents
 \pagebreak
 \section{Einleitung}
-\todo[inline]{Struktur vom Dokument erl\"autern}
+Dieses Dokument spezifiziert die im Projekt zu implementierende Anwendung.
+Die Spezifikation definiert eine gewisse Anzahl von Akzeptanzkriterien,
+die bei der Abgabe demonstrierbar sein m\"ussen. Als Demonstration ist
+eine Demo, eine glaubhafte Code-Inspektion oder automatisierte Tests tauglich.\\
+Im ersten Teil des Dokumentes werden die verwendeten Begriffe festgelegt,
+sowie die Annahmen, auf denen die Geheimhaltung der Daten jedes Anwenders beruhen.
+Danach werden zun\"achst gewisse technische Grundlagen gekl\"art, um danach
+die einzelnen Schritte in der Anwendung festzulegen.
+
 \subsection{Begriffe}
 \begin{definition}{Eigenes,Gesamtes}
 \(M\) sei eine Menge von Elementen, die in zwei Teilmengen \(M_A\)
@@ -107,7 +120,74 @@ als \defined{gemeinsames Wissen}.
 Wenn Anwender verschiedene Phasen hintereinander ausf\"uhren, dann bezeichnen
 wir das Wissen aus den bereits ausgef\"uhrten Phasen als \defined{Vorwissen}.
 \end{definition}\\
-\todo[inline]{Definition: Entscheidungsbaum}
+
+\begin{definition}{Entscheidungsbaum}\\
+Generell lassen sich Entscheidungsb\"aume wie folgt definieren: Es gibt eine
+Menge \(A\) von diskreten Attributen \({A_1, A_2, \dots, A_n}\) mit Werten
+\(values(A_i) = {v^1_i, v^2_i, \dots, v^w_i}\) und es gibt zu erkennde
+Klassen \(K = {K_1, K_2, \dots, K_k}\). Es bezeichne im Folgenden desweiteren
+\(Values = \bigcup_{A_i} values(A_i)\) die Menge aller m\"oglichen 
+Attributwerte (dies vereinfacht einige Definitionen, auch wenn 
+einige Typen etwas ungenauer werden).
+Dann kann die Menge \(T\) von Entscheidungsb\"aumen induktiv definiert werden 
+als:
+\( T = (A \times Values \mapsto T) \cup K\)\\
+Ein Entscheidungsbaum klassifiziert eine Abbildung der Attribute auf Werte.
+Dieser klassifizierungsvorgang ist induktiv definiert. Wenn der
+zu klassifizierende Kandidat mit \(s : A \mapsto Values\)
+bezeichnet wird, dann ergibt sich als Auswertungsfunktion
+\(evaluate : (A \mapsto Values) \times T \mapsto K\):
+
+\begin{align}
+evaluate(s, (A_i, f)) &=& evaluate(s, f(s(A_i)))\\
+evaluate(s, K_i) &=& K_i
+\end{align}
+\end{definition}
+
+Verbal beschrieben besteht ein Entscheidungsbaum also aus Bl\"attern,
+die aussagen, dass alle zu klassifizierenden Objekte, die dieses Blatt 
+,,erreichen'' zu dieser bestimmten Klasse geh\"oren und \"Asten, 
+die mit einem Attribut annotiert sind und zu jedem m\"oglichen 
+Wert des Attributes einen Unterbaum haben. Bei der Klassifizierung 
+werden dann die \"Aste entsprechend der Attributwerte des zu 
+klassifizierenden Objektes traversiert, bis ein Blatt erreicht 
+wird und die Klassifizierung abgeschlossen ist.\\
+Wenn wir beispielsweise annehmen, dass wir uns bei der Spamerkennung dadrauf
+geeinigt haben, dass wir als Attribute verwenden, ob die Worte "Foo" bzw
+"Bar" oft oder selten vorkommen, dann w\"urden die
+E-Mail-Datenbanken transformiert werden zu einem Vektor von Abbildungen
+von Foo und Bar auf oft oder selten:\\
+\begin{tabular}{c c}
+Vorkommnisse Foo & Vorkommnisse Bar \\
+Oft & Oft \\
+Selten & Oft \\
+Selten & Selten \\
+\end{tabular}
+Ein m\"oglicher Entscheidungsbaum ist in Abbildung ~\ref{fig:decision_tree_example} 
+dargestellt, der die Mails in Spam und Nicht Spam klassifiziert. Es ist hier ein
+Baum aufgezeichnet, der prinzipiell nur Mails als ,,Nicht Spam'' klassifiziert,
+wenn sie oft Foo und Bar enthalten. In der Grafik ist zudem illustriert, welche 
+Knoten und damit welche Kanten bei der Auswertung betrachtet wurden.
+\begin{figure}
+\begin{tikzpicture}
+[branch/.style={shape=rectangle,draw},
+ leaf/.style={shape=ellipse,draw},>=stealth']
+\node[branch] (foo) [color=red,dashed] {Vorkommnisse von Foo};
+\node[leaf] (spam1) [below left=of foo] {Spam};
+\node[branch] (bar) [color=red,dashed] [below right=of foo] {Vorkommnisse von Bar};
+\node[leaf] (spam2) [below left=of bar] {Spam};
+\node[leaf] (spam3) [color=red,dashed,below right=of bar] {kein Spam};
+
+\draw[->] (foo) to node[above]{Selten} (spam1);
+\draw[->,dashed,color=red] (foo) to node[above] {Oft} (bar);
+\draw[->] (bar) to node[above] {Selten} (spam2);
+\draw[->,dashed,color=red] (bar) to node[above] {Oft} (spam3);
+\end{tikzpicture}
+\caption{M\"oglicher Entscheidungsbaum, Klassifizierung von 
+,,Foo \(\rightarrow\) Oft, Bar \(\rightarrow\) Oft''}
+\label{fig:decision_tree_example}
+\end{figure}\\
+
 \begin{definition}{Attribut}
 Wir definieren eine Menge von Wahrscheinlichkeiten 
 \(P = [0, 1] \subset \mathbb{R}\) und eine Menge von Buchstaben 
@@ -178,17 +258,52 @@ werden sie sich an das Protokoll halten. (d.h., eine Annahme der Form
 
 \pagebreak
 \section{Grundlagen der Anwendung}
-\todo[inline]{Vision der Anwendung}
+Gegeben diese Begrifflichkeiten ist dann die Vision der Anwendung, dass
+aus den gesamten E-Mails ein gemeinsamer Klassifikator erzeugt wird,
+wobei \"uber die eigenen E-Mails jedes Anwenders m\"oglichst wenig preisgeben
+m\"ochte. Genauer gesagt, es soll nur der Klassifikator \"uber die eigenen 
+E-Mails preisgegeben werden.
 
 \subsection{Form der Benutzereingabe}
-\todo[inline]{Festlegen, wie die E-Mails ins Programm kommen}
+Da wir nicht mit weiteren Informationen der E-Mail arbeiten, sondern nur mit
+dem textuellen Inhalt, w\"ahlen wir als Eingabeform der E-Mails einfache
+Textdateien. Um die E-Mails einfach nach Spam und Nicht Spam organisieren
+zu k\"onnen, verlangt die Anwendung, dass in einem Verzeichnis, aus
+dem wir E-Mails einlesen sollen, zwei  Verzeichnisse ,,spam'' und ,,not\_spam'' 
+existieren, welche dann die Dateien mit den E-Mail-Inhalten enthalten.
+Weitere Unterverzeichnisse in irgendeinem beteiligten Verzeichnis werden
+von der Anwendung ignoriert. Dadurch ist es nicht notwendig, die Metadaten
+aus einer separaten Datei einzulesen (und diese separate Datei auf dem
+neuesten Stand zu halten), sondern die Existenz einer Datei in einem der
+beiden Verzeichnisse schreibt sofort die Klassifkation der Datei vor.
+
+Der Anwender kann dann \"uber einen Parameter steuern, ob der Klassifikator
+auf der Standardausgabe ausgegeben wird oder in welche Datei der Klassifikator
+geschrieben werden soll.
 
 \subsection{Interaktion der verteilten Programme}
-\todo[inline]{Festlegen, wie das Programm verteilt wird und die Teile kommunizieren}
-\todo[inline]{Austauschen der Anzahl der E-Mails}
+Wir implementieren die Kommunikation der verteilten Programme dadurch, dass
+wir das Programm in zwei verschiedenen Modi ausf\"uhrbar machen: Als Client
+und als Server. Der Server wird dann im Allgemeinen die Aufgabe von Bob 
+erf\"ullen und auf Anfragen des Clients antworten, der dann nat\"urlich die
+Rolle von Alice einnimmt. Der Client wird dann zudem die IP und den Port
+des Server vom Anwender erfahren, um mit dem Server kommunizieren zu k\"onnen.
+
+\subsection{\"Ubertragung der Gesamtanzahl der E-Mails}
+Aus technischen Gr\"unden wird zu Anfang der Anwendung von jedem der beiden
+Anwender die Gesamtanzahl der eigenen E-Mails \"ubertragen. Dies stellt kein
+Risiko f\"ur die Geheimhaltung dar, da die Anzahl der E-Mails keine Aussage
+\"uber den Inhalt der E-Mails preisgibt.
 
 \subsection{Phasen der Anwendung}
-\todo[inline]{Kurz die Einzelnen phasen der Anwendung beschreiben}
+Die Anwendung durchl\"auft bei der Berechnung mehrere Phasen, die aufeinander
+aufbauen. Der Ablauf dieser Phasen ist in Abbildung \ref{fig:phases}
+illustriert. In der ersten Phase bererechnen beide Anwender die gemeinsame 
+Wortliste, aus denen dann in einer zweiten Phase Schwellwerte und damit
+Attribute f\"ur einen Entscheidungsbaum berechnet werden. In einer
+dritten Phase wandeln dann beide Anwender ihre eigenen E-Mails in die
+Attributwert-vektoren um und berechnen dann in einer finalen Phase 
+den gemeinsamen Klassifikator.
 \begin{figure}
 \centering
 \begin{phases}
@@ -217,6 +332,7 @@ werden sie sich an das Protokoll halten. (d.h., eine Annahme der Form
 \symmetricknowledge{Gemeinsamer Klassifikator};
 \end{phases}
 \caption{Phasen der Anwendung}
+\label{fig:phases}
 \end{figure}
 
 
