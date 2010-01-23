@@ -3,6 +3,7 @@
 \usepackage{todonotes}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{hyperref}
 \usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart,automata}
 
 \hyphenation{Schwell-werte}
@@ -35,7 +36,7 @@
 {
 \setcounter{ycounter}{-1}
 \begin{tikzpicture}[node distance=3cm,text width=3cm,
-    box/.style={shape=rectangle,draw}]
+    box/.style={shape=rectangle,draw}, scale=0.7, transform shape]
 }
 {\end{tikzpicture}}
 
@@ -188,7 +189,7 @@ werden sie sich an das Protokoll halten. (d.h., eine Annahme der Form
 
 \subsection{Phasen der Anwendung}
 \todo[inline]{Kurz die Einzelnen phasen der Anwendung beschreiben}
-\begin{figure}[htb]
+\begin{figure}
 \centering
 \begin{phases}
 \aliceheader{Alice};
@@ -233,7 +234,7 @@ Im zweiten Schritt vereinen beide Parteien ihre eigenen Wortlisten, um
  die gemeinsame Wortliste zu berechnen. 
 Dieser Vorgang ist in Abbildung ~\ref{fig:phase:two} illustriert.
 
-\begin{figure}[h!tb]
+\begin{figure}
 \begin{phases}
 \aliceheader{Alice};
 \bobheader{Bob};
@@ -251,7 +252,7 @@ Dieser Vorgang ist in Abbildung ~\ref{fig:phase:two} illustriert.
 \phase{Phase 1.2: Synchronisierung der Wortlisten}
 \symmetricknowledge{Gemeinsame Wortliste}
 \end{phases}
-\caption{Schritte zum Berechnen der gemeinsamen Wortliste}
+\caption{Ablauf der Phase zum Berechnen der gemeinsamen Wortliste}
 \label{fig:phase:two}
 \end{figure}
 
@@ -334,11 +335,14 @@ Akzeptanzkriterium:\\
 Wortliste C, D, E berechnet hat, dann muss die zusammengefasste Wortliste
 A, B, C, D, E sein.} 
 
+Abschliessend ergibt sich somit das Akzeptanzkriterium:\\
+\requirement{Das Protokoll, in dem beide Anwender ihre Wortlisten einander
+zusenden und lokal die spezifizierte Syncronisierung durchf\"uhren, ist
+implementiert}
+
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Finden der gemeinsamen Schwellwerte}
-\todo[inline]{Einleitung, auf Figure f\"ur Schwellwerte verweisen}
-
-\begin{figure}[htb]
+\begin{figure}
 \begin{phases}
 \aliceheader{Alice};
 \bobheader{Bob};
@@ -356,7 +360,17 @@ A, B, C, D, E sein.}
 \phase{Phase 2.3: Synchronisierung der Schwellwerte};
 \symmetricknowledge{Gemeinsame Liste von (Wort + Schwellwerte)};
 \end{phases}
+\caption{Ablauf der Phase zum finden der gemeinsamen Schwellwerte}
+\label{fig:phase2}
 \end{figure}
+In dieser Phase m\"ussen wir f\"ur jedes Wort in der gemeinsamen Wortliste
+Schwellwerte finden, wann das Wort besonders oft oder besonders selten
+vorkommt. Jeder Anwender berechnet dazu zun\"achst einen eigenen
+Schwellwert f\"ur jedes Wort und in einem zweiten Schritt werden diese
+eigenen Schwellwerte mit den jeweils anderen Schwellwerten vereint, um
+die gemeinsamen Schwellwerte und somit die gemeinsamen Attribute zu
+berechnen. Diese Schritte sind in Abbildung \ref{fig:phase2} illustriert.
+
 \subsection{Bestimmung der eigenen Schwellwerte}
 Es muss nun f\"ur ein Wort \(w\) eine Schwelle gefunden werden, ab wann das
 Wort w in einer E-Mail oft vorkommt. Wir w\"ahlen hierzu den Mittelwert
@@ -389,13 +403,27 @@ Damit ergeben sich als Akzeptanzkriterien:\\
 (0.5, 0.5)}\\
 Da die Attribute am Ende \"offentlich bekannt sind, implementieren wir
 dies, indem sich beide Anwender die eigenen Schwellwerte f\"ur die Worte
-zuschicken und dann lokal die Syncronisierung berechnen.
+zuschicken und dann lokal die Syncronisierung berechnen. Somit ergibt
+sich noch das abschliessende Akzeptanzkriterium:\\
+\requirement{Das Protokoll, indem beide Anwender ihre eigenen Schwellwerte
+an den jeweils anderen Anwender senden und dann die bereits spezifizierte
+Merge-Operation ausf\"uhren ist implementiert.}
 
 \pagebreak % XXX: if possible, kill this pagebreak
 \section{Diskretisieren der eigenen E-Mails}
-\todo[inline]{Einleitung, Figure referenzieren}
-\todo[inline]{Content}
-\begin{figure}[htb]
+In dieser Phase muss die Anwendung die E-Mail-Inhalte, d.h., Texte ind
+die Attributvektoren umrechnen, auf denen der ID3-Algorithmus operiert.
+Dazu muss f\"ur einen E-Mail-Inhalt f\"ur jedes Wort in den Attributen
+der Anteil an den Worten in dem gesamten E-Mail-Inhalt berechnet werden
+und dann anhand des Schwellwertpaares als selten, oft oder mittel
+klassifiziert werden. Dies ist in Abbildung \ref{fig:phase3} illustriert.
+Da dies eine relativ einfache und vor allem lokale Phase ist, werden
+hier nur die Anforderungen aufgelistet:\\
+\requirement{Wenn der E-Mail-Inhalt "A A A A B B C D" ist und die Attribute
+sind (A, 0.2, 0.3), (B, 0.1, 0.9), (C, 0.5, 0.8),
+dann wird diese E-Mail diskretisiert in den Vektor oft, mittel, selten}
+
+\begin{figure}
 \begin{phases}
 \aliceheader{Alice};
 \bobheader{Bob};
@@ -409,6 +437,8 @@ zuschicken und dann lokal die Syncronisierung berechnen.
 \phase{Phase 3: Diskretisieren der eigenene E-Mails};
 \symmetricknowledge{Eigene diskretisierte E-Mails};
 \end{phases}
+\label{fig:phase3}
+\caption{Ablauf der Phase zum diskretisieren der eigenen E-Mails}
 \end{figure}
 
 \pagebreak % XXX: if possible, kill this pagebreak
@@ -437,7 +467,7 @@ Abbildung \ref{fig:id3:case3} illustiert und in Sektion \ref{sec:id3:case3} gena
 spezifiziert.
 \end{itemize}
 \subsection{Yaos Protokoll}
-\begin{figure}[htb]
+\begin{figure}
 \begin{phases}
 \aliceheader{Alice};
 \bobheader{Bob};
@@ -459,7 +489,7 @@ spezifiziert.
 \phase{Y.5 Bob wertet Schaltkreis aus und sendet die Ausgabe an Alice};
 \symmetricknowledge{Ausgabe} ;
 \end{phases}
-\caption{Yaos Protokoll}
+\caption{Ablauf von Yaos Protokoll}
 \label{fig:yao}
 \end{figure}
 \paragraph{Generelles Vorgehen}
@@ -539,7 +569,7 @@ zugeschickt werden. (Hier wird wieder die Annahme des ehrlichen Anwenders
 getroffen).
 
 \subsection{Feststellen der dominierenden Ausgabe}\label{sec:id3:case1}
-\begin{figure}[htb]
+\begin{figure}
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
 \aliceknowledge[2]{Eigene diskretisierte E-Mails};
@@ -585,8 +615,8 @@ Formal gilt also:
  \(lt(a, b) = b_i \Leftrightarrow a_i \neq b_i \wedge \forall k = i+1,\dots,n: a_k = b_k\)
 Der Allquantor ist als Kaskade von Und-Gattern implementierbar und die Gleichheit
  bzw Ungleichheit als Negation bzw direkte Verwendung des XOR-Gatters implementierbar,
- damit kann diese Formel einfach in einen Schaltkreis \"uberf\"uhrt werden.
-\begin{figure}[htb]
+ damit kann diese Formel einfach in einen Schaltkreis \"uberf\"uhrt werden.\\
+\begin{figure}
 \centering
 \begin{tikzpicture}
 [>=stealth']
@@ -636,7 +666,7 @@ MSB
 kann generiert werden}
 
 \subsection{Feststellen ob Ausgabe eindeutig}\label{sec:id3:case2}
-\begin{figure}[htb]
+\begin{figure}
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
 \aliceknowledge[2]{Eigene diskretisierte E-Mails};
@@ -794,7 +824,7 @@ parametrierte Shift werden wieder \"uber vollst\"andige Suchen implementiert,
 da so nur der (relativ einfache) Vergleich implementiert werden muss.
 Danach sind diese beiden Werte berechnet und ausgehend von der Vor\"uberlegung
 muss noch die Aufteilung beider Werte in Shares sowie die Verschleierung der
-Ausgaben f\"ur die beiden Anwender orthogonal hinzugef\"ugt werden.
+Ausgaben f\"ur die beiden Anwender orthogonal hinzugef\"ugt werden.\\
 \requirement{Dieser Schaltkreis zur Berechnung der Shares der
 ersten Approximation kann generiert werden}
 
@@ -911,7 +941,7 @@ nicht und Bob erf\"ahrt keinen der anderen Werte. Danach interpoliert Bob T und 
 Um zu rekapitulieren, Alice und Bob kennen nun beide Shares \(\beta_1, z_1\) bzw 
 \(\beta_2, z_2\), sodass 
 \((z_1 + lcm(2,\dots,k)\cdot\beta_1) + (z_2 + lcm(2,\dots,k)\cdot\beta_2)
- = lcm(2,\dots,k)\cdot2^N\cdot\ln x\) ist.
+ = lcm(2,\dots,k)\cdot2^N\cdot\ln x\) ist.\\
 \requirement{Dieses Protokoll zur Polynomauswertung kann ausgef\"uhrt werden.}
 
 \subsubsection{Private Multiplikation}
@@ -932,7 +962,7 @@ dann \(o_A = r_A\) und \(o_B = Q(i_B)\). Es gilt dann direkt, dass
 \(o_A, o_B\) sind wirklich zuf\"allig und geheim, da zum Berechnen von 
 (beispielsweise) \(o_B\) aus \(i_A\) und \(o_A\) eine Gleichung
 mit zwei Unbekannten \(Q(a_2), a_2\) gel\"ost werden m\"usste, was
-nicht eindeutig m\"oglich ist und der Privatheit der Polynomauswertung.
+nicht eindeutig m\"oglich ist und der Privatheit der Polynomauswertung.\\
 \requirement{Dieses Protokoll zur Multiplikation kann ausgef\"uhrt werden}
 
 \subsubsection{Das gesamte Protokoll}
@@ -959,12 +989,12 @@ bzw \(m_A^2 + m_B^2\), die restlichen Zeilen ergeben sich durch
 wiederholtes Ausklammern. Somit ist die Korrektheit des Protokolles
 gezeigt. Die Privatheit des Protokolles folgt aus der Privatheit
 der einzelnen Schritte sowie der Undurchsichtigkeit der 
-berechneten Shares.
+berechneten Shares.\\
 \requirement{Die Entropie-Shares k\"onnen anhand diesse Protokolles berechnet
 werden}
 
 \subsection{Attribut mit maximalem Informationsgewinn finden}\label{sec:id3:case3}
-\begin{figure}[htb]
+\begin{figure}
 \begin{phases}
 \aliceknowledge[-2]{Vorwissen};
 \aliceknowledge[2]{Eigene diskretisierte E-Mails};
@@ -1086,7 +1116,7 @@ einfaches Schaltnetz implementiert werden und einfach f\"ur alle
 Attribute wiederholt werden.
 
 \subparagraph{Summieren}
-Wir berechnen die Summe wieder durch einen einfachen Ripple-Carry-Adder.
+Wir berechnen die Summe wieder durch einen einfachen Ripple-Carry-Adder.\\
 
 \requirement{Dieses Protokoll kann implementiert werden}
 
