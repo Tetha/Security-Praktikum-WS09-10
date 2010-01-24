@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{cite}
 \usepackage{tikz}
 \usepackage{todonotes}
 \usepackage{amssymb}
@@ -610,7 +611,7 @@ spezifiziert.
 \end{figure}
 \paragraph{Generelles Vorgehen}
 Der grobe Ablauf von Yaos Protokoll f\"ur die private zwei-Parteien Berechnung
-ist in Abbidlung \ref{fig:yao} skizziert.
+ist in Abbidlung \ref{fig:yao} skizziert und basiert auf \cite{yaoprotocol}.
 Die Eingabe jedes Anwenders f\"ur Yaos Protokoll ist eine Eingabe, und nach
 Kerckhoffs Prinzip auch der auszuf\"uhrende Schaltkreis in Reinform. Einer
 der beiden Anwender, ohne Beeintraechtigung der Allgemeinheit Alice, muss
@@ -947,8 +948,9 @@ ersten Approximation kann generiert werden}
 \subsubsection{Verbesserung der ersten Approximation}
 \paragraph{Vorgehensweise}
 Um dann die Anfangsapproximation zu verbessern, wird die Taylorreihe bis auf
-das k. Element berechnet, wobei k ein Praezisionsparameter ist. Das Paper
-w\"ahlt hierzu eine zuf\"allige Zahl \(z_1\) und definiert das Polynom:
+das k. Element berechnet, wobei k ein Praezisionsparameter ist. 
+\cite{privateid3} w\"ahlt hierzu eine zuf\"allige Zahl \(z_1\) und definiert
+das Polynom:
 \begin{equation}
 Q(z) = 
     \mathrm{lcm}(2,\dots,k)
@@ -1017,7 +1019,7 @@ geheimer Share von Bob ist, brauchen wir einen Algorithmus zur
 geheimen Auswertung von Polynomen, sodass Bob zwar \(Q(\alpha_2)\) lernt, 
 aber nicht Q und dass Alice nichts \"uber \(\alpha_2\) erf\"ahrt.
 \subparagraph{Das verwendete Protokoll}
-Das dazu verwendete Protokoll arbeitet wie folgt:
+Das dazu verwendete Protokoll basiert auf \cite{ot} arbeitet wie folgt:
 Alice w\"ahlt ein zuf\"alliges bivariates Polynom \(R(x, y)\) mit den 
 Eigenschaften:  
  (1) Der Grad \(d_y\) von y ist der Grad von Q
@@ -1053,12 +1055,63 @@ Punkte und damit die Position von \(S(x_i)\) kennt -- den Wert \(R(x_i, S(x_i))\
 lernen. Alice lernt dabei die Position nicht und deswegen den Wert \(S(x_i)\)
 nicht und Bob erf\"ahrt keinen der anderen Werte. Danach interpoliert Bob T und berechnet 
 \(T(0)\)
+\requirement{Dieses Protokoll zur Polynomauswertung kann ausgef\"uhrt werden.}
+
+\paragraph{1-out-of-N Oblivious Transfer}
+\subparagraph{Die Problemstellung}
+Es verbleibt nun ein Protokoll f\"ur den 1-out-of-N Oblivious Transfer zu
+w\"ahlen. Um zu rekapitulieren, Alice kennt N Werte 
+\(I_A^1, I_A^2, \dots, I_A^N \in \{0,1\}^m \)
+und Bob kennt einen Index \(i_B\). Das Ziel des Protokolles ist nun, dass Bob
+\(I_A^{i_B}\) lernt, ohne dass Bob \(I_A^{j}\) f\"ur \(j \neq i_B\) lernt und
+ohne dass Alice \(i_B\) lernt.
+
+\subparagraph{Das verwendete Protokoll}
+Es sei \(\{F_k : \{0,1\}^m \mapsto \{0,1\}^m\} | K \in \{0,1\}^t\) eine Familie
+von pseudozuf\"alligen Funktionen. Wir verwenden nun diese Funktionen und
+1-out-of-2-Oblivious Transfer (f\"ur den bereits eine Spezifikation existiert),
+um die 1-out-of-N Oblivious Transfer zu implementieren.
+
+Alice berechnet nun l Schl\"usselpaare
+\((K_1^0, K_1^1), (K_2^0, K_2^1), \dots, (K_l^0, K_l^1))\) mit \(N = 2^l\),
+sodass alle Schl\"ussel Schl\"ussel f\"ur die pseudo-zuf\"allige Funktion F
+sind. Desweiteren berechnet Alice 
+\(Y_s = i_A^s \oplus \bigoplus_{j=1}^l F_{K_j^{s \rhd j}}(s)\), wobei \(s \rhd j\) das
+Bit mit Index j von s ist. Bob w\"ahlt nun aus jedem der l Paare via
+1-out-of-2-Oblivious-Transfer eines aus. 
+Wenn Bob den Wert mit Index \(i_B\) lernen will, dann muss Bob im Schritt j
+den Eintrag \(i_B \rhd j\) w\"ahlen. Desweiteren sendet Alice die Strings \(Y_s\) an Bob.
+Dann ist Bob in der Lage, \(i_A^{i_B}\) zu rekonstruieren, indem er
+\(Y_{i_B} \oplus \bigoplus_{j=1}^l F_{K_j}^{i_B \rhd j}(i_B)\) berechnet,
+denn:
+\begin{align*}
+& & Y_{i_B} \oplus \bigoplus_{j=1}^l F_{K_j}^{i_B \rhd j}(i_B)\\
+&=& i_A^{i_B} 
+        \oplus \bigoplus_{j=1}^l F_{K_j^{i_B \rhd j}}(i_B) 
+        \oplus \bigoplus_{j=1}^l F_{K_j^{i_B \rhd j}}(i_B)\\
+&=& i_A^{i_B}
+\end{align*}
+
+\requirement{Dieses Protokoll zum 1-out-of-N-Oblivious Transfer kann
+ausgef\"uhrt werden.}
+
+\subparagraph{Die Familie pseudozuf\"alliger Funktionen}
+Es verbleibt die Familie \(F_k\) von Funktionen zu spezifizieren. Ausgehend von
+\cite{constructrandom} funktioniert dies wie folgt: Wir w\"ahlen einen 
+kryptographisch sicheren Zufallsbit-generator G, der einen Seed der L\"ange
+k auf \(2\cdot k\) Bit erweitert. Wir bezeichnen dann mit \(G^0(k)\) die erste
+H\"alfte von \(G(k)\) und mit \(G^1(k)\) die zweite H\"alfte von \(G(k)\). Ist
+nun \(i\) ein Bitstring der L\"ange l, dann definieren wir 
+\(G^i(x) = G^{i \rhd 1}(G^{i \rhd 2}(\dots G^{i \rhd l}(x) \dots))\), d.h. der
+Zufallszahlengenerator wird immer wieder aufgerufen und es wird in der 
+,,richtigen'' H\"alfte weitergerechnet. Wir definieren dann eine Familie 
+von Funktionen \(\{F_k\}\) wobei wir \(F_k(x) = G_x(k)\) definieren.\\
+\requirement{Es ist so eine Funktionsfamilie implementiert.}
 
 Um zu rekapitulieren, Alice und Bob kennen nun beide Shares \(\beta_1, z_1\) bzw 
-\(\beta_2, z_2\), sodass 
+\(\beta_2, z_2\), sodass
 \((z_1 + lcm(2,\dots,k)\cdot\beta_1) + (z_2 + lcm(2,\dots,k)\cdot\beta_2)
  = lcm(2,\dots,k)\cdot2^N\cdot\ln x\) ist.\\
-\requirement{Dieses Protokoll zur Polynomauswertung kann ausgef\"uhrt werden.}
 
 \subsubsection{Private Multiplikation}
 \paragraph{Die Problemstellung}
@@ -1371,4 +1424,8 @@ Output(Not Spam), Output(Spam)) und eine Verzeichnisstruktur wie oben
 skizziert, wobei hank/mail1 "Bar Foo Foo Foo", hank/mail2 "Bar Bar Foo Foo"
 und bob/mail1 "Bar Bar Bar Foo" enth\"alt, dann wird die oben als Beispiel
 genannte Ausgabe produziert (oder in einer anderen Reihenfolge}
+
+\section{References}
+\bibliography{references}{}
+\bibliographystyle{plain}
 \end{document}
