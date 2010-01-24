@@ -7,6 +7,7 @@
 \usepackage{hyperref}
 \usetikzlibrary{arrows,decorations.pathmorphing,shapes.multipart,automata,positioning,shapes}
 
+\setcounter{tocdepth}{2}
 \hyphenation{Schwell-werte}
 % =============== Definitionen =========
 \newcommand{\var}[1]{{\em #1}}
@@ -91,7 +92,8 @@
 \section{Einleitung}
 Dieses Dokument spezifiziert die im Projekt zu implementierende Anwendung.
 Die Spezifikation definiert eine gewisse Anzahl von Akzeptanzkriterien,
-die bei der Abgabe demonstrierbar sein m\"ussen. Als Demonstration ist
+die bei der Abgabe demonstrierbar sein m\"ussen. Als Demonstration 
+eines einzelnen Requirement sind
 eine Demo, eine glaubhafte Code-Inspektion oder automatisierte Tests tauglich.\\
 Im ersten Teil des Dokumentes werden die verwendeten Begriffe festgelegt,
 sowie die Annahmen, auf denen die Geheimhaltung der Daten jedes Anwenders beruhen.
@@ -254,15 +256,16 @@ Desweiteren wird f\"ur jede Eingabekante die Verschleierungsfunktion
 Wir nehmen im Folgenden an, dass die Anwender ehrlich sind.
 Das bedeutet, dass die Anwender zwar versuchen, aus den Informationen,
 die sie im Protokoll erhalten, m\"oglichst viel zu lernen, allerdings
-werden sie sich an das Protokoll halten. (d.h., eine Annahme der Form
-,,Jetzt sendet Alice diesen Wert erneut'' funktioniert).
+werden sie sich an das Protokoll halten (d.h., beispielsweise
+die Annahme, dass Alice genau den gleichen Wert zweimal versendet,
+nur weil dies im Protokoll steht kann getroffen werden.)
 
 \pagebreak
 \section{Grundlagen der Anwendung}
 Gegeben diese Begrifflichkeiten ist dann die Vision der Anwendung, dass
 aus den gesamten E-Mails ein gemeinsamer Klassifikator erzeugt wird,
 wobei \"uber die eigenen E-Mails jedes Anwenders m\"oglichst wenig preisgeben
-m\"ochte. Genauer gesagt, es soll nur der Klassifikator \"uber die eigenen 
+wird. Genauer gesagt, es soll nur der Klassifikator \"uber die eigenen 
 E-Mails preisgegeben werden.
 
 \subsection{Form der Benutzereingabe}
@@ -273,14 +276,30 @@ zu k\"onnen, verlangt die Anwendung, dass in einem Verzeichnis, aus
 dem wir E-Mails einlesen sollen, zwei  Verzeichnisse ,,spam'' und ,,not\_spam'' 
 existieren, welche dann die Dateien mit den E-Mail-Inhalten enthalten.
 Weitere Unterverzeichnisse in irgendeinem beteiligten Verzeichnis werden
-von der Anwendung ignoriert. Dadurch ist es nicht notwendig, die Metadaten
-aus einer separaten Datei einzulesen (und diese separate Datei auf dem
-neuesten Stand zu halten), sondern die Existenz einer Datei in einem der
-beiden Verzeichnisse schreibt sofort die Klassifkation der Datei vor.
+von der Anwendung ignoriert. Dateien, die sich nicht in dem Verzeichnis
+,,spam'' oder ,,not\_spam'' befinden werden ignoriert.
+Dadurch ist es nicht notwendig, die Metadaten aus einer separaten Datei 
+einzulesen (und diese separate Datei auf dem neuesten Stand zu halten),
+sondern die Existenz einer Datei in einem der beiden Verzeichnisse schreibt
+sofort die Klassifkation der Datei vor.\\
+\requirement{Das Programm liest die E-Mails aus dem Verzeichnis, das der
+Benutzer angegeben hat, ein und behandelt sie entsprechend der
+Unterverzeichnisse als Spam oder Nicht Spam}
 
 Der Anwender kann dann \"uber einen Parameter steuern, ob der Klassifikator
 auf der Standardausgabe ausgegeben wird oder in welche Datei der Klassifikator
-geschrieben werden soll.
+geschrieben werden soll.\\
+\requirement{Wenn der Anwender keine Aussage \"uber die Ausgabeform des
+Programmes trifft, wird der Klassifikator auf die Standardausgabe geschrieben}\\
+\requirement{Wenn der Anwender mit einem Kommandozeilenparameter einen
+Dateinamen f\"ur die Ausgabe definiert, wird der Klassifikator in diese
+Ausgabedatei geschrieben.}\\
+\requirement{Wenn der Anwender mit einem Kommandozeilenparameter
+einen Dateinamen f\"ur die Ausgabe definiert und dieser Dateiname
+ist `-', dann wird der Klassifikator auf die Standardausgabe 
+geschrieben}\\
+\requirement{Wenn der Anwender den Ausgabeparameter mehrfach angibt,
+gibt die Anwendung einen Fehler aus}\\
 
 \subsection{Interaktion der verteilten Programme}
 Wir implementieren die Kommunikation der verteilten Programme dadurch, dass
@@ -288,7 +307,22 @@ wir das Programm in zwei verschiedenen Modi ausf\"uhrbar machen: Als Client
 und als Server. Der Server wird dann im Allgemeinen die Aufgabe von Bob 
 erf\"ullen und auf Anfragen des Clients antworten, der dann nat\"urlich die
 Rolle von Alice einnimmt. Der Client wird dann zudem die IP und den Port
-des Server vom Anwender erfahren, um mit dem Server kommunizieren zu k\"onnen.
+des Server vom Anwender erfahren, um mit dem Server kommunizieren zu k\"onnen.\\
+\requirement{Die Anwendung kann mit einem Parameter \texttt{--server} gestartet
+werden. Zus\"atzlich muss ein Parameter \texttt{--port=INTEGER} angegeben werden.
+Dies veranlasst die Anwendung, einen Server zu starten, welcher auf dem
+Rechner auf dem angegebenen Port auf den Client wartet. Falls hier ein
+Fehler auftritt (beispielsweise bei Berechtigungsproblemen oder bei
+bereits belegten Ports) bricht der Server mit einer entsprechenden Fehlermeldung
+ab}
+\requirement{Die Anwendung kann mit einem Parameter \texttt{--client} gestartet
+werden. Zus\"atzlich m\"ussen dann die Parameter \texttt{--port=INTEGER}
+und \texttt{--server-ip=IP-Addresse} angegeben sein. Die Anwendung versucht
+dann, eine Verbindung zum Server unter der gegebenen IP und dem gegebenen
+Port aufzubauen und den Lernvorgang durchzuf\"uhren. Sowohl Client als
+auch Server beenden sich nach einem Lernvorgang. Sollte beim Verbinden
+ein Problem auftreten (Unerreichbarkeit des Servers, Port geschlossen),
+so beendet sich der Client mit einer entsprechenden Fehlermeldung}\\
 
 \subsection{\"Ubertragung der Gesamtanzahl der E-Mails}
 Aus technischen Gr\"unden wird zu Anfang der Anwendung von jedem der beiden
@@ -303,7 +337,7 @@ illustriert. In der ersten Phase bererechnen beide Anwender die gemeinsame
 Wortliste, aus denen dann in einer zweiten Phase Schwellwerte und damit
 Attribute f\"ur einen Entscheidungsbaum berechnet werden. In einer
 dritten Phase wandeln dann beide Anwender ihre eigenen E-Mails in die
-Attributwert-vektoren um und berechnen dann in einer finalen Phase 
+Attributwert-Vektoren um und berechnen dann in einer finalen Phase 
 den gemeinsamen Klassifikator.
 \begin{figure}
 \centering
@@ -443,8 +477,8 @@ Daten nicht so manipulieren, dass eine bestimmte Wortliste versendet wird.
 Zudem werden die Attribute des Baumes \"offentlich sein, sodass eine
 Geheimhaltung der Wortlisten keinen Sinn macht.
 Deswegen k\"onnen wir die Wortlisten durch eine einfache Vereinigung der
-separaten Wortlisten zu einer gesamten Wortliste vereinigen. Deswegen wird 
-das Zusammenfassen der Wortliste implementiert, indem beide Anwender ihre
+separaten Wortlisten zu einer gesamten Wortliste vereinigen. Wir implementieren
+ das Zusammenfassen der Wortliste, indem beide Anwender ihre
 lokale Wortliste an den jeweils anderen Anwender versenden und beide 
 Anwender lokal die Wortlisten vereinigen. Damit ergibt sich folgendes
 Akzeptanzkriterium:\\
@@ -472,7 +506,7 @@ implementiert}
 \bobknowledge[2]{Gemeinsame Wortliste};
 \phase{Phase 2.1: Berechnung der Vorkommnisse der Worte in eigenen Spam/Nicht Spam E-Mails};
 \symmetricknowledge[1]{Eigene Liste von (Wort + Anteil der Vorkomnisse eines Wortes an Spam/Nicht-Spam Worten)};
-\phase{Phase 2.2: Bestimmung eines Schwellwertes, der Spam, Nicht-Spam Anteile m\"oglichst halbiert};
+\phase{Phase 2.2: Bestimmung eines Schwellwertes, der Spam, Nicht-Spam Anteile m\"oglichst gut trennt};
 \symmetricknowledge{Eigene Liste von (Wort + Schwellwert)};
 \phase{Phase 2.3: Synchronisierung der Schwellwerte};
 \symmetricknowledge{Gemeinsame Liste von (Wort + Schwellwerte)};
@@ -499,7 +533,7 @@ Damit ergibt sich folgendes Akzeptanzkriterium:\\
 muss die Software als eigenen Mittelwert f\"ur das Wort A 
 \(\frac{1}{4} \cdot (1 + \frac{1}{3} + \frac{1}{3} + \frac{2}{3}) = \frac{7}{12}\) bestimmen.}
 
-\subsection{Syncronisierung der Schwellwerte}
+\subsection{Zusammenf\"ugen der Schwellwerte}
 Wir haben nun von Alice und Bob jeweils einen Schwellwert a und einen
 Schwellwert b, sodass Alice der Meinung ist, dass ein Wort \(w\)
 selten vorkommt, wenn der Anteil an Vorkomnissen unter a liegt und
@@ -611,10 +645,10 @@ spezifiziert.
 \end{figure}
 \paragraph{Generelles Vorgehen}
 Der grobe Ablauf von Yaos Protokoll f\"ur die private zwei-Parteien Berechnung
-ist in Abbidlung \ref{fig:yao} skizziert und basiert auf \cite{yaoprotocol}.
+ist in Abbildung \ref{fig:yao} skizziert und basiert auf \cite{yaoprotocol}.
 Die Eingabe jedes Anwenders f\"ur Yaos Protokoll ist eine Eingabe, und nach
 Kerckhoffs Prinzip auch der auszuf\"uhrende Schaltkreis in Reinform. Einer
-der beiden Anwender, ohne Beeintraechtigung der Allgemeinheit Alice, muss
+der beiden Anwender, ohne Beeintr\"achtigung der Allgemeinheit Alice, muss
 nun aus diesem Schaltkreis einen enstellten Schaltkreis konstruieren. Dies
 kann am einfachsten passieren, indem der Schaltkreis in einer Breitensuche
 traversiert wird und die Kanten verschleiert werden. Das bedeutet, dass
@@ -798,12 +832,12 @@ kann generiert werden}
 \caption{ID3-Algorithmus, Fall 2: Ausgabe eindeutig}
 \label{fig:id3:case2}
 \end{figure}
-Es muss ein Schaltkreis designed werden, der Feststellt, ob alle Elemente
+Es muss ein Schaltkreis designed werden, der feststellt, ob alle Elemente
 einer Menge eindeutig sind und dann entweder das Klassenlabel oder ein 
 Fehlersymbol ausgibt. Die Eingabe ist somit f\"ur jede E-Mail eine
 Kodierung f\"ur Spam, Nicht Spam oder Abwesenheit, die Anzahl der Eingaben
 ist bekannt und durch die Gesamtanzahl der E-Mails beschr\"ankt.\\
-Wir implementieren diesen Schaltkreis dann als Zustandsmaschine, die die
+Wir implementieren diesen Schaltkreis als Zustandsmaschine, die die
 internen Zust\"ande ,,Alles bis hier Spam'', ,,Alles bis hier kein Spam''
 und ,,Bereits uneindeutig'' hat. Wenn dann 
 \(T \colon \mathrm{State} \times \mathrm{Mailtype}\) ist, muss folgende
@@ -841,12 +875,15 @@ s_0' &=& s_0 \vee \overline{s_1} \overline{e_0} e_1
            \vee s_1 \overline{e_0} \overline{e_1}\\
 s_1' &=& s_1 \vee \overline{e_0} e_1
 \end{align*}
-Der Anfangszustand des Automatens ist die Kodierung der Klasse der ersten E-Mail.
+Der Anfangszustand des Automatens ist die Kodierung der Klasse der ersten
+E-Mail (dies nimmt an, dass die erste E-Mail nicht abwesend ist).
 Es muss dann nur noch f\"ur jede E-Mail das beschriebene Zustands\"ubergangsnetz
 von den vorherigen Zust\"anden und der Kodierung der Klasse der aktuellen
 E-Mail implementiert werden. Das Fehlersymbol, das ausgegeben wird, ist 11,
 andernfalls ist die Klasse im zweiten Ausgabebit Kodiert, wobei Spam als 1 
-kodiert ist und Nicht Spam als 0.
+kodiert ist und Nicht Spam als 0.\\
+\requirement{Dieser Schaltkreis zur Bestimmung der dominierenden Ausgabe kann
+generiert werden.}
 
 \subsection{Das Entropien-Protokoll}
 Es muss in diesem Teilschritt f\"ur jeden Anwender ein Share von
@@ -884,16 +921,16 @@ nur der Anwender kennt, der diese Ausgabe wisssen soll.\\
 \subsubsection{Erweiterung von Yaos Protokoll: Zerlegung der Ausgabe in zuf\"allige Shares}
 \paragraph{Die Problemstellung}
 Zum zweiten muss ein bin\"arkodierter Integer \(S\) in zwei zuf\"allige Shares 
-\(S_A, S_B\) zerlegt werden, sodass \(S_A + S_B = S\) ist. Da unsere
+\(S_A, S_B\) zerlegt werden, sodass \(S_A + S_B = S\) ist. 
+\paragraph{Unsere L\"osung}
+Da unsere
 Schaltkreise deterministisch sind, bedeutet das, dass wir Zufallsbits als 
 Eingabe hinzugeben m\"ussen, um eine zuf\"allige Aufteilung zu erreichen.
-Wir l\"osen dieses Problem dann so, dass wir einen Verteilungsvektor \(V\)
+Wir l\"osen dieses Problem, indem wir einen Verteilungsvektor \(V\)
 berechnen mit \(\|V\| = \|S\|\) und kopieren das Bit i in Alice' Share \(S_A\),
 falls \(V^i = 1\) ist, andernfalls kopieren wir das Bit i in Bobs Share \(S_B\).
 Das Kopieren kann implementiert werden, indem \(S_A^i = S^i \wedge V^i\) und
 \(S_B^i = S^i \wedge \overline{V^i}\) implementiert wird.
-
-\paragraph{Unsere L\"osung}
 Die Summe der beiden Shares ist dann wieder S, weil die Shares den Wert von
 S als zwei disjunkte Mengen von Zweierpotenzen darstellen, sodass die Addition
 keinen Carry erfordert, sondern einfach eine Veroderung der beiden Shares ist.
@@ -1028,7 +1065,7 @@ Eigenschaften:
 So ein Polynom kann gew\"ahlt werden, indem wir mit dem Polynom Q
 anfangen und dann Zufallskoeffizienten f\"ur Terme, die den Parameter
 x enthalten, w\"ahlen, bis der Grad in x gross genug ist. Dadurch
-kann durch setzen von x = 0 direkt das Polynom Q rekonstruiert werden,
+kann durch Setzen von x = 0 direkt das Polynom Q rekonstruiert werden,
 da nur die Faktoren aus Q keinen Anteil am x haben. Wenn wir desweiteren
 keine zu grossen Potenzen von y einf\"ugen ist die 1. Bedingung ebenfalls
 direkt erf\"ullt.  Die dritte Bedingung ist nach Konstruktion erf\"ullt.\\
@@ -1036,14 +1073,13 @@ Bob w\"ahlt ein weiteres univariates Polynom S mit der Eigenschaft, dass
 \(S(0) = \alpha_2\) ist und der Grad des Polynoms ist \(\frac{d_{R,x}}{d_Q}\),
 wobei \(d_Q\) der Grad von Q ist. Dies kann konstruiert werden, indem 
 der konstante Faktor des Polynoms auf \(\alpha_2\) gesetzt wird und
-die restlichen Faktoren zuf\"allig gew\"ahlt werden.
+die restlichen Faktoren zuf\"allig gew\"ahlt werden bis der Grad erreicht ist.
 
 Der Plan ist nun, ein Polynom \(T(0) = R(0,S(0)) = P(S(0)) = P(\alpha_2)\)
-auszuwerten, damit Bob den gesuchten Wert lernen kann. um T rekonstruieren
+auszuwerten, damit Bob den gesuchten Wert lernen kann. Um T rekonstruieren
 zu k\"onnen muss Bob dementsprechend 
 \(d_T + 1 = d_{R,x} + d_Q \cdot d_s +1= 2\cdot d_{R,x}+1\) 
-Punkte von T erfahren,
-um T zu rekonstruieren und \(T(0)\) auswerden zu k\"onnen. (Die verschiedenen
+Punkte von T erfahren. Danach kann er \(T(0)\) auswerten. (Die verschiedenen
 \(d_p\) bzw \(d_{p,v}\) bezeichnen den Grad des Polynoms p, eventuell in der
 Variablen v). Um dies geheim durchzuf\"uhren, w\"ahlt Bob \(n = 2 \cdot d_{R,x}+1\)
 verschiedene Punkte verschieden von 0. F\"ur jeden Punkt \(x_i\) dieser Punkte
@@ -1054,7 +1090,7 @@ der zuf\"alligen Punkte anbieten und Bob kann -- da er die Reihenfolge der
 Punkte und damit die Position von \(S(x_i)\) kennt -- den Wert \(R(x_i, S(x_i))\)
 lernen. Alice lernt dabei die Position nicht und deswegen den Wert \(S(x_i)\)
 nicht und Bob erf\"ahrt keinen der anderen Werte. Danach interpoliert Bob T und berechnet 
-\(T(0)\)
+\(T(0)\).\\
 \requirement{Dieses Protokoll zur Polynomauswertung kann ausgef\"uhrt werden.}
 
 \paragraph{1-out-of-N Oblivious Transfer}
@@ -1067,7 +1103,7 @@ und Bob kennt einen Index \(i_B\). Das Ziel des Protokolles ist nun, dass Bob
 ohne dass Alice \(i_B\) lernt.
 
 \subparagraph{Das verwendete Protokoll}
-Es sei \(\{F_k : \{0,1\}^m \mapsto \{0,1\}^m\} | K \in \{0,1\}^t\) eine Familie
+Es sei \(\{F_k : \{0,1\}^m \mapsto \{0,1\}^m\} | K \in \{0,1\}^t\}\) eine Familie
 von pseudozuf\"alligen Funktionen. Wir verwenden nun diese Funktionen und
 1-out-of-2-Oblivious Transfer (f\"ur den bereits eine Spezifikation existiert),
 um die 1-out-of-N Oblivious Transfer zu implementieren.
@@ -1092,6 +1128,10 @@ denn:
 &=& i_A^{i_B}
 \end{align*}
 
+Falls N keine Zweierpotenz ist, werden am Anfang von \(i_B\) 0en 
+angef\"ugt, bis N eine Zweierpotenz ist. Fehlende Werte werden durch
+Zufallswerte an das Ende der Sequenz angef\"ugt. Dadurch, dass
+\(0 \leq i_b \leq N\) gilt, werden diese Werte nicht selektiert werden.\\
 \requirement{Dieses Protokoll zum 1-out-of-N-Oblivious Transfer kann
 ausgef\"uhrt werden.}
 
@@ -1216,7 +1256,7 @@ i_m' &=& \: \mathrm{if} \: S_A + S_B < S_m \: \mathrm{then} \: i \: \mathrm{ els
 Wenn wir dies als einen Schaltkreis implementieren k\"onnen, 
 k\"onnen wir diesen Zustands\"ubergangschaltkreis f\"ur alle
 eingegebenen Shares wiederholen. Der Anfangszustand ist
-das erste Paar Shares.
+das erste Paar Shares sowie der Index 0.
 
 \subparagraph{Bedingte Zuweisung}
 Gegeben die Zuweisung 
@@ -1244,21 +1284,31 @@ wenn im ersten unterschiedlichen Bit von a und b in der Stelle von b eine 1
 und in der Stelle von a eine 0 steht. Damit kann dies erneut einfach als
 Automat implementiert werden, der die Zahlen a, b vom signifikantesten
 Bit zum wenigsten signifikanten Bit liest und die Zust\"ande 
-,,unentschieden'', ,,Ergebnis positiv'' und ,,Ergebnis negativ'' besitzt.
-Die Eingabe des Automaten sind die 2 Bits von a, b. Die Zustands\"ubergangstabelle
-ist somit:
-\begin{center}
-\begin{tabular}{r|c c c c}
-\(a_i, b_i \rightarrow \) & 1, 1 & 1, 0 & 0, 1 & 0, 0\\
-\hline
-unentschieden & unentschieden & Ergebnis negativ & Ergebnis positiv & unentschieden \\
-Ergebnis positiv & Ergebnis positiv & Ergebnis positiv & Ergebnis postiv & Ergebnis positiv \\
-Ergebnis negativ & Ergebnis negativ & Ergebnis negativ & Ergebnis negativ & Ergebnis positiv 
-\end{tabular}
-\end{center}
+\(a = b\), \(a < b\) und \(a > b\) besitzt. 
+Die Eingabe des Automaten sind die 2 Bits von a, b. 
+Der Zustands\"ubergangsgraph ist in Abbildung \ref{fig:state:compare}
+illustriert. 
+\begin{figure}
+\begin{tikzpicture}
+\node[state,initial] (unentschieden) {\(a = b\)};
+\node[state] (less) [below left=of unentschieden] {\(a < b\)};
+\node[state] (more) [below right=of unentschieden] {\(a > b\)};
 
-Wir kodieren dann ,,unentschieden'' mit 00, ,,Ergebnis negativ'' mit 10 und
-,,Ergebnis positiv'' mit 11. Damit ergibt sich die bin\"are Zustands\"ubergangstabelle:\\
+\draw[->] (unentschieden) edge [loop above] node {\(a_i,b_i = (1,1),(0,0)\)} (unentschieden)
+                          edge              node [left] {\(a_i,b_i = (0,1)\)} (less)
+                          edge              node [right] {\(a_i,b_i = (1,0)\)} (more);
+
+\draw[->] (less) edge [loop below] node { * } (less);
+\draw[->] (more) edge [loop below] node { * } (more);
+
+\end{tikzpicture}
+\centering
+\label{fig:state:compare}
+\caption{Zust\"ande des Vergleichsautomaten}
+\end{figure}
+
+Wir kodieren dann \(a = b\) mit 00, \(a > b\) mit 10 und
+\(a < b\) mit 11. Damit ergibt sich die bin\"are Zustands\"ubergangstabelle:\\
 \begin{center}
 \begin{tabular}{c|c c c c}
 \(a_i, b_i \rightarrow\) & 11 & 10 & 01 & 00 \\
@@ -1275,14 +1325,15 @@ s_1' &=& s_1 \vee \overline{s_0} \wedge \overline{s_1} \wedge \overline{a_i} \we
 \end{align}
 Diese Gleichungen machen Sinn, da \(s_0\) kodiert, ob bereits
 ein Ergebnis gespeichert wird und wenn ein Ergebnis vorhanden
-ist oder \(a_i\) und \(b_i\) unterschiedlich sind, bleibt ein
-Ergebnis gesetzt. Im zweiten Zustandsbit ist kodiert,
+ist oder \(a_i\) und \(b_i\) unterschiedlich sind, ist im n\"achsten
+Schritt ein Ergebnis vorhanden. Im zweiten Zustandsbit ist kodiert,
 ob das Ergebnis positiv oder negativ ist. Es wird entweder einfach
 kopiert oder gesetzt, wenn der Zustand vorher ,,unentschieden'' war
 und \(a_i\) 0 ist und \(b_i\) 1. Der Anfangszustand ist \(s_0 = s_1 = 0\).
 Diese Zustands\"ubergangsgleichungen k\"onnen nun durch ein
 einfaches Schaltnetz implementiert werden und einfach f\"ur alle
-Attribute wiederholt werden.
+Attribute wiederholt werden.\\
+\requirement{Dieser Vergleichsschaltkreis kann generiert werden.}
 
 \subparagraph{Summieren}
 Wir berechnen die Summe wieder durch einen einfachen Ripple-Carry-Adder.\\
