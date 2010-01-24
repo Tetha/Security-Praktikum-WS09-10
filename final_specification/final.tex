@@ -694,6 +694,7 @@ der beiden Werte Bob gew\"ahlt hat, und dass Bob den nicht gew\"ahlten Wert
 nicht kennt. Somit ist die Sicherheit von Bobs Eingabe gegeben und 
 sichergestellt, dass Bob wirklich seine Eingabe verwendet.
 
+\subparagraph{1-out-of-2 Oblivious Transfer} \label{12ot}
 Wir implementieren den 1-2 Oblivious Transfer mittels RSA. Die Eingabe
 von Alice seien \(m_1\), \(m_2\) und die Eingabe von Bob sei \(b\).
 Alice ein Schl\"usselpaar, den privaten Exponenten e, den
@@ -761,12 +762,8 @@ Wenn wir zudem definieren, dass die Ausgabe 0 bedeutet, dass die erste
  vereinfacht sich die Maximumsbestimmung noch weiter zum finden der
  h\"ochstwertigen Stelle, die sich unterscheidet und dem zur\"uckgeben
  des Bits in der ersten Zahl. Dies ist in Abbildung ~\ref{fig:circuit:max sum}
- angedeutet.\\
-Formal gilt also:
- \(lt(a, b) = b_i \Leftrightarrow a_i \neq b_i \wedge \forall k = i+1,\dots,n: a_k = b_k\)
-Der Allquantor ist als Kaskade von Und-Gattern implementierbar und die Gleichheit
- bzw Ungleichheit als Negation bzw direkte Verwendung des XOR-Gatters implementierbar,
- damit kann diese Formel einfach in einen Schaltkreis \"uberf\"uhrt werden.\\
+ angedeutet. Ein Automat zum Vergleichen ist dann in \ref{compare_automata} 
+ genau implementiert. \\
 \begin{figure}
 \centering
 \begin{tikzpicture}
@@ -838,32 +835,37 @@ Fehlersymbol ausgibt. Die Eingabe ist somit f\"ur jede E-Mail eine
 Kodierung f\"ur Spam, Nicht Spam oder Abwesenheit, die Anzahl der Eingaben
 ist bekannt und durch die Gesamtanzahl der E-Mails beschr\"ankt.\\
 Wir implementieren diesen Schaltkreis als Zustandsmaschine, die die
-internen Zust\"ande ,,Alles bis hier Spam'', ,,Alles bis hier kein Spam''
-und ,,Bereits uneindeutig'' hat. Wenn dann 
-\(T \colon \mathrm{State} \times \mathrm{Mailtype}\) ist, muss folgende
-Zustands\"ubergangstabelle implementiert werden:\\
-\begin{center}
-\begin{tabular}{c c c c}
-T & Alles bis hier Spam & Alles bis hier kein Spam & Bereits uneindeutig\\
-Spam & Alles bis hier Spam & Uneindeutig & Bereits Uneindeutig \\
-Nicht Spam & Uneindeutig & Alles bis hier kein Spam & Bereits Uneindeutig \\
-Abwesenheit & Alles bis hier Spam & Alles bis hier kein Spam & Bereits uneindeutig
-\end{tabular}
-\end{center}
-Zudem w\"are es sehr angenehm, wenn die Kodierung von Spam und 
-,,Alles bis hier Spam'' und von ,,Nicht Spam'' und ,,Alles bis hier kein Spam''
-gleich sind, da dies den Anfangsfall vereinfacht.\\
-Wenn wir nun ,,Bereits uneindeutig'' durch 11 kodieren und 
-,,Alles bis hier Spam'' mit 01 kodieren und ,,Alles bis hier kein Spam''
-mit 00 kodieren und davon ausgehend ,,Spam'' als 01 kodieren und
-,,Nicht Spam'' als 00 und ,,Abwesenheit'' als 11, dann muss folgende
+internen Zust\"ande ,,Keine Mails'' ,,Alles Spam'', ,,Kein Spam''
+und ,,beide Labels'' hat.  Der Zustands\"ubergangsgraph des Automaten
+ist in \ref{fig:states:uniqueness} dargestellt. \begin{figure}
+\begin{tikzpicture}[text width = 2cm]
+\node[state, initial] (nomails) {Keine Mails};
+\node[state] (allspam) [above right=of nomails] {Alles Spam};
+\node[state] (allgood) [below right=of nomails] {Kein Spam};
+\node[state] (both) [below right=of allspam] {Beide Labels};
+
+\draw[->] (nomails) edge node [right] {Spam} (allspam)
+                    edge node [left] {kein Spam} (allgood)
+                    edge [loop above] node [left] {Abwesenheit} (nomails);
+\draw[->] (allspam) edge [loop above] node {Spam, Abwesenheit} (allspam)
+                    edge node [right]{kein Spam} (both);
+\draw[->] (allgood) edge [loop below] node {kein Spam, Abwesenheit} (allgood)
+                    edge node [right] {Spam} (both);
+\draw[->] (both) edge [loop right] node {*} (both);
+\end{tikzpicture}
+\caption{Zustands\"ubergangsgraph des Eindeutigkeitsautomaten}
+\label{fig:states:uniqueness}
+\end{figure}
+Wenn wir nun ,,keine Mails'' mit 00, ,,Alles Spam'' mit 01,
+,,Kein Spam'' mit 10 und ''beide Label'' mit 11 kodieren, dann muss folgende
 Zustands\"ubergangstabelle gelten:\\
 \begin{center}
-\begin{tabular}{c c c c}
-T & 01 & 00 & 11\\
-01 & 01 & 11 & 11\\
-00 & 11 & 00 & 11\\
-11 & 01 & 00 & 11
+\begin{tabular}{c|c c c c}
+E-Mail \(\downarrow\) & 00 & 01 & 10 & 11\\
+\hline
+Spam = 01 & 01 & 01 & 11 & 11\\
+kein Spam = 00 & 10 & 11 & 10 & 11\\
+Abwesend = 11 & 00 & 01 & 10 & 11
 \end{tabular}
 \end{center}
 
@@ -871,17 +873,18 @@ Durch Anwenden von KV-Diagrammen ergeben sich als Zustands\"ubergangsgleichungen
 somit, mit \(s_0, s_1\) als Bits des vorherigen Zustandes, \(e_0, e_1\) als Bits
 der E-Mail Kodierung und \(s_0', s_1'\) als Bits des neuen Zustandes:
 \begin{align*}
-s_0' &=& s_0 \vee \overline{s_1} \overline{e_0} e_1
-           \vee s_1 \overline{e_0} \overline{e_1}\\
-s_1' &=& s_1 \vee \overline{e_0} e_1
+s_0'  =& \overline{e_1} \\
+       & \vee s_0 s_1\\
+       & \vee e_0(s_0 \vee s_1)\\
+s_1'  =& s_1 \\
+       & \vee \overline{e_0} e_1
 \end{align*}
-Der Anfangszustand des Automatens ist die Kodierung der Klasse der ersten
-E-Mail (dies nimmt an, dass die erste E-Mail nicht abwesend ist).
+Der Anfangszustand des Automatens ist 00.\\
 Es muss dann nur noch f\"ur jede E-Mail das beschriebene Zustands\"ubergangsnetz
 von den vorherigen Zust\"anden und der Kodierung der Klasse der aktuellen
 E-Mail implementiert werden. Das Fehlersymbol, das ausgegeben wird, ist 11,
-andernfalls ist die Klasse im zweiten Ausgabebit Kodiert, wobei Spam als 1 
-kodiert ist und Nicht Spam als 0.\\
+andernfalls ist die Klasse durch den Index des gesetzten Bits im Zustand kodiert,
+wobei das erste Bit ,,kein Spam'' bedeutet und das zweite Bit ,,Spam''. \\
 \requirement{Dieser Schaltkreis zur Bestimmung der dominierenden Ausgabe kann
 generiert werden.}
 
@@ -1105,7 +1108,7 @@ ohne dass Alice \(i_B\) lernt.
 \subparagraph{Das verwendete Protokoll}
 Es sei \(\{F_k : \{0,1\}^m \mapsto \{0,1\}^m\} | K \in \{0,1\}^t\}\) eine Familie
 von pseudozuf\"alligen Funktionen. Wir verwenden nun diese Funktionen und
-1-out-of-2-Oblivious Transfer (f\"ur den bereits eine Spezifikation existiert),
+1-out-of-2-Oblivious Transfer (welcher bereits in \ref{12ot} spezifiziert ist),
 um die 1-out-of-N Oblivious Transfer zu implementieren.
 
 Alice berechnet nun l Schl\"usselpaare
@@ -1278,16 +1281,7 @@ insgesamt gilt \(x = f\). Somit ist dieser Teilschaltkreis
 korrekt. Desweiteren werden wir die Indizes der Attribute
 hart in den Schaltkreis kodieren. 
 
-\subparagraph{Vergleichen}
-F\"ur bin\"arkodierte Integer a, b gilt, dass \(a \le b\) gilt,
-wenn im ersten unterschiedlichen Bit von a und b in der Stelle von b eine 1 
-und in der Stelle von a eine 0 steht. Damit kann dies erneut einfach als
-Automat implementiert werden, der die Zahlen a, b vom signifikantesten
-Bit zum wenigsten signifikanten Bit liest und die Zust\"ande 
-\(a = b\), \(a < b\) und \(a > b\) besitzt. 
-Die Eingabe des Automaten sind die 2 Bits von a, b. 
-Der Zustands\"ubergangsgraph ist in Abbildung \ref{fig:state:compare}
-illustriert. 
+\subparagraph{Vergleichen}\label{compare_automata}
 \begin{figure}
 \begin{tikzpicture}
 \node[state,initial] (unentschieden) {\(a = b\)};
@@ -1303,9 +1297,18 @@ illustriert.
 
 \end{tikzpicture}
 \centering
-\label{fig:state:compare}
 \caption{Zust\"ande des Vergleichsautomaten}
+\label{fig:compare_states}
 \end{figure}
+F\"ur bin\"arkodierte Integer a, b gilt, dass \(a \le b\) gilt,
+wenn im ersten unterschiedlichen Bit von a und b in der Stelle von b eine 1 
+und in der Stelle von a eine 0 steht. Damit kann dies erneut einfach als
+Automat implementiert werden, der die Zahlen a, b vom signifikantesten
+Bit zum wenigsten signifikanten Bit liest und die Zust\"ande 
+\(a = b\), \(a < b\) und \(a > b\) besitzt. 
+Die Eingabe des Automaten sind die 2 Bits von a, b. 
+Der Zustands\"ubergangsgraph ist in Abbildung ~\ref{fig:compare_states}
+illustriert. 
 
 Wir kodieren dann \(a = b\) mit 00, \(a > b\) mit 10 und
 \(a < b\) mit 11. Damit ergibt sich die bin\"are Zustands\"ubergangstabelle:\\
@@ -1332,7 +1335,9 @@ kopiert oder gesetzt, wenn der Zustand vorher ,,unentschieden'' war
 und \(a_i\) 0 ist und \(b_i\) 1. Der Anfangszustand ist \(s_0 = s_1 = 0\).
 Diese Zustands\"ubergangsgleichungen k\"onnen nun durch ein
 einfaches Schaltnetz implementiert werden und einfach f\"ur alle
-Attribute wiederholt werden.\\
+Attribute wiederholt werden. Die Ausgabe kann dann in 1 Bit zusammengefasst
+werden, indem \(s_0\) und \(s_1\) verundet werden und dann in der bedingten
+Zuweisung verwendet werden. \\
 \requirement{Dieser Vergleichsschaltkreis kann generiert werden.}
 
 \subparagraph{Summieren}
