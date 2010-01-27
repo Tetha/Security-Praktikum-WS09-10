@@ -1,0 +1,228 @@
+\documentclass{article}
+\usepackage{color}
+\usepackage{multicol}
+% =============== Requirements =========
+\newcounter{requirementscount}{}
+\setcounter{requirementscount}{0}
+\newcommand{\requirement}[1] {
+        \addtocounter{requirementscount}{1}
+        {\bf Requirement \therequirementscount:} #1\\
+    }
+
+\begin{document}
+\section{Lerner}
+\requirement{Das Programm liest die E-Mails aus dem
+Verzeichnis, das der Benutzer angegeben hat, ein und 
+behandelt sie entsprechend der Unterverzeichnisse als Spam
+oder Nicht Spam}
+\requirement{Wenn der Anwender keine Aussage \"uber die Ausgabeform des
+Programmes trifft, wird der Klassifikator auf die Standardausgabe geschrieben}\\
+\requirement{Wenn der Anwender mit einem Kommandozeilenparameter einen
+Dateinamen f\"ur die Ausgabe definiert, wird der Klassifikator in diese
+Ausgabedatei geschrieben.}\\
+\requirement{Wenn der Anwender mit einem Kommandozeilenparameter
+einen Dateinamen f\"ur die Ausgabe definiert und dieser Dateiname
+ist `-', dann wird der Klassifikator auf die Standardausgabe 
+geschrieben}\\
+\requirement{Wenn der Anwender den Ausgabeparameter mehrfach angibt,
+gibt die Anwendung einen Fehler aus}\\
+\requirement{Die Anwendung kann mit einem Parameter \texttt{--server} gestartet
+werden. Zus\"atzlich muss ein Parameter \texttt{--port=INTEGER} angegeben werden.
+Dies veranlasst die Anwendung, einen Server zu starten, welcher auf dem
+Rechner auf dem angegebenen Port auf den Client wartet. Falls hier ein
+Fehler auftritt (beispielsweise bei Berechtigungsproblemen oder bei
+bereits belegten Ports) bricht der Server mit einer entsprechenden Fehlermeldung
+ab}
+\requirement{Die Anwendung kann mit einem Parameter \texttt{--client} gestartet
+werden. Zus\"atzlich m\"ussen dann die Parameter \texttt{--port=INTEGER}
+und \texttt{--server-ip=IP-Addresse} angegeben sein. Die Anwendung versucht
+dann, eine Verbindung zum Server unter der gegebenen IP und dem gegebenen
+Port aufzubauen und den Lernvorgang durchzuf\"uhren. Sowohl Client als
+auch Server beenden sich nach einem Lernvorgang. Sollte beim Verbinden
+ein Problem auftreten (Unerreichbarkeit des Servers, Port geschlossen),
+so beendet sich der Client mit einer entsprechenden Fehlermeldung}\\
+\requirement{Wenn die Spam-Mails die Mails "Foo Bar", "Foo Bar", "Foo Foo"
+und "Foo" sind und die Nicht-Spam-Mails "Bar Bar", "Foo" und "Bar", 
+dann muss diese Phase die folgende Tabelle berechnen:\\
+\begin{center}
+\begin{tabular}{c c c}
+Wort & Spam-Anteil & Nicht-Spam-Anteil \\
+Foo & \(\frac{5}{7}\) & \(\frac{1}{4}\) \\
+Bar & \(\frac{2}{7}\) & \(\frac{3}{4}\)
+\end{tabular}
+\end{center}
+Eine Approximation der Werte durch Fliesskommazahlen ist
+ebenfalls akzeptabel.}
+\requirement{Wenn N = 2 ist, und als Worte mit Vorkomnissen gegeben sind:
+\begin{center}
+\begin{tabular}{c c c}
+Wort & Vorkomnisse in Spam-E-Mails & Vorkommnisse in Nicht-Spam-Emails \\
+A & 0.5 & 0.5 \\
+B & 0.2 & 0.2 \\
+C & 0.3 & 0.5 \\
+D & 0.2 & 0.8 \\
+E & 0.9 & 0.2
+\end{tabular}
+\end{center}
+dann werden als Wortliste D und E gew\"ahlt.}
+\requirement{Wenn Alice die Wortliste A, B, C berechnet hat, und Bob die
+Wortliste C, D, E berechnet hat, dann muss die zusammengefasste Wortliste
+A, B, C, D, E sein.} 
+
+\requirement{Das Protokoll, in dem beide Anwender ihre Wortlisten einander
+zusenden und lokal die spezifizierte Syncronisierung durchf\"uhren, ist
+implementiert}
+\requirement{Wenn die E-Mails "A A A", "A B B", "A C C" und "A A C" sind, dann
+muss die Software als eigenen Mittelwert f\"ur das Wort A 
+\(\frac{1}{4} \cdot (1 + \frac{1}{3} + \frac{1}{3} + \frac{2}{3}) = \frac{7}{12}\) bestimmen.}
+\requirement{Wenn a = 0.2 ist und b = 0.4, dann ist das Schwellwertpaar
+(0.2, 0.4)}\\
+\requirement{Wenn a = 0.5 ist und b = 0.4, dann ist das Schwellwertpaar
+(0,4, 0.5)}\\
+\requirement{Wenn a = b = 0.5 ist, dann ist das resultierende Schwellwertpaar
+(0.5, 0.5)}\\
+\requirement{Das Protokoll, indem beide Anwender ihre eigenen Schwellwerte
+an den jeweils anderen Anwender senden und dann die bereits spezifizierte
+Merge-Operation ausf\"uhren ist implementiert.}
+\requirement{Wenn der E-Mail-Inhalt "A A A A B B C D" ist und die Attribute
+sind (A, 0.2, 0.3), (B, 0.1, 0.9), (C, 0.5, 0.8),
+dann wird diese E-Mail diskretisiert in den Vektor oft, mittel, selten}
+\requirement{Dieser Schaltkeris f\"ur die dominierende Ausgabe 
+kann generiert werden}
+\requirement{Dieser Schaltkreis zur Bestimmung der dominierenden Ausgabe kann
+generiert werden.}
+\requirement{Es ist m\"oglich, einen Schaltkreis so zu erweitern (separate Ausgaben)}
+
+\requirement{Es ist m\"oglich, einen Schaltkreis so zu erweitern (Shares)}
+\requirement{Dieser Schaltkreis zur Berechnung der Shares der
+ersten Approximation kann generiert werden}
+\requirement{Dieses Protokoll zur Polynomauswertung kann ausgef\"uhrt werden.}
+\requirement{Dieses Protokoll zum 1-out-of-N-Oblivious Transfer kann
+ausgef\"uhrt werden.}
+
+\requirement{Es ist so eine einweg Funktionsfamilie implementiert.}
+\requirement{Dieses Protokoll zur Multiplikation kann ausgef\"uhrt werden}
+
+\requirement{Die Entropie-Shares k\"onnen anhand diesse Protokolles berechnet
+werden}
+\requirement{Dieser Vergleichsschaltkreis kann generiert werden.}
+\requirement{Dieses Protokoll kann implementiert werden}
+\pagebreak
+Nouns:
+\begin{multicols}{2}
+\begin{itemize}
+\item Programm, Anwendung, Software
+\item E-Mails
+\item Verzeichnis
+\item Benutzer, Anwender
+\item Unterverzeichnis
+\item Spam, Spam-Mails
+\item Nicht Spam, Nicht-Spam-Mails
+\item Ausgabeform
+\item Klassifikator
+\item Standardausgabe
+\item Kommandozeilenparameter, Parameter
+\item Dateiname
+\item Ausgabedatei
+\item Fehler, Problem
+\item Server
+\item Client
+\item Berechtigungsproblem
+\item Port
+\item Fehlermeldung
+\item IP Adresse, IP
+\item Verbindung
+\item Lernvorgang
+\item Unerreichbarkeit
+\item Phase
+\item Tabelle
+\item Spam-Anteil
+\item Nicht-Spam-Anteil
+\item Approximation
+\item Wert
+\item Fliesskommazahl
+\item Wort
+\item Vorkomniss
+\item Wortliste
+\item Protokoll
+\item Syncronisierung
+\item Mittelwert
+\item Schwellwertpaar
+\item Schwellwert
+\item Merge-Operation
+\item E-Mail Inhalt
+\item Attribut
+\item Vektor
+\item Schaltkreis
+\item Ausgabe
+\item Share, Entropie-Share
+\item Polynomauswertung
+\item Polynom
+\item 1-out-of-N-Oblivious-Transfer
+\item FunktionsFamilie
+\item Multiplikation
+\item Vergleichsschaltkreis
+\end{itemize}
+\end{multicols}
+\pagebreak
+\section{Klassifikator}
+\requirement{Der Klassifizierer weist die Eingabe Decide((Foo, 0.5,2),
+Output(Spam), Output(Spam)) wegen eines zu grossen Schwellwertes zur\"uck}
+\requirement{Der Klassifizierer weist die Eingabe Decide((Foo, 2, 3),
+Output(Spam), Output(Spam)) wegen eines zu grossen Schwellwertes zur\"uck}
+\requirement{Der Klassifizierer weist die Eingabe Decide((Foo, 1, 0),
+Output(Spam), Output(Spam)) wegen falsch sortierter Schwellwerte zur\"uck}
+\requirement{Der Klassifizierer weist die Eingabe Decide((Foo, 0.2, 0.3),
+Output(Spam), Output(Spam)) wegen zuweniger Teilb\"aume zur\"uck}
+\requirement{Der Klassifizierer weist die Eingabe Decide((Foo, 0.2, 0.3),
+Output(Spam), Output(Spam), Output(Spam), Output(Spam)) wegen zuvieler
+Teilb\"aume zur\"uck}
+\requirement{Der Klassifizierer akzeptiert die Eingabe 
+Decide((Foo, 0.2, 0.3), 
+    Output(Spam),
+    Decide((Bar, 0.3, 0.4)
+        Output(Spam),
+        Output(Not Spam), 
+        Output(Spam)),
+    Output(Spam))}
+\requirement{Der Klassifizierer akzeptiert die Eingabe Decide((Foo, 0, 0.5),
+Output(Spam), Output(Spam))}
+\requirement{Der Klassifizierer akzeptiert die Eingabe Decide((Foo, 0.5, 1),
+Output(Spam), Output(Spam))}
+\requirement{Der Klassifizierer akzeptiert die Eingabe 
+Decide((Foo, 0.5, 0.5)), Output(Spam), Output(Spam))}
+\requirement{Der Klassifizierer akzeptiert die Eingabe Decide((Foo, 0, 0),
+Output(Spam))}
+\requirement{Der Klassifizierer akzeptiert die Eingabe Decide((Foo, 1, 1),
+Output(Spam))}
+\requirement{Gegeben der Klassifikator Decision((Bar, 0.3, 0.6), Output(Spam),
+Output(Not Spam), Output(Spam)), dann wird die E-Mail "Bar Foo Foo Foo" als
+Spam klassifiziert}
+\requirement{Gegeben der Klassifikator Decision((Bar, 0.3, 0.6), Output(Spam),
+Output(Not Spam), Output(Spam)), dann wird die E-Mail "Bar, Bar, Foo, Foo" als
+Not Spam klassifiziert}
+\requirement{Gegeben der Klassifikator Decision((Bar, 0.3, 0.6), Output(Spam),
+Output(Not Spam), Output(Spam)), dann wird die E-Mail "Bar, Bar, Bar, Foo" als
+Spam klassifiziert}
+\requirement{Gegen der Klassifikator Decision((Bar, 0.3, 0.6), Output(Spam),
+Output(Not Spam), Output(Spam)) und eine Verzeichnisstruktur wie oben
+skizziert, wobei hank/mail1 "Bar Foo Foo Foo", hank/mail2 "Bar Bar Foo Foo"
+und bob/mail1 "Bar Bar Bar Foo" enth\"alt, dann wird die oben als Beispiel
+genannte Ausgabe produziert (oder in einer anderen Reihenfolge}
+
+\pagebreak
+\begin{multicols}{2}
+\begin{itemize}
+\item Klassifizierer
+\item Eingabe
+\item Schwellwert
+\item Teilbaum
+\item E-Mail
+\item Spam
+\item Nicht Spam
+\item Verzeichnisstruktur
+\item Beispiel
+\item Ausgabe
+\end{itemize}
+\end{multicols}
+\end{document}
