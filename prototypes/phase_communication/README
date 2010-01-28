@@ -1,0 +1,136 @@
+Introduction
+------------
+
+ Diese Prototypen untersuchen die Moeglichkeiten, Wissen aus
+einer Phase in die naechste Phase(n) zu bewegen.
+
+Es werden als Moeglichkeiten untersucht:
+ - explizites Herumschieben der Werte durch die Zusammensetzende
+   Klasse
+ - Verwenden des Entwurfsmusters Mediator
+ - Verwenden des Entwurfsmusters Beobachter
+
+Der Beispielfall
+----------------
+Alle Prototypen implementieren den folgenden Fall:
+ (1) Wir haben eine erste Phase, welche als Eingabewissen einen String
+     erfordert und als Ausgabewissen eine Zahl, die Laenge des String,
+     produziert.
+ (2) Wir haben eine zweite Phase, welche als Eingabe einen String und eine
+     Zahl erwartet und als Ausgabe den String und die Zahl mit einem
+     "has length" dazwischen produziert.
+ (3) Wir wollen diese beiden Phasen zusammensetzen, sodass wir insgesamt
+     eine Phase haben, die aus einem String X den String 
+     X + "has length" + X.length() produziert.
+
+Ausfuehrung der Prototypen
+--------------------------
+ (Kommandozeile)
+   (Kompilierung) javac *.java
+   (Ausfuehrung) java -classpath . Main
+
+
+Auswertung
+----------
+Die wichtigen Aspekte bei der Auswertung sind: 
+ (Robust) Fagilitaet in diesem Bereich stellt die Fragen wann und
+          wie oft eine Klasse sich aendern muss und wie kompliziert
+          es war, den Protoypen ans Laufen zu bekommen.
+ (Skalierbar) Skalierbarkeit in diesem Bereich befasst sich mit der Frage,
+              wie einfach die Anzahl der verschaltbaren Phasen und der 
+              verschiedenen Wissensanteile vergroessert werden kann, ohne
+              dass Probleme auftreten, bzw, welche Probleme vermutlich
+              auftreten werden.
+
+Evaluation
+----------
+ (explizites Herumschieben der Werte)
+    {Robust} Der Prototyp funktionierte direkt, d.h., die Umsetzung ist
+             ziemlich einfach. Die einzelnen Phasenklassen werden sich
+             aendern, wenn das Eingabe- oder Ausgabewissen sich aendert,
+             da dann neue setInput<Wissen> bzw getOutput<Wissen>-Klassen
+             hinzukommen und wenn die verwendeten Unterphasen sich 
+             veraendern, bzw, der Wissensfluss zwischen diesen Unterphasen
+             sich aendert. Dazu muessen prinzipiell in der execute-Methode
+             einer zusammengesetzten Phase neue Variablen fuer neues
+             Wissen eingefuegt werden und an den richtigen Stellen 
+             aufgerufen werden.
+             Das "richtige Aufrufen" ist dabei noch etwas trickreich, da
+             man die getOutput<Wissen>-Methoden einer Phase erst nach der
+             Ausfuehrung der Phase (hier modelliert als execute-Methode)
+             vorgenommen werden kann.
+    {Skalierbar} Jede Phase hat pro Eingabewissen eine Methode
+                 setInput<Wissen> und pro Ausgabewissen eine Methode
+                 getOutput<Wissen>, sowie pro beteiligtem Wissen ein
+                 Attribut, welches dieses Wissen enthaelt. Das kann 
+                 vor allem fuer die spaeteren Phasen, die viel Wissen
+                 brauchen, unuebersichtlich werden.
+                 Zudem werden fuer groessere Zusammengesetzte Phasen die 
+                 execute-methoden unuebersichtlich, da pro auftretendem
+                 Wissen zwischen zwei Unterphasen eine lokale Variable
+                 notwendig ist. (oder zumindest ein zusammengesetzter
+                 Aufruf :) ).
+
+ (Mediator)
+    {Robust} Eine kleine Verzoegerung in der Implementierung des Prototypen
+             ergab sich, weil ich den Mediator zunaechst nur fuer Strings
+             implementiert habe, allerdings auch Integer-Ausgaben hatte.
+             Dadurch musste ich kurzfristig ein Generic dadraus machen.
+             Ansonsten lief der Prototyp ebenfalls ohne wirkliche Probleme.
+    {Skalierbar} Jede Phase hat pro Wissen ein Attribut, welches durch
+                 einen Konstruktorparameter gesetzt werden sollte. Die
+                 Zusammensetzende Phase muss fuer alle Wissen, die
+                 in einem Zwischenschritt auftreten, einen Port instantiieren
+                 und diesen Port bei den Phasen als Parameter setzen. Die 
+                 eigenen Eingabe- und Ausgabeports werden dabei an die
+                 erste bzw letzte Phase uebergeben. Danach
+                 muss die zusammensetzende Phase einfach bei den Phasen in
+                 Reihenfolge die Ausfuehrung anstossen. Danach liegt
+                 im Ausgabeport der zusammensetzenden Phase die Ausgabe,
+                 somit keine weitere Aktion notwendig.
+
+ (Observer)
+    {Robust} Den Prototypen hier zum Laufen zu kriegen war etwas
+             abenteuerlich. Im Beobachtermuster ist es ja prinzipiell so, dass
+             jede Phase fuer jede Eingabe eine handle<Eingabe>-Methode
+             haben muss, welche vom bebachteten Object aufgerufen wird, wenn
+             die Eingabe zur Verfuegung steht. Daher habe ich als erstes
+             einen generischen Observer<V> implementiert, welcher 
+             die Methode handleInput(V value) anbietet. Das geht nicht,
+             da die zweite Phase handle-Methoden fuer Integer und Strings
+             braucht und man nicht gleichzeitig Observer<Integer> und
+             Observer<String> implementieren kann. Ich habe dann den Weg 
+             gewaehlt, die methode handleInput(Object) zu definieren und
+             einen unparametrierten Observer zu implementieren. Dieser
+             Observer muss dann in der handleInput-Methode mit einer
+             if-instanceof-else-Kaskade untersuchen, was diese Eingabe ist,
+             um die Eingabe zu speichern.
+             Desweiteren musste ich hier meine Main-Klasse instatiieren, um
+             irgendwie die Ausgabe der letzten Phase zu behalten. Das
+             zusammensetzen der Observer fuehlte sich zudem relativ frickelig
+             an, da man irgendwie immer im Kopf behalten musste, dass 
+             die Verbindung, die ich gerade setze, halt irgendwann zur
+             Laufzeit wenn alles fertig ist, aufgerufen werden wird. 
+             Danach war es nur noch notwendig, die execute-Methoden in der
+             richtigen Reihenfolge aufzurufen und die Ausgabe wurde ordentlich
+             weiter propagiert (eine zusammensetzende Phase kann ja ihre
+             eigenen Observer an die letzte Phase weitergeben).
+    {Skalierbar} Es ist unklar, wie mit den handleInput(Object)-Methoden
+                 verschiedene Wissen vom gleichen Typ behandelt werden
+                 koennen. Es ist zwar moeglich, fuer jedes einzelne Wissen
+                 eine Methode handle<Wissen>(<Wissen> w) zu definieren
+                 mit passendem Input, allerdings erzeugt dies unglaublich
+                 viele Interfaces und unglaublich viele sehr aehnliche
+                 Methoden. Zudem muss man dann noch weiter untersuchen, wie
+                 man beispielsweise das Uminterpretieren von Wissen
+                 behandelt (sprich, was passiert wenn eine Phase Foo das
+                 Ausgabewissen "Bar" nennt, aber eine Phase Baz das
+                 Wissen als Qux eingegeben haben will"). Zudem hat
+                 das Beobachter Entwurfsmuster auch immer das Problem der
+                 Delegation hell, d.h., irgenwdann blickt man einfach nicht
+                 mehr durch, wer nun was von wo wohin delegiert.
+
+Wenn wir nun in den einzelnen Kategorien sortieren, ergeben sich
+folgende Strukturen:
+ {Robust} (Mediator) = (Explizit) > (Observer)
+ {Skalierbar} (Mediator) > (Explizit) > (Observer) 
