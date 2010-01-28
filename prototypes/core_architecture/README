@@ -63,3 +63,29 @@ Evaluation
      {Klassengroesse} Jede der Phasenklassen wird so unglaublich kurz sein, da
                       sie nur einen Schritt in einer Phase auf einer Seite
                       (Client oder Server) implementieren wird.
+  (Methoden)
+     {Wartbarkeit} Zumindest jetzt wo die execute-Methoden noch klein sind,
+                   ist diese Variante extrem uebersichtlich, da man die beiden
+                   Methoden einfach direkt uebereinander (oder untereinander)
+                   hat, und dann direkt suchen kann, welches send und
+                   welches receive zueinander gehoeren. Wenn wir gut
+                   faktorisieren, koennen die Phasen auch so klein und
+                   uebersichtlich bleiben. :)
+     {erwartete Redundanz} Es werden sich unter Umstaenden Dinge in den 
+                           clientExecute / serverExecute ueberschneiden,
+                           allerdings kann dies durch eine extrahierte
+                           Methode relativ einfach vermieden werden
+                           (eventuell kann man dafuer halt eine
+                           abstrakte Basisklasse 'SymmetricPhase'
+                           implementieren, die das tut). Der Setup und
+                           das Zusammenschalten der Phasen funktioniert 
+                           auf server und client gleichermassen und
+                           hat damit hier keine Redundanz
+     {Klassengroesse} Die erwartete Klassengroesse ist hier definitiv
+                      groesser, da nun in einer Klasse beide Seiten
+                      der Phase implementiert werden muessen.
+
+Damit ergibt sich in den Kriterien:
+ {Wartbarkeit} (Methoden) > (Klassen)
+ {erwartete Redundanz} (Methoden) > (Klassen)
+ {Klassengroesse} (Klassen) > (Methoden)
