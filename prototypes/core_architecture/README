@@ -1,0 +1,65 @@
+Einleitung
+----------
+
+In diesem Prototypen soll die Kernarchitektur mit den Phasen
+untersucht werden und eventuelle Schwachstellen oder 
+Grauschleier darin entdeckt werden, die im naechsten Designtreffen
+dann erledigt werden koennen.
+
+Es wird hier nicht weiter auf die Kommunikation mehrerer Phasen
+eingegangen (dazu gibt es einen separaten Prototypen, da das 
+noch ein groesseres Problem ist), sondern vielmehr auf das Zusammenspiel 
+von Phase und Connection. Deswegen wird als Fall nur untersucht,
+dass eine Phase mit einigen Integern ping-pong spielt. Praezise
+wird untersucht:
+
+ (1) das Erzeugen der Phase
+ (2) das Ausfuehren der Phase auf dem Server
+     (2.1) das Senden eines Integers
+     (2.2) das Empfangen eines Integers
+ (3) das Ausfuehren der Phase auf dem Client
+     (3.1) das Empfangen des Integers vom Server
+     (3.2) das verdoppeln des Integers
+     (3.3) das zuruecksenden des Integers
+
+ Es gibt hierbei zwei Moeglichkeiten, zwischen Client und Server zu
+ unterscheiden:
+  (Klassen) Wir implementieren fuer jede Phase zwei Klassen,
+            <Phase>ClientSide und <Phase>Serverside, die dann
+            nur die Ausfuehrungsmethoden und die Kommunikationsmethoden
+            implementieren
+  (Methoden) Wir implementieren eine Klasse fuer jede Phase mit 2 Methoden
+             clientExecute und serverExecute (oder bessere Namen), die
+             dann die entsprechende Seite der Phase ausfuehren.
+
+Kriterien
+---------
+
+{Wartbarkeit} Wartbarkeit fragt, wie gut man sehen kann, dass die Phase
+              richtig mit sich selbst kooperiert und wie gut man
+              Fehler identifizieren kann.
+{erwartete Redundanz} es muss untersucht werden, inwiefern Redundanzen in
+                      der Konstruktion sich ergeben, d.h., ob man eventuell
+                      bei einer Design-Entscheidung einen grossen Teil Code
+                      doppelt hat.
+{Klassengroesse} Dies fragt, wie gross die Klassen dann vermutlich werden.
+
+Evaluation
+----------
+  (Klassen)
+     {Wartbarkeit} Die einzelnen Schritte der Protokolle sind sehr stark
+                   separiert, da sie in verschiedenen Dateien liegen.
+                   Damit muss man zum nachvollziehen eigentilch beide
+                   Dateien irgendwie nebeneinander aufmachen, um
+                   halbwegs zu sehen, dass das funktioniert.
+     {erwartete Redundanz} Es zeichnet sich in der Main bereits ab,
+                           dass man durch diese Aufteilung das Zusammensetzen
+                           der Phasen eigentlich zweimal bauen darf, weil man
+                           immer gucken muss, ob man nun im Client-fall ist
+                           oder im Server-Fall und dann das richtige Objekt
+                           instantiieren muss. Da man dazu eben den
+                           Klassennamen braucht, kommt man da auch nur sehr
+                           schwer drumherum.
+     {Klassengroesse} Jede der Phasenklassen wird so unglaublich kurz sein, da
+                      sie nur einen Schritt in einer Phase auf einer Seite
+                      (Client oder Server) implementieren wird.
