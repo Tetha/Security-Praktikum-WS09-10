@@ -1,0 +1,15 @@
+Ergebnisse
+----------
+
+ - Es sollte eine Exception ConnectionIssues (unchecked) eingefuehrt
+   werden, die IOException und andere Socket-Exceptions wrappt, damit
+   man nicht _ueberall_ throws IOException dranschreiben muss.
+ - Aufgepasst: man muss die ObjectOutputStreams zuerst instantiieren
+   und flushen und dann erst die ObjectInputStreams, sonst haengen
+   Client und Server wegen den Stream headers.
+ - nach jedem write<Type> muss der to-Stream geflushed werden, sonst
+   haengt die Anwendung
+ - es muesste moeglich sein, die ClientSide und ServerSide zu einer
+   einer einzelnen Klasse zusammenzufassen, die dann evtl 2
+   Konstruktor hat (zumindest sind die ganzen sendFoo und receiveFoo
+   Methoden alle gleich).
