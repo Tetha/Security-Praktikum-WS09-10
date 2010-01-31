@@ -1,6 +1,6 @@
 env = Environment()
 
-files = ['requirements']
+files = ['requirements', 'designtreffen_2_roadmap']
 
 for file in files:
     env.PDF(target='bin/%s.pdf' % (file,), source="%s.tex" % (file,))
