@@ -1,0 +1,14 @@
+Dies ist ein Universitaetsprojekt zur Umsetzung eines privaten,
+verteilten Lerners.
+
+Die Anwendung wurde in mehreren Schritten umgesetzt. Zunaechst
+wurde eine Spezifikation mit dem Kunden erarbetet, danach wurde
+die Anwendung mittels CRC-Karten und UML-Diagrammen designed,
+bis fuer alle Klassen relativ klar war, wie man sie implementieren
+muss und danach wurde Code generiert und dieser in woechentlichen
+Treffen umgesetzt.
+
+
+Die Artefakte auf dem Weg zur Spezifikation finden sich in
+specification_development, die Artefakte aus dem Design-Prozess
+finden sich in design.

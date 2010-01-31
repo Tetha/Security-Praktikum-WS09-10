@@ -1,0 +1,11 @@
+Dieser Ordner enthaelt Artefakte der Designphase der Anwendung.
+Es wurden zunaechst aus der Spezifikation die Requirements extrahiert
+(requirements.tex), um einfacher mit den Requirements arbeiten zu koennen 
+und aus den Requirements die Nomen extrahiert, um anfaengliche CRC-Karten
+zu haben.
+
+Nach einer ersten CRC-Karten-Sitzung zeichnete sich dann bereits
+ein grobes Bild der Anwendung ab. Teile des Designs und gewisse
+Designentscheidungen wurden dann durch Prototypen untersucht.
+Diese Prototypen finden sich im Verzeichnis Prototypes.
+
