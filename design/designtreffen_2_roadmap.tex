@@ -106,8 +106,15 @@
               client oder server? als separates Programm?
         \item bei Aufteilung brauchen wir Package-Diagramme und Deployment-
               Diagramme
+		\item 2 Achsen entlang denen sich das \"andert Anzahl jarfiles und Anzahl main-Methoden.
+		\item Jarfile f\"u Server, Client, Klassifizerer, oder entsprechende Teilmengen davon
+		\item Anzahl Main-Methoden: Main-Methode f\"ur Client, Server, Klassifizerer,
+			  oder Teilmengen davon
+		\item Anzahl Main-Methoden >= Anzahl Jarfiles
+		\item mehr Jarfiles = mehr Flexibilitaet und mehr Aufwand (wegen mehr Files)
+		\item mehr Main-Methodne = einfacherer Code, aber mehr Wissen, was der Anwender
+			  behalten muss
     \end{itemize}
-
 
 \item Testing
     \begin{itemize}
