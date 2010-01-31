@@ -2,4 +2,141 @@
 
 \begin{document}
 \section{Designtreffen 2: Roadmap}
+\begin{enumerate}
+\item Einleitung
+
+\item Name der Anwendung?
+
+\item Ergebnisse Phasenprotoyp
+    \begin{itemize}
+        \item Wie teilen wir Phasen in Client/Server ein? 
+            \begin{itemize}
+                \item M\"oglichkeit 1: wir haben eine ClientXPhase und eine
+                      ServerXPhase mit genau einer execute-methode. Das
+                      ergibt kleine Klassen, aber schwer wartbare Methoden
+                      und relativ grosse Redundanzen bei der Konstrktion
+                      der Phasen
+                \item M\"oglichkeit 2: wir haben eine Phasenklasse mit 
+                      Methoden clientExecute, serverExecute. Das ergibt
+                      etwas groessere Klassen, ist aber wesentlich
+                      \"ubersichtlicher und erlaubt es, genau einmal
+                      die Phasen zusammenzusetzen.
+            \end{itemize}
+
+        \item Symmetrische Phasen? (Hier muesste man sich vmtl einfach
+              einmal ein Kollaborations-Diagramm einer symmetrischen
+              Phase hinmalen, clientseitig und serverseitig und gucken,
+              was dann passiert und ob man das zusammenfassen kann)
+
+        \item Genaue Methoden der Verbindung? (Hier muss man vermutlich
+              die Phasen alle einmal durchgehen und untersuchen, welche
+              Daten ausgetauscht werden, um so die Methoden der Verbindung
+              zu bekommen.
+
+        \item Kommunikation von Phase zu Phase?
+                \begin{itemize}
+                    \item M\"oglichkeit 1: mittels getOutputFoo und setInputBar
+                          in der uebergeordneten Klasse Wissen von A nach B
+                          schieben. Das ist relativ einfach umzusetzen, wird
+                          bei viel Wissen und viel Bewegung etwas
+                          un\"ubersichtlich.
+                    \item M\"oglichkeit 2: mittles einem Mediator werden die
+                          Daten verschoben -- der Vorg\"anger rutf put(wissen)
+                          auf, der Nachfolger ruft get(wissen) auf. Das ist
+                          etwas anspruchsvoller zu implementieren, macht aber
+                          das Zusammensetzen der Phasen sehr einfach und
+                          modelliert erstaunlich dicht die Phasendiagramme 
+                          aus der Spezifikation.
+                    \item M\"oglichkeit 3: Observer. Die Nachfolgephasen
+                          registrieren sich bei der Vorgaengerphase als
+                          Ergebnis-observer und behandeln dann die Objekte.
+                          Hier gab es im Prototypen relativ grosse Probleme, das
+                          ans Laufen zu kriegen und die Skalierbarkeit ist
+                          fragw\"urdig.
+                \end{itemize}
+    \end{itemize}
+
+\item CRC-Karten abschliessen
+    \begin{itemize}
+        \item Phasen f\"ur Yaos Protokoll
+        \item Klassifikator
+        \item Schaltkreise, garbled Schaltkreise
+    \end{itemize}
+
+\item Feindesign Schaltkreis
+    \begin{itemize}
+    \item Interne darstellung?
+    \item Api?
+    \item Builder?
+    \item Verwendung in der Spezifikation:
+        \begin{itemize}
+            \item Seite 5: Definition
+            \item Seite 16: Yaos Protokoll
+            \item Seite 19: Dominierende Ausgabe
+            \item Seite 20: eindeutige Ausgabe
+            \item Seite 22: Erweiterung eines Schaltkreises: Separate Ausgabe
+            \item Seite 23: Erweiterung eines Schaltkreises: Share-Zerlegung
+            \item Seite 24: Anfangsapproximation
+            \item Seite 24: Attribut mit maximalem Informationsgewinnn
+        \end{itemize}
+    \end{itemize}
+
+\item Feindesign Polynom
+    \begin{itemize}
+        \item interne Darstellung?
+        \item API?
+        \item Verwendung in der Spezifikation:
+            \begin{itemize}
+                \item Seite 27: Private Multiplikation
+                \item Seite 24: Polynomauswertung
+                \item Seite 24: Verbesserung der Approximation
+            \end{itemize}
+    \end{itemize}
+
+\item weitere Umsetzung
+    \begin{itemize}
+        \item w\"ochentliche Treffen?
+        \item ISP Rechnerpool ist frei
+        \item Anfrage an Admin ist noch nicht beantwortet
+    \end{itemize}
+
+\item Deployment
+    \begin{itemize}
+        \item Aufteilung in Klassifkator und Lerner: mit einem Parameter wie
+              client oder server? als separates Programm?
+        \item bei Aufteilung brauchen wir Package-Diagramme und Deployment-
+              Diagramme
+    \end{itemize}
+
+
+\item Testing
+    \begin{itemize}
+        \item Testen wir?
+        \item Was testen wir?
+        \item Mocks?
+        \item Random? (muesste man Seeden und injecten)
+    \end{itemize}
+
+\item Logging
+    \begin{itemize}
+        \item Loggen wir?
+        \item Was loggen wir? (Phasen-Schritte, Daten senden, ...?)
+        \item Framework? (logback ist das aktuellste freie)
+    \end{itemize}
+
+\item Code-Dokumentation
+    \begin{itemize}
+        \item Dokumentieren wir?
+        \item Womit?
+        \item Was?
+    \end{itemize}
+
+\item Handbuch
+    \begin{itemize}
+        \item Verlorene Information
+        \item Ausf\"uhrung der Programme
+        \item Fehlermeldungen, ihre Bedeutung, beheben der Ursache
+        \item LoggingKonfiguration erklaeren, wenn wir das tun
+    \end{itemize}
+\end{enumerate}
 \end{document}
