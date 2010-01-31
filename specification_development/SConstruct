@@ -1,0 +1,7 @@
+env = Environment()
+
+files = ['final_specification', 'misunderstanding', 'option_document', 
+         'vision']
+
+for file in files:
+    env.PDF(target='bin/%s.pdf' % (file,), source="%s.tex" % (file,))
