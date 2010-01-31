@@ -1,0 +1,6 @@
+env = Environment()
+
+files = ['requirements']
+
+for file in files:
+    env.PDF(target='bin/%s.pdf' % (file,), source="%s.tex" % (file,))
