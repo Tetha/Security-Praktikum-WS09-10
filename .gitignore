@@ -4,3 +4,4 @@
 *.tdo
 *.toc
 *.fls
+*/.sconsign.dblite
