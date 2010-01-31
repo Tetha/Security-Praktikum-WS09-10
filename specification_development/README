@@ -1,0 +1,28 @@
+Ausgehend von der ausgeteilten Aufgabenstellung (von der leider kein
+PDF zu finden ist), wurde zunaechst die Vision der Anwendung
+(vision.tex, vision.pdf) erzeugt und diskutiert.
+
+Danach folgte ein gewisses Kommunikationsproblem zwischen dem Kunden
+und uns und es entstand ein weniger aussagekraeftiges Dokument
+(misunterstanding.tex, misunderstanding.pdf).
+
+Nachdem dieses Missverstaendnis geklaert war, entstand das options-dokument
+(option_document.tex, option_document.pdf). Dieses Optionsdokument
+fixiert grosse Teile der Anwendung, dokumentiert noch offene
+Designentscheidungen und bietet dem Kunden fuer diese Designentscheidungen
+bewertete Entscheidungsmoeglichkeiten an (d.h., wenn wir diesen Teil
+der Anwendung so implementieren, hat das diese und jene Auswirkungen
+auf die Geheimhaltung und diese und jene Auswirkung auf die Performance).
+
+Dadurch konnte der Kunde die fehlenden Designentscheidungen festlegen
+und es wurde die finale Spezifikation (final_specification.tex,
+final_specification.pdf) erstellt. Diese enthaelt die Requirements,
+die die Anwendung zu erfuellen hat sowie eine detaillierte Beschreibung
+der Anwendung.
+
+Mit der Anerkennung der finalen Spezifikation durch den Kunden ist dann die
+Anforderungsanalyse der Anwendung soweit wie moeglich beendet.
+
+
+(Um die PDF-Files in bin upzudaten, muss einfach 'scons' hier aufgerufen
+werden und ein tikz-taugliches pdflatex installiert sein)
