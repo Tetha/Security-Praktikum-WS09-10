@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.uniluebeck.tcs.ws0910.security</groupId>
+  <artifactId>yaquix</artifactId>
+  <name>Yaquix</name>
+  <version>1.0</version>
+  <description>A distiributed, private Id3 classifier learner.</description>
+  <developers>
+  	<developer>
+  		<id>gudrun</id>
+  		<name>Gudrun Amedick</name>
+  		<email>gudrun_amedick@web.de</email>
+  	</developer>
+  	<developer>
+  		<id>tim</id>
+  		<name>Tim Kunold</name>
+  		<email>tim.kunold@googlemail.com</email>
+  	</developer>
+  	<developer>
+  		<id>harald</id>
+  		<name>Harald Kraemer</name>
+  		<email>harryk@freenet.de</email>
+  	</developer>
+  </developers>
+  <dependencies>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.7</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>ch.qos.logback</groupId>
+  		<artifactId>logback-classic</artifactId>
+  		<version>0.9.18</version>
+  	</dependency>
+  </dependencies>
+</project>

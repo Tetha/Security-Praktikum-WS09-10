@@ -1,0 +1,40 @@
+package yaquix.classifier.error;
+
+/**
+ * This class is raised whenever an error occurs during parsing
+ * a classifier.
+ * @author hk
+ *
+ */
+public class ClassifierParseException extends IllegalArgumentException {
+	private static final long serialVersionUID = 4470584941747234698L;
+	
+	/**
+	 * Contains the line the error occured.
+	 */
+	private int line;
+	/**
+	 * Contains the column the error occured.
+	 */
+	private int column;
+	
+	/**
+	 * Constructs a new Parse exception with the given input position.
+	 * @param line the line where the error occurred
+	 * @param column the column where the error occurred
+	 * @param reason what went wrong.
+	 */
+	public ClassifierParseException(int line, int column, String reason) {
+		// TODO: constructor
+	}
+	
+	public int getLine() {
+		// TODO getLine;
+		return -1;
+	}
+	
+	public int getColumn() {
+		// TODO getColumn
+		return -1;
+	}
+}
