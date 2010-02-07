@@ -5,3 +5,5 @@
 *.toc
 *.fls
 */.sconsign.dblite
+code/.metadata/*
+code/yaquix/target/*

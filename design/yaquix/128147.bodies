@@ -1,0 +1,20 @@
+class GarbledCircuit
+!!!131475.java!!!	addInput() : int
+		// TODO addInput
+		return -1;
+!!!131603.java!!!	addConstantGate(in output : int) : int
+		// TODO addConstantGate
+		return -1;
+!!!131731.java!!!	addUnaryGate(inout table : int, in input : int) : int
+		// TODO addUnaryGate
+		return -1;
+!!!131859.java!!!	addBinaryGate(inout table : int, in left : int, in right : int) : int
+		// TODO addBinaryGate
+		return -1;
+!!!131987.java!!!	makeOutput(inout outputMapping : int, in gate : int) : void
+		// TODO: makeOutput
+!!!132115.java!!!	evaluate() : boolean
+		// TODO evaluate
+		return null;
+!!!132243.java!!!	setInput(in index : int, in value : int) : void
+		// TODO setInput

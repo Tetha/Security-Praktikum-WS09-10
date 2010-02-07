@@ -1,0 +1,37 @@
+class Mails
+!!!138259.java!!!	Mails()
+		// TODO Constructor
+!!!138387.java!!!	getSpamMails() : Mail
+		// TODO: getSpamMails
+		return null;
+!!!138515.java!!!	getNonSpamMails() : Mail
+		// TODO: getNonSpamMails
+		return null;
+!!!138643.java!!!	getAllMails() : Mail
+		// TODO: getAllMails
+		return null;
+!!!138771.java!!!	getAllWords() : Set<String>
+		// TODO: getAllWords
+		return null;
+!!!138899.java!!!	countWordInSpamMails(in word : String) : int
+		// TODO: countWordInSpamMails
+		return -1;
+!!!139027.java!!!	countWordInNonSpamMails(in word : String) : int
+		// TODO: countWordInNonSpamMails
+		return -1;
+!!!139155.java!!!	countWordInAllEmails(in word : String) : int
+		// TODO: countWordInAllEmails
+		return -1;
+!!!139283.java!!!	countSpamWords() : int
+		// TODO countSpamWords
+		return -1;
+!!!139411.java!!!	countNonSpamWords() : int
+		// TODO countNonSpamWords
+		return -1;
+!!!139539.java!!!	countAllWords() : int
+		// TODO countAllWords
+		return -1;
+!!!139667.java!!!	addSpamMail(inout newMail : Mail) : void
+		// TODO: addSpamMail
+!!!139795.java!!!	addNonSpamMail(inout newMail : Mail) : void
+		// TODO addNonSpamMail

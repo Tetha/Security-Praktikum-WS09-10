@@ -1,0 +1,4 @@
+class OneWayFunctionFamiliy
+!!!129939.java!!!	evaluate(in K : int, in x : int) : int
+		// TODO evaluate
+		return -1;

@@ -1,0 +1,10 @@
+class PolynomialEvaluation
+!!!147603.java!!!	PolynomialEvaluation(inout serverPolynomial : InputKnowledge)
+		this.serverPolynomial = serverPolynomial;
+!!!147731.java!!!	PolynomialEvaluation(inout clientParameter : InputKnowledge, inout clientResult : OutputKnowledge)
+		this.clientParameter = clientParameter;
+		this.clientResult = clientResult;
+!!!147859.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+!!!147987.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute	

@@ -1,0 +1,605 @@
+format 70
+"classifier" // yaquix::classifier
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/classifier"
+  java_package "yaquix.classifier"
+  classview 128403 "classifier"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 129811 "Branch"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Implements a branch in a decision tree.
+This branch contains an attribute and three further decision trees
+which correspond to the classification results of an email.
+@author hk
+"
+      classrelation 129043 // <realization>
+	relation 129043 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129043 // <realization>
+	  b parent class_ref 129939 // Classifier
+      end
+
+      classrelation 129171 // label (<unidirectional association>)
+	relation 129171 --->
+	  a role_name "label" private
+	    comment "
+contains the attribute to decide the further classfication by.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129171 // label (<unidirectional association>)
+	  b parent class_ref 130323 // Attribute
+      end
+
+      classrelation 129299 // subTrees (<unidirectional association>)
+	relation 129299 --->
+	  stereotype "EnumMap"
+	  a role_name "subTrees" private
+	    comment "contains the subtrees to deserialize recursively in.
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}, Classifier> ${name}${value};
+"
+	    classrelation_ref 129299 // subTrees (<unidirectional association>)
+	  b parent class_ref 130067 // MailType
+      end
+
+      operation 133523 "Branch"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "label" type class_ref 130323 // Attribute
+	  param inout name "subTrees" explicit_type "EnumMap<MailType, Classifier>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new decision tree branch.
+@param label the label to store
+@param subTrees the subtrees to use."
+      end
+
+      operation 133651 "classify"
+	public return_type class_ref 130067 // MailType
+	nparams 1
+	  param inout name "input" type class_ref 130195 // Mail
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 133779 "formatAsOutput"
+	public explicit_return_type "String"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 129939 "Classifier"
+      visibility public stereotype "interface"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This is the interface for all decision tree nodes. 
+It provides method to classify a mail and to turn the 
+decision tree into a string which can be parsed by the
+ClassifierParser.
+@author hk
+"
+      operation 133267 "classify"
+	public return_type class_ref 130067 // MailType
+	nparams 1
+	  param inout name "input" type class_ref 130195 // Mail
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Classifies the given mail
+@param input the mail to classify
+@return Spam or Not Spam, depending on the tree and the mail"
+      end
+
+      operation 133395 "formatAsOutput"
+	public explicit_return_type "String"
+	nparams 0
+	
+	java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Turns the Classifier into a string which can be parsed by
+the ClassifierParser.
+@return a parse-able representation of the Classifier"
+      end
+    end
+
+    class 130451 "ClassifierParser"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This parses a classifier in the format defined in the
+specification.
+
+The parser implemented is a simple backtracking recursive
+descent parser. That means, each parse method stores
+the current input position and tries to parse whatever
+it can parse by checking the prefix of the input for a certain
+constant string or by calling other methods and checking
+their return type for validness until either all possibilities
+are exhausted and the parse fails or until a parse succeeded.
+Furthermore, some productions perform a semantic evaluation of
+the parse result and potentially throw parse exceptions. 
+
+Note the difference between a syntax error, a parse failure and a 
+semantic error. 
+
+A syntax error occurs if we could deduce that
+a certain production must be in effect now (which we can easily do,
+as the grammar is LL(1)), but the production matches only partially.
+Nothing can rescue us in this case, so we raise a syntax error.
+
+A parse failure occurs if we try to match the first part of
+a rule and this fails (for example, in the tree production, there is no
+'Decide' in the beginning of the string). This simply fails, because
+another rule might still work.
+
+A semantic error occurs if we managed to parse something, but
+whatever we managed to parse violates some invariants (sorted limits,
+small limits, number of sub trees). This is decided after actually
+parsing something and results in exceptions, too.
+@author hk
+"
+      attribute 129683 "input"
+	private explicit_type "String"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains the string to parse.
+"
+      end
+
+      attribute 129811 "positionInInput"
+	private explicit_type "int"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains the position we are at right now in input.
+"
+      end
+
+      attribute 129939 "column"
+	private explicit_type "int"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains the column in the line we are in.
+Note that this is different from positionInInput
+once we encountered a line break, as column is reset
+to 0 on a line break, while positionInInput just increases.
+"
+      end
+
+      attribute 130067 "line"
+	private explicit_type "int"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains the line we are in (which essentially is the number
+of linebreaks we have seen so far + 1)
+"
+      end
+
+      operation 133907 "ClassifierParser"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "input" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This creates a new Parser that parses the entire contents from 
+the 
+public ClassifierParser(Reader input) {
+
+}
+/**
+This creates a new Parser to parse the given input.
+@param input the string to parse"
+      end
+
+      operation 134035 "parse"
+	public return_type class_ref 129939 // Classifier
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "parses the given input. This basically parses a tree
+and checks that the entire input was consumed. If 
+something other than whitespace follows the 
+classifier, a SyntaxError must be raised, as something
+is strange then.
+@return"
+      end
+
+      operation 134163 "parseTree"
+	private return_type class_ref 129939 // Classifier
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Parses the tree production:
+tree -> 'Decide' '(' attribute (',' tree)+ ')'
+		 | 'Output' '(' class ')'.
+If the number of trees is wrong, this raises
+TooManySubtreesExceptions or NotEnoughSubtreesExceptions.
+If the parse does not work at all, this throws a
+SyntaxException. This happens, e.g. if we manage
+to match 'Decide (', but not attribute. Since the grammar
+is small, we can see that no further match is possible then
+and thus, the syntax is broken.
+@return a classifier or null on failure"
+      end
+
+      operation 134291 "parseClass"
+	private return_type class_ref 130067 // MailType
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Parses the class production:
+class -> 'Spam' | 'Not Spam'.
+@return the class label or null on failure."
+      end
+
+      operation 134419 "parseAttribute"
+	private return_type class_ref 130323 // Attribute
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Parses the attribute production
+attribute -> '(' word ',' probability ',' probability ')'.
+If the limits are not ordered properly, this raises 
+a LimitsUnsortedException. If the parse does not work at
+all (e.g. by matching '(' word, but not the ','), we can
+see that no parse will ever succeed here and thus, we raise
+a SyntaxException in that case.
+@return an Attribute or null on failure"
+      end
+
+      operation 134547 "parseWord"
+	private explicit_return_type "String"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Parses the word production
+word -> ('a'|'b'|...|'z'|'A'|...|'Z')+ 
+@return a string or null on failure"
+      end
+
+      operation 134675 "parseProbability"
+	private explicit_return_type "double"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This parses the probability production:
+probability -> number '.' number
+If the Probability is larger than 1, a LmitTooLarge-Exception
+is raised. If the parse does not work at all (e.g. if we
+match number, but not ',', we raise a Syntax exception). 
+@return the parsed number or -1 on failure"
+      end
+
+      operation 134803 "parseNumber"
+	private explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This parses the number production.
+number -> ('0' | '1' | ... | '9')+
+@return an integer on success or -1 on failure."
+      end
+
+      operation 134931 "skipWhitespace"
+	private explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This skips whitespaces. During skipping whitespaces, the line
+counter is incremented whenever a '\\n' is encountered and the
+column counter is increased. This may also skip nothing."
+      end
+
+      operation 135059 "matchLiteral"
+	private explicit_return_type "boolean"
+	nparams 1
+	  param in name "literal" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This checks if the given literal is a prefix of the remaining string,
+starting at the positionInInput. In case of a successful match, the 
+positionInString is updated.
+@param literal the literal to match
+@return true if the literal is a prefix, false otherwise. "
+      end
+    end
+
+    class 130579 "Leaf"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This is a leaf of a decision tree. It contains a class
+label and classifies all mails as this attribute.
+@author hk
+"
+      classrelation 129427 // <realization>
+	relation 129427 -_-|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129427 // <realization>
+	  b parent class_ref 129939 // Classifier
+      end
+
+      classrelation 129555 // label (<unidirectional association>)
+	relation 129555 --->
+	  a role_name "label" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	    classrelation_ref 129555 // label (<unidirectional association>)
+	  b parent class_ref 130067 // MailType
+      end
+
+      operation 135187 "Leaf"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "label" type class_ref 130067 // MailType
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new Leaf with the given label
+@param label the label the leaf is supposed to output."
+      end
+
+      operation 135315 "classify"
+	public return_type class_ref 130067 // MailType
+	nparams 1
+	  param inout name "input" type class_ref 130195 // Mail
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 135443 "formatAsOutput"
+	public explicit_return_type "String"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+  end
+
+  deploymentview 128403 "classifier"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 129683 "Classifier"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.knowledge.Mail;
+import yaquix.knowledge.MailType;
+${definition}"
+      associated_classes
+	class_ref 129939 // Classifier
+      end
+    end
+
+    artifact 129811 "Branch"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.EnumMap;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.Mail;
+import yaquix.knowledge.MailType;
+${definition}"
+      associated_classes
+	class_ref 129811 // Branch
+      end
+    end
+
+    artifact 129939 "ClassifierParser"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.io.Reader;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.MailType;
+${definition}"
+      associated_classes
+	class_ref 130451 // ClassifierParser
+      end
+    end
+
+    artifact 130067 "Leaf"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.knowledge.Mail;
+import yaquix.knowledge.MailType;
+${definition}"
+      associated_classes
+	class_ref 130579 // Leaf
+      end
+    end
+  end
+
+  package_ref 128659 // error
+end

@@ -1,0 +1,10 @@
+class Branch
+!!!133523.java!!!	Branch(inout label : Attribute, inout subTrees : EnumMap<MailType, Classifier>)
+		this.label = label;
+		this.subTrees = subTrees;
+!!!133651.java!!!	classify(inout input : Mail) : MailType
+		// TODO classify
+		return null;
+!!!133779.java!!!	formatAsOutput() : String
+		// TODO formatAsOutput
+		return null;

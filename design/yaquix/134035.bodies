@@ -1,0 +1,9 @@
+class ID3Step
+!!!144659.java!!!	ID3Step(inout concertedRemainingAttributes : InputKnowledge, inout localValues : InputKnowledge, inout concertedClassifier : OutputKnowledge)
+		this.concertedRemainingAttributes = concertedRemainingAttributes;
+		this.localValues = localValues;
+		this.concertedClassifier = concertedClassifier;
+!!!144787.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+!!!144915.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute

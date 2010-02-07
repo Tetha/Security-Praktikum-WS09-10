@@ -1,0 +1,6 @@
+class WordlistComputation
+!!!142739.java!!!	WordlistComputation(inout localMails : InputKnowledge, inout concertedWordlist : OutputKnowledge)
+		this.localMails = localMails;
+		this.concertedWordlist = concertedWordlist;
+!!!142867.java!!!	execute(inout connection : Connection) : void
+		// TODO execute

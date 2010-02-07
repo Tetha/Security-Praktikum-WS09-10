@@ -1,0 +1,8 @@
+class AgreedLabelComputation
+!!!143379.java!!!	AgreedLabelComputation(inout localLabels : InputKnowledge, inout concertedUniqueLabel : OutputKnowledge)
+		this.localLabels = localLabels;
+		this.concertedUniqueLabel = concertedUniqueLabel;
+!!!143507.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+!!!143635.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute

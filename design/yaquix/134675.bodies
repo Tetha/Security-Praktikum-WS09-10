@@ -1,0 +1,15 @@
+class UnivariantPolynomial
+!!!149523.java!!!	UnivariantPolynomial(inout coefficients : int)
+		// TODO Constructor
+!!!149651.java!!!	degree() : int
+		// TODO degree
+		return -1;
+!!!149779.java!!!	evaluate(in x : int) : int
+		// TODO evaluate
+		return -1;
+!!!149907.java!!!	interpolate(inout points : Map<Integer, Integer>) : UnivariantPolynomial
+		// TODO interpolate
+		return null;
+!!!150035.java!!!	solveLinearEquations(inout coefficients : int, inout rightHandSide : int) : int
+		// TODO solve linear equation
+		return null;

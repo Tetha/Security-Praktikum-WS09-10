@@ -1,0 +1,475 @@
+format 70
+"error" // yaquix::classifier::error
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/classifier/error"
+  java_package "yaquix.classifier.error"
+  classview 128659 "error"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 130707 "ClassifierParseException"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class is raised whenever an error occurs during parsing
+a classifier.
+@author hk
+"
+      classrelation 129683 // <generalisation>
+	relation 129683 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129683 // <generalisation>
+	  b parent class_ref 130835 // IllegalArgumentException
+      end
+
+      attribute 130195 "serialVersionUID"
+	class_attribute const_attribute private explicit_type "long"
+	init_value " 4470584941747234698L"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      attribute 130323 "line"
+	private explicit_type "int"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Contains the line the error occured.
+"
+      end
+
+      attribute 130451 "column"
+	private explicit_type "int"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Contains the column the error occured.
+"
+      end
+
+      operation 135571 "ClassifierParseException"
+	public explicit_return_type ""
+	nparams 3
+	  param in name "line" explicit_type "int"
+	  param in name "column" explicit_type "int"
+	  param in name "reason" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new Parse exception with the given input position.
+@param line the line where the error occurred
+@param column the column where the error occurred
+@param reason what went wrong."
+      end
+
+      operation 135699 "getLine"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      operation 135827 "getColumn"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 130963 "LimitsUnsortedException"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This error is raised if the limits in an attribute are unsorted.
+@author hk
+"
+      classrelation 129811 // <generalisation>
+	relation 129811 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129811 // <generalisation>
+	  b parent class_ref 130707 // ClassifierParseException
+      end
+
+      attribute 130579 "serialVersionUID"
+	class_attribute const_attribute private explicit_type "long"
+	init_value " 1L"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 135955 "LimitsUnsortedException"
+	public explicit_return_type ""
+	nparams 4
+	  param in name "line" explicit_type "int"
+	  param in name "column" explicit_type "int"
+	  param in name "limit1" explicit_type "double"
+	  param in name "limit2" explicit_type "double"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3} ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new error
+@param line the line where the error occurred
+@param column the column where the error occurred
+@param limit1 the first limit that caused an error
+@param limti2 the second limit that caused an error"
+      end
+    end
+
+    class 131091 "LimitTooLargeException"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This error is raised if one of the limits in the input was larger
+than 1.
+@author hk
+"
+      classrelation 129939 // <generalisation>
+	relation 129939 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 129939 // <generalisation>
+	  b parent class_ref 130707 // ClassifierParseException
+      end
+
+      attribute 130707 "serialVersionUID"
+	class_attribute const_attribute private explicit_type "long"
+	init_value " 1L"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 136083 "LimitTooLargeException"
+	public explicit_return_type ""
+	nparams 3
+	  param in name "line" explicit_type "int"
+	  param in name "column" explicit_type "int"
+	  param in name "limit" explicit_type "double"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new error.
+@param line the line where the error occured 
+@param column the column where the error occured
+@param limit the limit that was too large"
+      end
+    end
+
+    class 131219 "NotEnoughSubtreesException"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This error is raised if a tree defines too little subtrees.
+@author hk
+"
+      classrelation 130067 // <generalisation>
+	relation 130067 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 130067 // <generalisation>
+	  b parent class_ref 130707 // ClassifierParseException
+      end
+
+      operation 136211 "NotEnoughSubtreesException"
+	public explicit_return_type ""
+	nparams 4
+	  param in name "line" explicit_type "int"
+	  param in name "column" explicit_type "int"
+	  param in name "requiredNumberOfSubtrees" explicit_type "int"
+	  param inout name "subTrees" type class_ref 129939 // Classifier
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3}[] ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new exception
+@param line the line where the error occured
+@param column the column where the error occured
+@param requiredNumberOfSubtrees the number of subtrees we require at least
+@param subTrees the subtrees we actually found"
+      end
+    end
+
+    class 131347 "SyntaxException"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This exception is raised if there was a general syntax error during
+parsing the classifier.
+@author hk
+"
+      classrelation 130195 // <generalisation>
+	relation 130195 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 130195 // <generalisation>
+	  b parent class_ref 130707 // ClassifierParseException
+      end
+
+      operation 136339 "SyntaxException"
+	public explicit_return_type ""
+	nparams 4
+	  param in name "line" explicit_type "int"
+	  param in name "column" explicit_type "int"
+	  param in name "foundPrefix" explicit_type "String"
+	  param inout name "expectedPrefixes" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3}[] ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new error
+@param line the line where the error occurred
+@param column the column where the error occured
+@param foundPrefix the prefix of the now following string
+@param expectedPrefixes the number of prefixes we'd expect to be here"
+      end
+    end
+
+    class 131475 "TooManySubtreesException"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This exception is raised if a tree contains too many subtrees.
+@author hk
+"
+      classrelation 130323 // <generalisation>
+	relation 130323 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 130323 // <generalisation>
+	  b parent class_ref 130707 // ClassifierParseException
+      end
+
+      attribute 130835 "serialVersionUID"
+	class_attribute const_attribute private explicit_type "long"
+	init_value " 1L"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      operation 136467 "TooManySubtreesException"
+	public explicit_return_type ""
+	nparams 4
+	  param in name "line" explicit_type "int"
+	  param in name "column" explicit_type "int"
+	  param in name "requiredSubTrees" explicit_type "int"
+	  param inout name "subTrees" type class_ref 129939 // Classifier
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}, ${t3}[] ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new exception
+@param line the line the error occurred in
+@param column the column the error occurred in
+@param requiredSubTrees how many subtrees we are allowed to have at most
+@param subTrees the sub trees we found"
+      end
+    end
+  end
+
+  deploymentview 128531 "error"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 130195 "ClassifierParseException"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 130707 // ClassifierParseException
+      end
+    end
+
+    artifact 130323 "LimitsUnsortedException"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 130963 // LimitsUnsortedException
+      end
+    end
+
+    artifact 130451 "LimitTooLargeException"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 131091 // LimitTooLargeException
+      end
+    end
+
+    artifact 130579 "NotEnoughSubtreesException"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.classifier.Classifier;
+${definition}"
+      associated_classes
+	class_ref 131219 // NotEnoughSubtreesException
+      end
+    end
+
+    artifact 130707 "SyntaxException"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 131347 // SyntaxException
+      end
+    end
+
+    artifact 130835 "TooManySubtreesException"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.classifier.Classifier;
+${definition}"
+      associated_classes
+	class_ref 131475 // TooManySubtreesException
+      end
+    end
+  end
+end

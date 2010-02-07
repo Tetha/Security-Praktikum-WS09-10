@@ -1,0 +1,468 @@
+format 70
+"yaquix" // yaquix
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix"
+  java_package "yaquix"
+  classview 128019 "yaquix"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 128019 "Connection"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class handles all the communication between client
+and server.
+@author hk
+"
+      attribute 128019 "isServer"
+	private explicit_type "Boolean"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains true if this is the server side of the connection.
+"
+      end
+
+      attribute 128147 "fromRemote"
+	private explicit_type "ObjectInputStream"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Stuff written here (and flushed afterwards) goes to the
+other side.
+"
+      end
+
+      attribute 128275 "toRemote"
+	private explicit_type "ObjectOutputStream"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "Stuff from the other side arrives here.
+"
+      end
+
+      attribute 128403 "connection"
+	private explicit_type "Socket"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "the socket providing the connection
+"
+      end
+
+      operation 128019 "Connection"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "socket" explicit_type "ServerSocket"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs the server side of the connection.
+In order to do this, a socket is accepted and the server socket is
+closed afterwards. According to the prototype, 
+creating the InputStreams first and flushing them and
+afterwards creating the OutputStreams is crucial, because
+otherwise, a deadlock occurs if the output streams wait
+for the stream header. 
+@param socket the socket to wait for a connection"
+      end
+
+      operation 128147 "Connection"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "socket" explicit_type "Socket"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs the client side of the connection.
+
+@param socket"
+      end
+
+      operation 128275 "sendInteger"
+	public explicit_return_type "void"
+	nparams 1
+	  param in name "localInteger" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "sends an integer to the other side. According to
+the prototype, flushing is crucial.
+@param localInteger the integer to send"
+      end
+
+      operation 128403 "receiveInteger"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "receives an integer from the other side.
+@return the integer received"
+      end
+
+      operation 128531 "sendListOfBitStrings"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "localBitstrings" explicit_type "List<boolean[]>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Sends a list of bitstrings to the other side. According
+to the prototype, flushing is crucial.
+@param localBitstrings the bitstrings to send"
+      end
+
+      operation 128659 "receiveListOfBitStrings"
+	public explicit_return_type "List<boolean[]>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Receives a list of bitstrings from the other side.
+@return the bitstrings received."
+      end
+
+      operation 128787 "sendIntegers"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "localIntegers" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0}[] ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "sends a list of integers to the other side. According
+to the prototype, flushing is crucial.
+@param localIntegers the integers to send"
+      end
+
+      operation 128915 "receiveIntegers"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type}[] ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "receives a list of integers from the other side
+@return the received integers."
+      end
+
+      operation 129043 "exchangeWordlist"
+	public explicit_return_type "List<String>"
+	nparams 1
+	  param inout name "localWordlist" explicit_type "List<String>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This exchanges word lists. If we are the server, we need
+to send the word lists first before receiving the clients
+word list, while the client needs to receive the word list
+first and send it's own list afterwards. Flushing is
+crucial while sending according to the prototype.
+
+@param localWordlist the local word list
+@return the remote word list"
+      end
+
+      operation 129171 "exchangeLimits"
+	public explicit_return_type "Map<String, Double>"
+	nparams 1
+	  param inout name "localLimits" explicit_type "Map<String, Double>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This exchanges limits. If we are the server, we need
+to send the limits first before receiving the clients
+limits, while the client needs to receive the limits
+first and send it's own limits  afterwards. Flushing is
+crucial while sending according to the prototype.
+
+@param localLimits the local limits
+@return the remote limits"
+      end
+
+      operation 129299 "sendGarbledCircuit"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "localCircuit" type class_ref 128147 // GarbledCircuit
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Sends a garbled circuit to the other side. According to the
+prototype, flushing is crucial. 
+@param localCircuit the circuit to transmit"
+      end
+
+      operation 129427 "receiveGarbledCircuit"
+	public return_type class_ref 128147 // GarbledCircuit
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "receives a sent garbled circuit.
+@return the received garbled circuit"
+      end
+
+      operation 129555 "sendBitstring"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "localBitstring" explicit_type "boolean"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0}[] ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "sends a bitstring to the other side. According
+to the prototype, flushing is crucial.
+@param localBitstring the local bitstring"
+      end
+
+      operation 129683 "receiveBitstring"
+	public explicit_return_type "boolean"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type}[] ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "receives a sent bitstring
+@return the remote bistring"
+      end
+
+      operation 129811 "close"
+	public explicit_return_type "void"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "closes the connection."
+      end
+    end
+
+    class 128275 "Main"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class parses the command line arguments and sets up
+the connection or reads mails for the classifier.
+@author hk
+"
+      classrelation 144275 // <dependency>
+	relation 144275 -_->
+	  a default
+	    classrelation_ref 144275 // <dependency>
+	  b parent class_ref 135699 // ReadLearnWrite
+      end
+
+      classrelation 144403 // <dependency>
+	relation 144403 -_->
+	  a default
+	    classrelation_ref 144403 // <dependency>
+	  b parent class_ref 128019 // Connection
+      end
+    end
+
+    class 128403 "OneWayFunctionFamiliy"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 129939 "evaluate"
+	public explicit_return_type "int"
+	nparams 2
+	  param in name "K" explicit_type "int"
+	  param in name "x" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "evaluates the function identified by k at the point x.
+@param K the key to identify the function
+@param x the value to evaluate the function in"
+      end
+    end
+  end
+
+  package_ref 128147 // circuit
+
+  deploymentview 128019 "yaquix"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 128019 "Connection"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.List;
+import java.util.Map;
+import yaquix.circuit.GarbledCircuit;
+${definition}"
+      associated_classes
+	class_ref 128019 // Connection
+      end
+    end
+
+    artifact 128147 "Main"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 128275 // Main
+      end
+    end
+
+    artifact 128275 "OneWayFunctionFamiliy"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 128403 // OneWayFunctionFamiliy
+      end
+    end
+  end
+
+  package_ref 128403 // classifier
+
+  package_ref 128531 // knowledge
+
+  package_ref 128915 // phase
+
+  package_ref 129683 // polynomial
+end

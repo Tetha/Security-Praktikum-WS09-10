@@ -1,0 +1,10 @@
+class ReadFolders
+!!!148883.java!!!	ReadFolders(inout localSpamFolder : InputKnowledge, inout localNonSpamFolder : InputKnowledge, inout localMails : OutputKnowledge)
+		this.localSpamFolder = localSpamFolder;
+		this.localNonSpamFolder = localNonSpamFolder;
+		this.localMails = localMails;
+!!!149011.java!!!	execute(inout connection : Connection) : void
+		// TODO execute		
+!!!149139.java!!!	readMail(inout filename : File) : Mail
+		// TODO: readMail
+		return null;

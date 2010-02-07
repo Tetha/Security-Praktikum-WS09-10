@@ -1,0 +1,9 @@
+class EntropySharesComputation
+!!!146835.java!!!	EntropySharesComputation(inout localAttributeValues : InputKnowledge, inout concertedAttributes : InputKnowledge, inout localShares : OutputKnowledge, inout randomSource : Random)
+		this.localAttributeValues = localAttributeValues;
+		this.concertedAttributes = concertedAttributes;
+		this.localShares = localShares;
+!!!146963.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+!!!147091.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute

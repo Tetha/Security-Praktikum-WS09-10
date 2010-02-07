@@ -1,0 +1,1112 @@
+format 70
+"classifier" // yaquix::phase::classifier
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/phase/classifier"
+  java_package "yaquix.phase.classifier"
+  classview 129427 "classifier"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 133651 "AgreedLabelComputation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class checks if the labels of mails are unique. 
+
+In order to do this, this class creates a circuit which
+walks through all labels and checks if the labels are unique,
+encodes the labels for the circuit, executes it with yaos 
+protocol and eventually decodes and returns the output of
+the circuit.
+
+@author hk
+"
+      classrelation 134675 // <generalisation>
+	relation 134675 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 134675 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 134803 // localLabels (<unidirectional association>)
+	relation 134803 --->
+	  a role_name "localLabels" private
+	    comment "
+contains the labels of mails.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<MailType>> ${name}${value};
+"
+	    classrelation_ref 134803 // localLabels (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 134931 // concertedUniqueLabel (<unidirectional association>)
+	relation 134931 --->
+	  a role_name "concertedUniqueLabel" private
+	    comment "
+requires the common attribute or null if none exists
+to be set.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<MailType> ${name}${value};
+"
+	    classrelation_ref 134931 // concertedUniqueLabel (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 143379 "AgreedLabelComputation"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localLabels" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedUniqueLabel" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<MailType>> ${p0}, ${t1}<MailType> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new AgreedLabelComputation
+@param localLabels the local email labels
+@param concertedUniqueLabel a place to store the common label or null on error."
+      end
+
+      operation 143507 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 143635 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 143635 // <dependency>
+	relation 143635 -_->
+	  a default
+	    classrelation_ref 143635 // <dependency>
+	  b parent class_ref 133779 // CircuitEvaluation
+      end
+    end
+
+    class 133779 "CircuitEvaluation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This implements Yaos protocol for private circuit evaluation such
+that each party only learns the output (and whatever they can
+deduce from the output), but not the input of the other party.
+
+In order to do this, the phase constructs selects an input mapping
+for the circuit, constructs a garbled circuit using this, 
+sends the circut to the client, encodes the own input, encodes
+the remote input using 1-2-OT, evaluates the circuit on the clietn
+and sends the output back to the server.
+@author hk"
+      classrelation 135059 // <generalisation>
+	relation 135059 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 135059 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 135187 // serverCircuit (<unidirectional association>)
+	relation 135187 --->
+	  a role_name "serverCircuit" private
+	    comment "
+If the server constructor was used and serverExecute
+is called, this contains the circuit to evaluate.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Circuit> ${name}${value};
+"
+	    classrelation_ref 135187 // serverCircuit (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 135315 // localInput (<unidirectional association>)
+	relation 135315 --->
+	  a role_name "localInput" private
+	    comment "
+this contains the local input for the circuit.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<boolean[]> ${name}${value};
+"
+	    classrelation_ref 135315 // localInput (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 135443 // concertedOutput (<unidirectional association>)
+	relation 135443 --->
+	  a role_name "concertedOutput" private
+	    comment "
+This contains the overall output of the circuit.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<boolean[]> ${name}${value};
+"
+	    classrelation_ref 135443 // concertedOutput (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 143763 "CircuitEvaluation"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "serverCircuit" type class_ref 131987 // InputKnowledge
+	  param inout name "localInput" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedOutput" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Circuit> ${p0}, ${t1}<boolean[]> ${p1}, ${t2}<boolean[]> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the server side constructor for the circuit evaluation
+phase. Note that if you call this constructor, you must call
+serverExecute, or undefined behaviour will happen (well, in
+this case, nonsensical behaviour will happen, but the
+point stands. Don't use this constructor and clientExecute).
+@param serverCircuit the circuit to evaluate
+@param localInput the local input for the circuit
+@param concertedOutput the overall output of the circuit evaluation"
+      end
+
+      operation 143891 "CircuitEvaluation"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localInput" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedOutput" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<boolean[]> ${p0}, ${t1}<boolean[]> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the client side constructor for the circuit evaluation
+phase. Note that if you call this constructor, you must
+call clientExecute or undefined behavior will happen.
+@param localInput the local input for the circuit evaluation
+@param concertedOutput the overall output of the circuit evaluation."
+      end
+
+      operation 144019 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 144147 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 143251 // <dependency>
+	relation 143251 -_->
+	  a default
+	    classrelation_ref 143251 // <dependency>
+	  b parent class_ref 134291 // OneOfTwoObliviousTransfer
+      end
+    end
+
+    class 133907 "DominatingOutputComputation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class computes the class label that occurs most often
+in the local and remote labels.
+
+This is done by using the dominating labels circuit. This
+class is responsible for encoding the input for the circuit,
+creating the circuit, evaluating it with yaos phase and
+decoding the overall output of the circuit.
+@author hk
+"
+      classrelation 135571 // <generalisation>
+	relation 135571 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 135571 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 135699 // localLabels (<unidirectional association>)
+	relation 135699 --->
+	  a role_name "localLabels" private
+	    comment "
+contains the list of local mail labels.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<MailType>> ${name}${value};
+"
+	    classrelation_ref 135699 // localLabels (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 135827 // concertedDominatingLabel (<unidirectional association>)
+	relation 135827 --->
+	  a role_name "concertedDominatingLabel" private
+	    comment "
+requires the dominating label of the local and remote
+labels to be stored.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<MailType> ${name}${value};
+"
+	    classrelation_ref 135827 // concertedDominatingLabel (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 144275 "DominatingOutputComputation"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localLabels" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedDominatingLabel" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<MailType>> ${p0}, ${t1}<MailType> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Creates a new DominatingOutputPhase.
+@param localLabels the local mail labels.
+@param concertedDominatingLabel a place to store the dominating class 
+label"
+      end
+
+      operation 144403 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 144531 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 143763 // <dependency>
+	relation 143763 -_->
+	  a default
+	    classrelation_ref 143763 // <dependency>
+	  b parent class_ref 133779 // CircuitEvaluation
+      end
+    end
+
+    class 134035 "ID3Step"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class executes a single step in the ID3 algorithm.
+
+It at first checks if the output is unique using a subphase,
+then it checks if the remaing attributes are empty, and if this
+is the case, applies another sub phase to compute the dominating
+class label in the attribute value set, otherwise, it computes
+the entropy shares and computes the maximum gain using two
+sub phases. After it knows the Attribute with the highest information
+gain, it removes the attribute from the list of attributes,
+partitions the values according to these tables, applies
+new instances of the ID3step phase and combines the resulting
+classificators.
+@author hk
+"
+      classrelation 135955 // <generalisation>
+	relation 135955 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 135955 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 136083 // concertedRemainingAttributes (<unidirectional association>)
+	relation 136083 --->
+	  a role_name "concertedRemainingAttributes" private
+	    comment "
+contains the remaining attributes that can still be used in the
+decision tree.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 136083 // concertedRemainingAttributes (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 136211 // localValues (<unidirectional association>)
+	relation 136211 --->
+	  a role_name "localValues" private
+	    comment "
+contains the vlaues of emails for these attributes.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<AttributeValueTable> ${name}${value};
+"
+	    classrelation_ref 136211 // localValues (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 136339 // concertedClassifier (<unidirectional association>)
+	relation 136339 --->
+	  a role_name "concertedClassifier" private
+	    comment "
+requires the resulting classifier to be set.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Classifier> ${name}${value};
+"
+	    classrelation_ref 136339 // concertedClassifier (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 144659 "ID3Step"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "concertedRemainingAttributes" type class_ref 131987 // InputKnowledge
+	  param inout name "localValues" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedClassifier" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<Attribute>> ${p0}, ${t1}<AttributeValueTable> ${p1}, ${t2}<Classifier> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs a new ID3 step computation phase.
+@param concertedRemainingAttributes the remaining attributes
+@param localValues the values to consider
+@param concertedClassifier a place to store the classifier"
+      end
+
+      operation 144787 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 144915 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 142739 // <dependency>
+	relation 142739 -_->
+	  a default
+	    classrelation_ref 142739 // <dependency>
+	  b parent class_ref 133651 // AgreedLabelComputation
+      end
+
+      classrelation 142867 // <dependency>
+	relation 142867 -_->
+	  a default
+	    classrelation_ref 142867 // <dependency>
+	  b parent class_ref 133907 // DominatingOutputComputation
+      end
+
+      classrelation 142995 // <dependency>
+	relation 142995 -_->
+	  a default
+	    classrelation_ref 142995 // <dependency>
+	  b parent class_ref 134163 // MaxGainComputation
+      end
+
+      classrelation 143123 // <dependency>
+	relation 143123 -_->
+	  a default
+	    classrelation_ref 143123 // <dependency>
+	  b parent class_ref 134803 // EntropySharesComputation
+      end
+    end
+
+    class 134163 "MaxGainComputation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase computes the attribute, which provides the
+greates information gain if we split the set of data
+according to this attribute. 
+This computation is based on a sequence of shares such
+that the sum of these shares is the information gained
+if we split the data according to the attribute with the
+same index.
+
+ In order to compute this, we construct the maximum gain
+ circuit and execute it by using yaos protocol.
+@author hk
+"
+      classrelation 136467 // <generalisation>
+	relation 136467 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 136467 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 136595 // localEntropyShares (<unidirectional association>)
+	relation 136595 --->
+	  a role_name "localEntropyShares" private
+	    comment "
+This contains the local entropy shares of the user.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<int[]> ${name}${value};
+"
+	    classrelation_ref 136595 // localEntropyShares (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 136723 // concertedAttributes (<unidirectional association>)
+	relation 136723 --->
+	  a role_name "concertedAttributes" private
+	    comment "
+This contains the attributes ordered exactly the same
+as the local entropy shares. 
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 136723 // concertedAttributes (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 136851 // concertedBestAttribute (<unidirectional association>)
+	relation 136851 --->
+	  a role_name "concertedBestAttribute" private
+	    comment "
+This requires the best attribute to be stored. 
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Attribute> ${name}${value};
+"
+	    classrelation_ref 136851 // concertedBestAttribute (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 145043 "MaxGainComputation"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "localEntropyShares" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedAttributes" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedBestAttribute" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<int[]> ${p0}, ${t1}<List<Attribute>> ${p1}, ${t2}<Attribute> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new maximum gain computation phase.
+@param localEntropyShares the local entropy shares
+@param concertedAttributes the attributes we are using
+@param concertedBestAttribute where to store the best attribute"
+      end
+
+      operation 145171 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 145299 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 143891 // <dependency>
+	relation 143891 -_->
+	  a default
+	    classrelation_ref 143891 // <dependency>
+	  b parent class_ref 133779 // CircuitEvaluation
+      end
+    end
+
+    class 134291 "OneOfTwoObliviousTransfer"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase implements 1-out-of-2 oblivious transfer.
+
+We implement the 1-out-of-2 oblivious transfer using RSA.
+Compare to the specification for the detailed algorithm to
+implement, compare with java.crypto for an RSA implementation.
+@author hk
+"
+      classrelation 136979 // <generalisation>
+	relation 136979 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 136979 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 137107 // serverMessages (<unidirectional association>)
+	relation 137107 --->
+	  a role_name "serverMessages" private
+	    comment "
+If the server side constructor was used and serverExecute
+is called, this knowledge will be examined for the two
+messages to select one from.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<int[]> ${name}${value};
+"
+	    classrelation_ref 137107 // serverMessages (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 137235 // clientBit (<unidirectional association>)
+	relation 137235 --->
+	  a role_name "clientBit" private
+	    comment "
+If the client side constructor was used and clientExecute
+is called, this knowledge will be examined for the
+bit the client wants to select.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Boolean> ${name}${value};
+"
+	    classrelation_ref 137235 // clientBit (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 137363 // clientReceivedMessage (<unidirectional association>)
+	relation 137363 --->
+	  a role_name "clientReceivedMessage" private
+	    comment "
+If the client side constructor was used and clientExecute
+is called, this knowledge requires the received
+message to be put.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 137363 // clientReceivedMessage (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 145427 "OneOfTwoObliviousTransfer"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "serverMessages" type class_ref 131987 // InputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<int[]> ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the server side constructor. It sets the two messages to 
+have the client select from. Note that if you use this constructor,
+you MUST call serverExecute or undefined behavior happens.
+@param serverMessages contains the two messages to select one from."
+      end
+
+      operation 145555 "OneOfTwoObliviousTransfer"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "clientBit" type class_ref 131987 // InputKnowledge
+	  param inout name "clientReceivedMessage" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Boolean> ${p0}, ${t1}<Integer> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the client side constructor. It sets the bit to select and
+eventually stores the received message in the given output knowledge.
+Note that if you use this constructor. you MUST call clientExecute
+or undefined behaviour happens.
+@param clientBit the index of the message to select
+@param clientReceivedMessage a place to store the received message."
+      end
+
+      operation 145683 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 145811 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 134419 "OneOutOfMObliviousTransfer"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This implements 1-out-of-M oblivious transfer.
+
+Compare to the specification for the detailed algorithm involved.
+@author hk
+"
+      classrelation 137491 // <generalisation>
+	relation 137491 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 137491 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 137619 // serverMessages (<unidirectional association>)
+	relation 137619 --->
+	  a role_name "serverMessages" private
+	    comment "
+This contains the messages the client can choose from, if the
+server constructor was used.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<int[]> ${name}${value};
+"
+	    classrelation_ref 137619 // serverMessages (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 137747 // clientIndex (<unidirectional association>)
+	relation 137747 --->
+	  a role_name "clientIndex" private
+	    comment "
+This contains the index the client selects, if the client
+side constructor was used.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 137747 // clientIndex (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 137875 // clientMessage (<unidirectional association>)
+	relation 137875 --->
+	  a role_name "clientMessage" private
+	    comment "
+This contains the message the client received if the client
+constructor was used and clientExecute was called. 
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 137875 // clientMessage (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 145939 "OneOutOfMObliviousTransfer"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "serverMessages" type class_ref 131987 // InputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<int[]> ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the server side constructor. Note that you MUST
+call serverExecute if you call this constructor, otherwise
+undefined behavior happens.
+@param serverMessages contains the messages the server can
+choose from"
+      end
+
+      operation 146067 "OneOutOfMObliviousTransfer"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "clientIndex" type class_ref 131987 // InputKnowledge
+	  param inout name "clientMessage" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Integer> ${p0}, ${t1}<Integer> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This the client side constructor. Note that you MUST
+call clientExecute if you call this constructor, otherwise
+undefined behaviour happens.
+@param clientIndex this contains the index the client wants to choose.
+@param clientMessage a place to store the message the client received"
+      end
+
+      operation 146195 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 146323 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 143507 // <dependency>
+	relation 143507 -_->
+	  a default
+	    classrelation_ref 143507 // <dependency>
+	  b parent class_ref 134291 // OneOfTwoObliviousTransfer
+      end
+
+      classrelation 144531 // <dependency>
+	relation 144531 -_->
+	  a default
+	    classrelation_ref 144531 // <dependency>
+	  b parent class_ref 128403 // OneWayFunctionFamiliy
+      end
+    end
+  end
+
+  deploymentview 129299 "classifier"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 133395 "AgreedLabelComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.MailType;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 133651 // AgreedLabelComputation
+      end
+    end
+
+    artifact 133523 "CircuitEvaluation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.Connection;
+import yaquix.circuit.Circuit;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 133779 // CircuitEvaluation
+      end
+    end
+
+    artifact 133651 "DominatingOutputComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.MailType;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 133907 // DominatingOutputComputation
+      end
+    end
+
+    artifact 133779 "ID3Step"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.classifier.Classifier;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.AttributeValueTable;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 134035 // ID3Step
+      end
+    end
+
+    artifact 133907 "MaxGainComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.Attribute;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 134163 // MaxGainComputation
+      end
+    end
+
+    artifact 134035 "OneOfTwoObliviousTransfer"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.Connection;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 134291 // OneOfTwoObliviousTransfer
+      end
+    end
+
+    artifact 134163 "OneOutOfMObliviousTransfer"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.Connection;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+${definition}"
+      associated_classes
+	class_ref 134419 // OneOutOfMObliviousTransfer
+      end
+    end
+  end
+
+  package_ref 129555 // entropy
+
+  simplerelation 128147
+    -_->
+      on class_ref 133779 // CircuitEvaluation
+  end
+end

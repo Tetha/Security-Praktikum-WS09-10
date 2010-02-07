@@ -1,0 +1,6 @@
+class BiVariantPolynomial
+!!!149267.java!!!	BiVariantPolynomial(inout coefficients : int)
+		// TODO: constructor
+!!!149395.java!!!	evaluate(in x : int, in y : int) : int
+		// TODO evaluate
+		return -1;

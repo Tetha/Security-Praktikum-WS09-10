@@ -1,0 +1,29 @@
+class ClassifierParser
+!!!133907.java!!!	ClassifierParser(in input : String)
+		// TODO constructor
+!!!134035.java!!!	parse() : Classifier
+		// TODO parse
+		return null;
+!!!134163.java!!!	parseTree() : Classifier
+		// TODO parseTree
+		return null;
+!!!134291.java!!!	parseClass() : MailType
+		// TODO parseClass
+		return null;
+!!!134419.java!!!	parseAttribute() : Attribute
+		// TODO parseAttribute
+		return null;
+!!!134547.java!!!	parseWord() : String
+		// TODO parseWord
+		return null;
+!!!134675.java!!!	parseProbability() : double
+		// TODO parseProbability
+		return -1;
+!!!134803.java!!!	parseNumber() : int
+		// TODO parseNumber
+		return -1;
+!!!134931.java!!!	skipWhitespace() : void
+		// TODO skipWhitespace
+!!!135059.java!!!	matchLiteral(in literal : String) : boolean
+		// TODO matchLiteral
+		return false;

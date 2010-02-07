@@ -1,0 +1,8 @@
+class LocalLimitComputation
+!!!142099.java!!!	LocalLimitComputation(inout concertedWordlist : InputKnowledge, inout localMails : InputKnowledge, inout localLimits : OutputKnowledge)
+		this.concertedWordlist = concertedWordlist;
+		this.localMails = localMails;
+		this.localLimits = localLimits;
+!!!142227.java!!!	execute(inout connection : Connection) : void
+		// TODO execute
+

@@ -1,0 +1,404 @@
+format 70
+"limit" // yaquix::phase::attribute::limit
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/phase/attribute/limit"
+  java_package "yaquix.phase.attribute.limit"
+  classview 129171 "limit"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 132883 "LimitComputation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class computes the limit pairs for each word in a 
+list of words. It does so by computing local limits for
+each word first and merging those local single limits
+with the local single limits from the other user in 
+a second step.
+These substeps are implemented in two other phases,
+LocalLimitComputationPhase and LimitComputationPhase.
+@author hk
+"
+      classrelation 132115 // <generalisation>
+	relation 132115 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 132115 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 132243 // concertedWordlist (<unidirectional association>)
+	relation 132243 --->
+	  a role_name "concertedWordlist" private
+	    comment "
+Contains the list of words to compute attributes for.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<String>> ${name}${value};
+"
+	    classrelation_ref 132243 // concertedWordlist (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 132371 // localMails (<unidirectional association>)
+	relation 132371 --->
+	  a role_name "localMails" private
+	    comment "
+Contains the list of mails to compute attributes for.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 132371 // localMails (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 132499 // concertedAttributes (<unidirectional association>)
+	relation 132499 --->
+	  a role_name "concertedAttributes" private
+	    comment "
+requires the list of attributes to be put.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 132499 // concertedAttributes (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 141587 "LimitComputation"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "concertedWordlist" type class_ref 131987 // InputKnowledge
+	  param inout name "localMails" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedAttributes" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<String>> ${p0}, ${t1}<Mails> ${p1}, ${t2}<List<Attribute>> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new limit computation class
+@param concertedWordlist the list of words to compute attributes for
+@param localMails the list of mails to compute attributes for
+@param concertedAttributes a place to store the attributes in"
+      end
+
+      operation 141715 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 141203 // <dependency>
+	relation 141203 -_->
+	  a default
+	    classrelation_ref 141203 // <dependency>
+	  b parent class_ref 133011 // LimitMerging
+      end
+
+      classrelation 141331 // <dependency>
+	relation 141331 -_->
+	  a default
+	    classrelation_ref 141331 // <dependency>
+	  b parent class_ref 133139 // LocalLimitComputation
+      end
+    end
+
+    class 133011 "LimitMerging"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase takes limits from each user and merges them into 
+the common attributes. This is done by transmitting the
+word-limit-mapping to the other user and constructing the
+attributes locally from the limits.
+@author hk
+"
+      classrelation 132627 // <generalisation>
+	relation 132627 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 132627 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 132755 // localLimits (<unidirectional association>)
+	relation 132755 --->
+	  a role_name "localLimits" private
+	    comment "
+contains the local own limits to merge.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Map<String, Double>> ${name}${value};
+"
+	    classrelation_ref 132755 // localLimits (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 132883 // concertedAttributes (<unidirectional association>)
+	relation 132883 --->
+	  a role_name "concertedAttributes" private
+	    comment "
+requires the computed attributes.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 132883 // concertedAttributes (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 141843 "LimitMerging"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localLimits" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedAttributes" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Map<String, Double>> ${p0}, ${t1}<List<Attribute>> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new ListMergingPhase
+@param localLimits the source of the limits to merge
+@param concertedAttributes the destination of the computed attributes"
+      end
+
+      operation 141971 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 133139 "LocalLimitComputation"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class computes the local limits. In order to to this, it 
+computes the average number of occurrences of each word in the
+list of important words and uses this as the own local limit.
+@author hk
+"
+      classrelation 133011 // <generalisation>
+	relation 133011 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 133011 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 133139 // concertedWordlist (<unidirectional association>)
+	relation 133139 --->
+	  a role_name "concertedWordlist" private
+	    comment "
+contains the list of words to compute limits for.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<String>> ${name}${value};
+"
+	    classrelation_ref 133139 // concertedWordlist (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 133267 // localMails (<unidirectional association>)
+	relation 133267 --->
+	  a role_name "localMails" private
+	    comment "
+contains the mails to compute the limits from.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 133267 // localMails (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 133395 // localLimits (<unidirectional association>)
+	relation 133395 --->
+	  a role_name "localLimits" private
+	    comment "
+requires the mapping from words to own local limit.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Map<String, Double>> ${name}${value};
+"
+	    classrelation_ref 133395 // localLimits (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 142099 "LocalLimitComputation"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "concertedWordlist" type class_ref 131987 // InputKnowledge
+	  param inout name "localMails" type class_ref 131987 // InputKnowledge
+	  param inout name "localLimits" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<String>> ${p0}, ${t1}<Mails> ${p1}, ${t2}<Map<String, Double>> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new LocalLimitComputation.
+@param concertedWordlist the list of words to compute the limits for
+@param localMails the list of mails to compute the limits from
+@param localLimits a place to store the computed limits"
+      end
+
+      operation 142227 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+  end
+
+  deploymentview 129043 "limit"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 132627 "LimitComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 132883 // LimitComputation
+      end
+    end
+
+    artifact 132755 "LimitMerging"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import java.util.Map;
+import yaquix.Connection;
+import yaquix.knowledge.Attribute;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 133011 // LimitMerging
+      end
+    end
+
+    artifact 132883 "LocalLimitComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import java.util.Map;
+import yaquix.Connection;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 133139 // LocalLimitComputation
+      end
+    end
+  end
+end

@@ -1,0 +1,402 @@
+format 70
+"wordlist" // yaquix::phase::attribute::wordlist
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/phase/attribute/wordlist"
+  java_package "yaquix.phase.attribute.wordlist"
+  classview 129299 "wordlist"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 133267 "LocalWordlistComputation"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This computes a local wordlist for each user. 
+In order to do this, we compute the relative number of occurences
+of a word in the spam words and the non spam words and select
+those words that have a high difference between these two values,
+because we assume that such words result in a good classification.
+@author hk
+"
+      classrelation 133523 // <generalisation>
+	relation 133523 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 133523 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      attribute 132627 "NUMBER_OF_WORDS"
+	const_attribute private explicit_type "int"
+	init_value " 100"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains the maximum number of words to select for the global word 
+list.
+"
+      end
+
+      classrelation 133651 // localMails (<unidirectional association>)
+	relation 133651 --->
+	  a role_name "localMails" private
+	    comment "
+This contains the mails to create a wordlist for.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 133651 // localMails (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 133779 // localWordlist (<unidirectional association>)
+	relation 133779 --->
+	  a role_name "localWordlist" private
+	    comment "
+This requires the computed local wordlist to be stored.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<String>> ${name}${value};
+"
+	    classrelation_ref 133779 // localWordlist (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 142355 "LocalWordlistComputation"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localMails" type class_ref 131987 // InputKnowledge
+	  param inout name "localWordlist" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Mails> ${p0}, ${t1}<List<String>> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This creates a new local discretization phase
+@param localMails the mails to compute a word list for
+@param ownWordlist the selected word list"
+      end
+
+      operation 142483 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 142611 "chooseWords"
+	private explicit_return_type "List<String>"
+	nparams 3
+	  param inout name "words" explicit_type "List<String>"
+	  param inout name "spamPercentage" explicit_type "List<Double>"
+	  param inout name "nonSpamPercentage" explicit_type "List<Double>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+    end
+
+    class 133395 "WordlistComputation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This computes and concerts a word list from the mails of both 
+users. This is implemented by first computing word lists 
+locally on the own mails of each user and later merging those
+local word lists into a concerted word list.
+These two substeps are implemented as two sub phases.
+@author hk
+"
+      classrelation 133907 // <generalisation>
+	relation 133907 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 133907 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 134035 // localMails (<unidirectional association>)
+	relation 134035 --->
+	  a role_name "localMails" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 134035 // localMails (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 134163 // concertedWordlist (<unidirectional association>)
+	relation 134163 --->
+	  a role_name "concertedWordlist" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<String>> ${name}${value};
+"
+	    classrelation_ref 134163 // concertedWordlist (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 142739 "WordlistComputation"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localMails" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedWordlist" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Mails> ${p0}, ${t1}<List<String>> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Creates a new WordListComputation phase with the given
+inputs and outputs.
+@param localMails the local mail input
+@param concertedWordlist a plcae to store the word list"
+      end
+
+      operation 142867 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 141459 // <dependency>
+	relation 141459 -_->
+	  a default
+	    classrelation_ref 141459 // <dependency>
+	  b parent class_ref 133267 // LocalWordlistComputation
+      end
+
+      classrelation 141587 // <dependency>
+	relation 141587 -_->
+	  a default
+	    classrelation_ref 141587 // <dependency>
+	  b parent class_ref 133523 // WordlistMerging
+      end
+    end
+
+    class 133523 "WordlistMerging"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase takes two local word lists and merges them into 
+a common global word list. This is implemented by exchanging
+the word lists via the connection and joining them with the 
+set union operation.
+@author hk
+"
+      classrelation 134291 // <generalisation>
+	relation 134291 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 134291 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 134419 // localWordlist (<unidirectional association>)
+	relation 134419 --->
+	  a role_name "localWordlist" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<String>> ${name}${value};
+"
+	    classrelation_ref 134419 // localWordlist (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 134547 // concertedWordlist (<unidirectional association>)
+	relation 134547 --->
+	  a role_name "concertedWordlist" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<String>> ${name}${value};
+"
+	    classrelation_ref 134547 // concertedWordlist (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 142995 "WordlistMerging"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "localWordlist" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedWordlist" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<String>> ${p0}, ${t1}<List<String>> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new word list merging phase
+@param localWordlist the local input of the merging phase
+@param concertedWordlist a place to store the common computed word list"
+      end
+
+      operation 143123 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 143251 "mergeWordlists"
+	private explicit_return_type "List<String>"
+	nparams 2
+	  param inout name "localWordlist" explicit_type "List<String>"
+	  param inout name "remoteWordlist" explicit_type "List<String>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This joins the two word lists with a simple set union.
+@param localWordlist the local word list of this user
+@param remoteWordlist the remote word list of the other user
+@return the joined word list."
+      end
+    end
+  end
+
+  deploymentview 129171 "wordlist"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 133011 "LocalWordlistComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 133267 // LocalWordlistComputation
+      end
+    end
+
+    artifact 133139 "WordlistComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 133395 // WordlistComputation
+      end
+    end
+
+    artifact 133267 "WordlistMerging"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 133523 // WordlistMerging
+      end
+    end
+  end
+end

@@ -1,0 +1,13 @@
+class PrivateMultiplication
+!!!148115.java!!!	PrivateMultiplication(inout randomSource : Random, inout localFactor : InputKnowledge, inout localTerm : OutputKnowledge)
+		this.randomSource = randomSource;
+		this.localFactor = localFactor;
+		this.localTerm = localTerm;
+!!!148243.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+
+!!!148371.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute
+!!!148499.java!!!	createPolynomial(in factor : int, in randomValue : int) : UnivariantPolynomial
+		// TODO createPolynomial
+		return null;

@@ -1,0 +1,6 @@
+class Knowledge
+!!!140179.java!!!	get() : C
+		// TODO get
+		return null;
+!!!140307.java!!!	put(inout knowledge : C) : void
+		// TODO put

@@ -1,0 +1,401 @@
+format 70
+"base" // yaquix::circuit::base
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/circuit/base"
+  java_package "yaquix.circuit.base"
+  classview 128275 "base"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 128915 "And"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This base circuit is the and of two inputs.
+@author hk
+"
+      classrelation 128147 // <generalisation>
+	relation 128147 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128147 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 132371 "And"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new base and circuit"
+      end
+    end
+
+    class 129043 "Constant"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This base circuit implements constant gates.
+@author hk
+"
+      classrelation 128275 // <generalisation>
+	relation 128275 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128275 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 132499 "Constant"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "isTrue" explicit_type "boolean"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This creates a new constant base circuit.
+@param isTrue if this is true, the base circuit has output 1, else 0"
+      end
+    end
+
+    class 129171 "Negation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This base circuits negates it single input.
+@author hk
+"
+      classrelation 128403 // <generalisation>
+	relation 128403 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128403 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 132627 "Negation"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new negation base circuit."
+      end
+    end
+
+    class 129299 "Or"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This base circuit is the or of two inputs.
+@author hk
+"
+      classrelation 128531 // <generalisation>
+	relation 128531 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128531 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 132755 "Or"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new base or circuit."
+      end
+    end
+
+    class 129427 "Shuffle"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This shuffles inputs and outputs around according
+to a certain wire mapping. Basically, you need 
+to think of a bipartite graph of the same number
+if inputs and outputs. 
+@author hk
+"
+      classrelation 128659 // <generalisation>
+	relation 128659 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128659 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 132883 "Shuffle"
+	public explicit_return_type ""
+	nparams 2
+	  param in name "inputCount" explicit_type "int"
+	  param inout name "connections" explicit_type "Map<Integer, Integer>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs the shuffle circuit.
+@param inputCount the number of inputs and outputs
+@param connections connections from the input to the output"
+      end
+    end
+
+    class 129555 "Split"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This base circuit implements the split of a single output
+into many outputs.
+@author hk
+"
+      classrelation 128787 // <generalisation>
+	relation 128787 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128787 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 133011 "Split"
+	public explicit_return_type ""
+	nparams 1
+	  param in name "numberOfOutputs" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new splitting circuit
+@param numberOfOutputs the number of outputs to split the input into."
+      end
+    end
+
+    class 129683 "Xor"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This base circuit is the xor of two inputs.
+@author hk
+"
+      classrelation 128915 // <generalisation>
+	relation 128915 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 128915 // <generalisation>
+	  b parent class_ref 128531 // Circuit
+      end
+
+      operation 133139 "Xor"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs a new xor base circuit."
+      end
+    end
+  end
+
+  deploymentview 128275 "base"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 128787 "And"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 128915 // And
+      end
+    end
+
+    artifact 128915 "Constant"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 129043 // Constant
+      end
+    end
+
+    artifact 129043 "Negation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 129171 // Negation
+      end
+    end
+
+    artifact 129171 "Or"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 129299 // Or
+      end
+    end
+
+    artifact 129299 "Shuffle"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.Map;
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 129427 // Shuffle
+      end
+    end
+
+    artifact 129427 "Split"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 129555 // Split
+      end
+    end
+
+    artifact 129555 "Xor"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.circuit.Circuit;
+${definition}"
+      associated_classes
+	class_ref 129683 // Xor
+      end
+    end
+  end
+end

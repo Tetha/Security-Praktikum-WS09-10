@@ -1,4 +1,4 @@
-package yaquix;
+package yaquix.phase.classifier.entropy;
 
 public class OneWayFunctionFamiliy {
 	

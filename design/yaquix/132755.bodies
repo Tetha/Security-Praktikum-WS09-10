@@ -1,0 +1,8 @@
+class LocalDiscretization
+!!!141331.java!!!	LocalDiscretization(inout commonAttributes : InputKnowledge, inout localEmails : InputKnowledge, inout localAttributeValues : OutputKnowledge)
+		this.commonAttributes = commonAttributes;
+		this.localEmails = localEmails;
+		this.localAttributeValues = localAttributeValues;
+!!!141459.java!!!	execute(inout connection : Connection) : void
+		// TODO Auto-generated method stub
+

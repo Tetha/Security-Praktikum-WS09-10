@@ -1,0 +1,10 @@
+class Attribute
+!!!136595.java!!!	Attribute(in word : String, in localLimit : double, in remoteLimit : double)
+		this.word = word;
+		// TODO: constructor
+!!!136723.java!!!	classify(inout mail : Mail) : MailType
+		// TODO classify
+		return null;
+!!!136851.java!!!	formatAsOutput() : String
+		// TODO formatAsOutput
+		return null;

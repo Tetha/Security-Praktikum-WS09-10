@@ -1,0 +1,10 @@
+class DominatingOutputComputation
+!!!144275.java!!!	DominatingOutputComputation(inout localLabels : InputKnowledge, inout concertedDominatingLabel : OutputKnowledge)
+		this.localLabels = localLabels;
+		this.concertedDominatingLabel = concertedDominatingLabel;
+!!!144403.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+
+!!!144531.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute
+

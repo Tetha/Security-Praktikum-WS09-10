@@ -1,4 +1,4 @@
-package yaquix.phase.classifier;
+package yaquix.phase.classifier.entropy;
 
 import yaquix.Connection;
 import yaquix.phase.InputKnowledge;

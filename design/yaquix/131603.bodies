@@ -1,0 +1,15 @@
+class AttributeValueTable
+!!!136979.java!!!	AttributeValueTable()
+		// TODO: constructor
+!!!137107.java!!!	addSpamMail(inout newMail : Map<Attribute, Occurrences>) : void
+		// TODO: addSpamMail
+!!!137235.java!!!	addNonSpamMail(inout newMail : Map<Attribute, Occurrences>) : void
+		// TODO: addNonSpamMail
+!!!137363.java!!!	countSpamMails() : int
+		 // TODO: countSpamMails
+		 return -1;
+!!!137491.java!!!	countNonSpamMails() : int
+		 // TODO: countNonSpamMails
+		 return -1;
+!!!137619.java!!!	partition(inout partitionAttribute : Attribute) : Occurrences
+		 return null;

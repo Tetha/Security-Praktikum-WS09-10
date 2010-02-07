@@ -1,0 +1,13 @@
+class Mail
+!!!137747.java!!!	parseWords() : List<String>
+		// TODO: parseWords;
+		return null;
+!!!137875.java!!!	getWords() : Set<String>
+		// TODO: getWords
+		return null;
+!!!138003.java!!!	countWords() : int
+		// TODO: countWords
+		return -1;
+!!!138131.java!!!	countWord(in word : String) : int
+		// TODO: countWord
+		return -1;

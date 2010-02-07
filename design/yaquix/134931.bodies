@@ -1,0 +1,9 @@
+class FirstApproximation
+!!!147219.java!!!	FirstApproximation(inout localTerm : InputKnowledge, inout localFirstShare : OutputKnowledge, inout localSecondShare : OutputKnowledge)
+		this.localTerm = localTerm;
+		this.localFirstShare = localFirstShare;
+		this.localSecondShare = localSecondShare;
+!!!147347.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+!!!147475.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute

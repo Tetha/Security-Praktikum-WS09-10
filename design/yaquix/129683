@@ -1,0 +1,254 @@
+format 70
+"polynomial" // yaquix::polynomial
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/polynomial"
+  java_package "yaquix.polynomial"
+  classview 129683 "polynomial"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 134675 "UnivariantPolynomial"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Models a polynomial in one variable.
+@author hk
+"
+      attribute 133011 "coefficients"
+	private explicit_type "int"
+	multiplicity "[]"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "stores the coefficients, such that the polynomial
+is stored as coefficients[i] * x^i.
+"
+      end
+
+      operation 149523 "UnivariantPolynomial"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "coefficients" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}[] ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This initializes the polynomial. The parameter array is
+copied so no modification side effects will happen.
+@param coefficients"
+      end
+
+      operation 149651 "degree"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "computes the degree of the polynomial.
+@return the degree"
+      end
+
+      operation 149779 "evaluate"
+	public explicit_return_type "int"
+	nparams 1
+	  param in name "x" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "evaluates the polynomial in the given point.
+@param x the point to evaluate the polynomial in
+@return the value of the polynomial"
+      end
+
+      operation 149907 "interpolate"
+	class_operation public return_type class_ref 134675 // UnivariantPolynomial
+	nparams 1
+	  param inout name "points" explicit_type "Map<Integer, Integer>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Given a mapping from x to values, this interpolates an univariant
+polynomial between these points. Compare, for example, Nevilles
+Algorithm.
+@return"
+      end
+
+      operation 150035 "solveLinearEquations"
+	class_operation private explicit_return_type "int"
+	nparams 2
+	  param inout name "coefficients" explicit_type "int"
+	  param inout name "rightHandSide" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type}[] ${name}${(}${t0}[] ${p0}, ${t1}[] ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Uses Gauss algorithm to solve a system of linear equations.
+@param coefficients the coefficient matrix of the linear equation system
+@param rightHandSide the right handside of the linear equation system
+@return a variable assignment that solves the linear equation system"
+      end
+    end
+
+    class 135571 "BiVariantPolynomial"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Implements a polynomial in two variables.
+@author hk
+"
+      attribute 132883 "coefficients"
+	package explicit_type "int"
+	multiplicity "[][]"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "stores the coefficients, such that it is
+coefficients[i][j] * x^i * y^j.
+"
+      end
+
+      operation 149267 "BiVariantPolynomial"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "coefficients" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}[] ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a polynomial in two variables. 
+
+The coefficient in the array must be arranged such that the 
+polynomial is represented by coefficients[i][j] * x^i * y^j.
+
+The array is copied in the constructor in order to avoid potential 
+problems if the coefficients array is modified after passing it
+into a polynomial.
+@param coefficients"
+      end
+
+      operation 149395 "evaluate"
+	public explicit_return_type "int"
+	nparams 2
+	  param in name "x" explicit_type "int"
+	  param in name "y" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "evaluates the polynomial in the given point
+@param x the value of the first variable
+@param y the value of the second variable
+@return the value of the polynomial in the given coordinate"
+      end
+    end
+  end
+
+  deploymentview 129683 "polynomial"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 135187 "BiVariantPolynomial"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 135571 // BiVariantPolynomial
+      end
+    end
+
+    artifact 135315 "UnivariantPolynomial"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.Map;
+${definition}"
+      associated_classes
+	class_ref 134675 // UnivariantPolynomial
+      end
+    end
+  end
+end

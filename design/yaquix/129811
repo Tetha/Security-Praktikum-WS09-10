@@ -1,0 +1,285 @@
+format 70
+"io" // yaquix::phase::io
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/phase/io"
+  java_package "yaquix.phase.io"
+  classview 129811 "io"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 135315 "OutputPhase"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class writes the resulting classifier onto the given 
+output stream.
+@author hk
+"
+      classrelation 140307 // <generalisation>
+	relation 140307 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 140307 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 140435 // concertedClassifier (<unidirectional association>)
+	relation 140435 --->
+	  a role_name "concertedClassifier" private
+	    comment "
+contains the classifier constructed in an earlier phase
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Classifier> ${name}${value};
+"
+	    classrelation_ref 140435 // concertedClassifier (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 140563 // localOutput (<unidirectional association>)
+	relation 140563 --->
+	  a role_name "localOutput" private
+	    comment "
+contains a place to write the classifier to.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Writer> ${name}${value};
+"
+	    classrelation_ref 140563 // localOutput (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      operation 148627 "OutputPhase"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "concertedClassifier" type class_ref 131987 // InputKnowledge
+	  param inout name "localOutput" type class_ref 131987 // InputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Classifier> ${p0}, ${t1}<Writer> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new OutputPhase.
+@param concertedClassifier the result classifier
+@param localOutput the place to write the classifier to"
+      end
+
+      operation 148755 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+
+    class 135443 "ReadFolders"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class takes a folder for the spam mail files and a folder
+for the non spam mails and reads the contents of the folders
+into mail objects and stores those mail objects in a 
+mails object.
+@author hk
+"
+      classrelation 140691 // <generalisation>
+	relation 140691 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 140691 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 140819 // localSpamFolder (<unidirectional association>)
+	relation 140819 --->
+	  a role_name "localSpamFolder" private
+	    comment "
+contains the name of the base folder containing the spam mail files.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<File> ${name}${value};
+"
+	    classrelation_ref 140819 // localSpamFolder (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 140947 // localNonSpamFolder (<unidirectional association>)
+	relation 140947 --->
+	  a role_name "localNonSpamFolder" private
+	    comment "
+contains the name of the base folder containing the non spam mail files.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<File> ${name}${value};
+"
+	    classrelation_ref 140947 // localNonSpamFolder (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 141075 // localMails (<unidirectional association>)
+	relation 141075 --->
+	  a role_name "localMails" private
+	    comment "
+contains a place to store the read mails.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 141075 // localMails (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 148883 "ReadFolders"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "localSpamFolder" type class_ref 131987 // InputKnowledge
+	  param inout name "localNonSpamFolder" type class_ref 131987 // InputKnowledge
+	  param inout name "localMails" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<File> ${p0}, ${t1}<File> ${p1}, ${t2}<Mails> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new phase to read the input folders
+@param localSpamFolder the folder containing spam mails
+@param localNonSpamFolder the folder containing non spam mails
+@param localMails a place to store the read mails"
+      end
+
+      operation 149011 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 149139 "readMail"
+	private return_type class_ref 130195 // Mail
+	nparams 1
+	  param inout name "filename" explicit_type "File"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "reads a single mail from the file.
+@param filename the file to read
+@return the mail containing the file contents."
+      end
+    end
+  end
+
+  deploymentview 129555 "io"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 134931 "OutputPhase"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.io.Writer;
+import yaquix.Connection;
+import yaquix.classifier.Classifier;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 135315 // OutputPhase
+      end
+    end
+
+    artifact 135059 "ReadFolders"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaquix.Connection;
+import yaquix.knowledge.Mail;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 135443 // ReadFolders
+      end
+    end
+  end
+end

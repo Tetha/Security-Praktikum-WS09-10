@@ -1,0 +1,318 @@
+format 70
+"attribute" // yaquix::phase::attribute
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/phase/attribute"
+  java_package "yaquix.phase.attribute"
+  classview 129043 "attribute"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 132627 "Discretization"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase computes a list of attributes and an attribute value table
+from the set of own local emails. These attributes are the same
+for both users.
+
+This is implemented by computing the concerted word list first,
+then using this to compute limits for discretizing the relative
+occurences of each word in the wordlist in the content of a mail
+and finally using these attributes in order to discretize each
+input mail into the final attribute value table.
+
+Each of these steps is implemented in a sub phase.
+@author hk
+"
+      classrelation 131091 // <generalisation>
+	relation 131091 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131091 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 131219 // localMails (<unidirectional association>)
+	relation 131219 --->
+	  a role_name "localMails" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 131219 // localMails (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 131347 // localAttributeValues (<unidirectional association>)
+	relation 131347 --->
+	  a role_name "localAttributeValues" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<AttributeValueTable> ${name}${value};
+"
+	    classrelation_ref 131347 // localAttributeValues (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      classrelation 131475 // concertedAttributes (<unidirectional association>)
+	relation 131475 --->
+	  a role_name "concertedAttributes" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 131475 // concertedAttributes (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 141075 "Discretization"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "localMails" type class_ref 131987 // InputKnowledge
+	  param inout name "localAttributeValues" type class_ref 132243 // OutputKnowledge
+	  param inout name "concertedAttributes" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Mails> ${p0}, ${t1}<AttributeValueTable> ${p1}, ${t2}<List<Attribute>> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new Discretization phase. 
+@param localMails the local mails to build attributes from and 
+discretize
+@param localAttributeValues a place to store the computed 
+attribute value table
+@param concertedAttributes a place to store the computed attributes"
+      end
+
+      operation 141203 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      simplerelation 128019
+	-_->
+	  on 
+	  package_ref 129043 // attribute
+      end
+
+      classrelation 141715 // <dependency>
+	relation 141715 -_->
+	  a default
+	    classrelation_ref 141715 // <dependency>
+	  b parent class_ref 132883 // LimitComputation
+      end
+
+      classrelation 141843 // <dependency>
+	relation 141843 -_->
+	  a default
+	    classrelation_ref 141843 // <dependency>
+	  b parent class_ref 133395 // WordlistComputation
+      end
+
+      classrelation 141971 // <dependency>
+	relation 141971 -_->
+	  a default
+	    classrelation_ref 141971 // <dependency>
+	  b parent class_ref 132755 // LocalDiscretization
+      end
+    end
+
+    class 132755 "LocalDiscretization"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase turns the set of emails into an attribute value table,
+given a list of attributes. this is done by fetching every mail in
+the set of mails, handing it to the various attributes and storing
+the classification result of the email in a mapping. Once we did
+this for all attributes, the mapping is stored in the result 
+attribute value table.
+@author hk
+"
+      classrelation 131603 // <generalisation>
+	relation 131603 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 131603 // <generalisation>
+	  b parent class_ref 132499 // SymmetricPhase
+      end
+
+      classrelation 131731 // commonAttributes (<unidirectional association>)
+	relation 131731 --->
+	  a role_name "commonAttributes" private
+	    comment "
+This contains the list of attributes to use during discretization.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 131731 // commonAttributes (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 131859 // localEmails (<unidirectional association>)
+	relation 131859 --->
+	  a role_name "localEmails" private
+	    comment "
+This contains the set of emails to discretize.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Mails> ${name}${value};
+"
+	    classrelation_ref 131859 // localEmails (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 131987 // localAttributeValues (<unidirectional association>)
+	relation 131987 --->
+	  a role_name "localAttributeValues" private
+	    comment "
+This requires the resulting attribute value table.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<AttributeValueTable> ${name}${value};
+"
+	    classrelation_ref 131987 // localAttributeValues (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 141331 "LocalDiscretization"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "commonAttributes" type class_ref 131987 // InputKnowledge
+	  param inout name "localEmails" type class_ref 131987 // InputKnowledge
+	  param inout name "localAttributeValues" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<List<Attribute>> ${p0}, ${t1}<Mails> ${p1}, ${t2}<AttributeValueTable> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new Local Discretization phase.
+@param commonAttributes the attributes to put into the table
+@param localEmails the mails to examine
+@param localAttributeValues a place to store the result table"
+      end
+
+      operation 141459 "execute"
+	protected explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+    end
+  end
+
+  deploymentview 128915 "attribute"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 132371 "Discretization"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.AttributeValueTable;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 132627 // Discretization
+      end
+    end
+
+    artifact 132499 "LocalDiscretization"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import yaquix.Connection;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.AttributeValueTable;
+import yaquix.knowledge.Mails;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.SymmetricPhase;
+${definition}"
+      associated_classes
+	class_ref 132755 // LocalDiscretization
+      end
+    end
+  end
+
+  package_ref 129171 // limit
+
+  package_ref 129299 // wordlist
+end

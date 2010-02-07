@@ -1,0 +1,10 @@
+class ApproximationImprovement
+!!!146451.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+
+!!!146579.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute
+
+!!!146707.java!!!	constructPolynomial(in localFirstShare : int, in randomShare : int) : UnivariantPolynomial
+		// TODO constructPolynomial
+		return null;

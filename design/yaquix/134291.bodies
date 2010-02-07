@@ -1,0 +1,12 @@
+class OneOfTwoObliviousTransfer
+!!!145427.java!!!	OneOfTwoObliviousTransfer(inout serverMessages : InputKnowledge)
+		this.serverMessages = serverMessages;
+!!!145555.java!!!	OneOfTwoObliviousTransfer(inout clientBit : InputKnowledge, inout clientReceivedMessage : OutputKnowledge)
+		this.clientBit = clientBit;
+		this.clientReceivedMessage = clientReceivedMessage;
+!!!145683.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+
+!!!145811.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute
+

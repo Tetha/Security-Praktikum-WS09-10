@@ -1,0 +1,22 @@
+class CircuitBuilder
+!!!130579.java!!!	extendWithSeparateOutputs(inout input : Circuit, inout owner : boolean) : Circuit
+		// TODO extendWithSeparateOutputs
+		return null;
+!!!130707.java!!!	extendWithShareSeparation(inout input : Circuit) : Circuit
+		// TODO extendWithShareSeparation
+		return null;
+!!!130835.java!!!	createDominatingOutputCircuit(in mailCount : int) : Circuit
+		// TODO createDominatingOutputcircuit
+		return null;
+!!!130963.java!!!	createFullAdder() : Circuit
+		// TODO createFullAdder
+		return null;
+!!!131091.java!!!	createAdder(in bitwidth : int) : Circuit
+		// TODO createAdder
+		return null;
+!!!131219.java!!!	createFirstHalfOfFirstApproximation(in N : int, in bitwidth : int) : Circuit
+		// TODO createFirstHalfOfFirstApproximation
+		return null;
+!!!131347.java!!!	createSecondHalfOfFirstApproximation(in N : int, in bitwidth : int) : Circuit
+		// TODO createSecondHalfOfFirstApproximation
+		return null;

@@ -1,0 +1,14 @@
+class CircuitEvaluation
+!!!143763.java!!!	CircuitEvaluation(inout serverCircuit : InputKnowledge, inout localInput : InputKnowledge, inout concertedOutput : OutputKnowledge)
+		this.serverCircuit = serverCircuit;
+		this.localInput = localInput;
+		this.concertedOutput = concertedOutput;
+!!!143891.java!!!	CircuitEvaluation(inout localInput : InputKnowledge, inout concertedOutput : OutputKnowledge)
+		this.localInput = localInput;
+		this.concertedOutput = concertedOutput;
+!!!144019.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+
+!!!144147.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute
+

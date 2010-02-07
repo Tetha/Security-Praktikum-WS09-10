@@ -1,0 +1,5 @@
+class SymmetricPhase
+!!!140819.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO: serverExecute
+!!!140947.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO: clientExecute

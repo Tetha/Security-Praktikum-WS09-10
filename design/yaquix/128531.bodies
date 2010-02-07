@@ -1,0 +1,13 @@
+class Circuit
+!!!130067.java!!!	extendTopLeft(inout addedCircuit : Circuit, inout connection : Map<Integer, Integer>) : Circuit
+		// TODO extendTopLeft
+		return null;
+!!!130195.java!!!	extendTopRight(inout addedCircuit : Circuit, inout connection : Map<Integer, Integer>) : Circuit
+		// TODO extendTopRight
+		return null;
+!!!130323.java!!!	extendLeft(inout addedCircuit : Circuit, inout connection : Map<Integer, Integer>) : Circuit
+		// TODO extendLeft
+		return null;
+!!!130451.java!!!	garble(inout inputMapping : Map<Integer, int[]>) : GarbledCircuit
+		// TODO garble
+		return null;

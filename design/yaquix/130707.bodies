@@ -1,0 +1,9 @@
+class ClassifierParseException
+!!!135571.java!!!	ClassifierParseException(in line : int, in column : int, in reason : String)
+		// TODO: constructor
+!!!135699.java!!!	getLine() : int
+		// TODO getLine;
+		return -1;
+!!!135827.java!!!	getColumn() : int
+		// TODO getColumn
+		return -1;

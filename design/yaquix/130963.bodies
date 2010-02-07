@@ -1,0 +1,4 @@
+class LimitsUnsortedException
+!!!135955.java!!!	LimitsUnsortedException(in line : int, in column : int, in limit1 : double, in limit2 : double)
+		super(line, column, "");
+		// TODO: constructor

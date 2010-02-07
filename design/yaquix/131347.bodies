@@ -1,0 +1,4 @@
+class SyntaxException
+!!!136339.java!!!	SyntaxException(in line : int, in column : int, in foundPrefix : String, inout expectedPrefixes : String)
+		super(line, column, "");
+		// TODO: constructor

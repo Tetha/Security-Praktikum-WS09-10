@@ -1,0 +1,656 @@
+format 70
+"circuit" // yaquix::circuit
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/circuit"
+  java_package "yaquix.circuit"
+  classview 128147 "circuit"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 128147 "GarbledCircuit"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      operation 131475 "addInput"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds an input to the circuit and returns the id of the input gate.
+@return the index of the new input gate"
+      end
+
+      operation 131603 "addConstantGate"
+	public explicit_return_type "int"
+	nparams 1
+	  param in name "output" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds a constant gate to the circuit and returns the id of this gate.
+@param output the value to output
+@return the id of the new gate"
+      end
+
+      operation 131731 "addUnaryGate"
+	public explicit_return_type "int"
+	nparams 2
+	  param inout name "table" explicit_type "int"
+	  param in name "input" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0}[] ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds an unary gate with the garbled decision table and
+the gate with index input as the input of the gate
+@param table the garbled decision table for the gate
+@param input the id of the gate which is the input for this gate
+@return the index of the added gate"
+      end
+
+      operation 131859 "addBinaryGate"
+	public explicit_return_type "int"
+	nparams 3
+	  param inout name "table" explicit_type "int"
+	  param in name "left" explicit_type "int"
+	  param in name "right" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0}[] ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds a binary gate to the garbled decision table and
+the gates with index left, right as the left and right
+input.
+@param table the garbled decision table of this gate 
+@param left the index of the left input
+@param right the index of the right input
+@return the index of the newly added gate."
+      end
+
+      operation 131987 "makeOutput"
+	public explicit_return_type "void"
+	nparams 2
+	  param inout name "outputMapping" explicit_type "int"
+	  param in name "gate" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0}[] ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "designates the output of the identified gate as an output of the
+circuit with the given outputMapping. outputMapping[0] is the
+garbled value for the output 0 and outputMapping[1] is the garbled
+value for the output 1.
+@param outputMapping the mapping back into 0 and 1 from garbled values
+@param gate the gate which provides the output value"
+      end
+
+      operation 132115 "evaluate"
+	public explicit_return_type "boolean"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type}[] ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "evaluates the circuit. Requires that all gates are outputs
+or connected to another gate and that all input are set.
+@return the result of the evaluation."
+      end
+
+      operation 132243 "setInput"
+	public explicit_return_type "void"
+	nparams 2
+	  param in name "index" explicit_type "int"
+	  param in name "value" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "sets the input number index to the garbled input value.
+@param index the index of the input
+@param value the input value"
+      end
+    end
+
+    class 128531 "Circuit"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Implements a boolean circuit, the bane of our existance.
+@author hk
+"
+      class 128659 "GateType"
+	visibility private stereotype "enum"
+	cpp_decl ""
+	java_decl "${comment}${@}${visibility}${final}${abstract}enum ${name}${implements} {
+${items};
+${members}}
+"
+	php_decl ""
+	python_2_2 python_decl ""
+	idl_decl ""
+	explicit_switch_type ""
+	
+	attribute 128531 "IN"
+	  public type class_ref 128659 // GateType
+	  cpp_decl ""
+	  java_decl "  ${@}${name}${value},${comment}"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment "describes the gate as an input gate
+"
+	end
+
+	attribute 128659 "OUT"
+	  public type class_ref 128659 // GateType
+	  cpp_decl ""
+	  java_decl "  ${@}${name}${value},${comment}"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment "describes the gate as an output gate
+"
+	end
+
+	attribute 128787 "CONSTANT"
+	  public type class_ref 128659 // GateType
+	  cpp_decl ""
+	  java_decl "  ${@}${name}${value},${comment}"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment "describes the gate as a constant value gate
+"
+	end
+
+	attribute 128915 "UNARYGATE"
+	  public type class_ref 128659 // GateType
+	  cpp_decl ""
+	  java_decl "  ${@}${name}${value},${comment}"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment "describes the gate as an unary gate
+"
+	end
+
+	attribute 129043 "BINARYGATE"
+	  public type class_ref 128659 // GateType
+	  cpp_decl ""
+	  java_decl "  ${@}${name}${value},${comment}"
+	  php_decl ""
+	  python_decl ""
+	  idl_decl ""
+	  comment "describes the gate as a binary gate"
+	end
+      end
+
+      classrelation 128019 // gateType (<unidirectional association>)
+	relation 128019 --->
+	  a role_name "gateType" multiplicity "[]" package
+	    comment "
+stores the type of all gates.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+"
+	    classrelation_ref 128019 // gateType (<unidirectional association>)
+	  b parent class_ref 128659 // GateType
+      end
+
+      attribute 129171 "adjacencyList"
+	package explicit_type "Integer"
+	multiplicity "[]"
+	stereotype "List"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}>${multiplicity} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "stores the structure of the circuit.
+"
+      end
+
+      attribute 129299 "tables"
+	package explicit_type "int"
+	multiplicity "[][][]"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "stores the annotations of the gates.
+"
+      end
+
+      attribute 129427 "inputs"
+	package explicit_type "int"
+	multiplicity "[]"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "stores the gate indices of the inputs.
+"
+      end
+
+      attribute 129555 "outputs"
+	package explicit_type "int"
+	multiplicity "[]"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "stores the gate indices of the outputs;
+"
+      end
+
+      operation 130067 "extendTopLeft"
+	public return_type class_ref 128531 // Circuit
+	nparams 2
+	  param inout name "addedCircuit" type class_ref 128531 // Circuit
+	  param inout name "connection" explicit_type "Map<Integer, Integer>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This extends a given circuit with another circuit.
+The parameter circuit is added on top of the existing circuit. That means, the
+outputs of the existing circuit are connected to the inputs of the 
+newly added circuit. These connections are controlled via the connection
+parameter: if connection.get(i) = j, then output output number i of the
+existing circuit is connected to input number j of the parameter circuit.
+The new circuit is added to the left of the existing circuit. That means,
+whatever inputs of the parameter circuit are not mentioned in the connection
+relation are added as inputs to the resulting circuit before copying
+all inputs of the current circuit to the resulting circuit and outputs
+of the current algorithm which are not mentioned by the mapping are added 
+after any outputs of the parameter circuit.
+
+Note that extendBottomRight can be implemented by swapping addedCircuit and
+the current circuit.
+@param addedCircuit a circuit to add to the existing circuit.
+@param connection a specification how to connect the outputs of the current
+circuit to the inputs of the parameter circuit.
+@return"
+      end
+
+      operation 130195 "extendTopRight"
+	public return_type class_ref 128531 // Circuit
+	nparams 2
+	  param inout name "addedCircuit" type class_ref 128531 // Circuit
+	  param inout name "connection" explicit_type "Map<Integer, Integer>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This extends a given circuit with another circuit.
+The parameter circuit is added on top of the existing circuit. This means that
+some inputs of the parameter input are fed by outputs of the current algorithm.
+Which inputs are fed by what output exactly is determined by the connection mapping.
+If connection.get(i) = j, then the output number i of the current algorithm
+feeds input number j of the parameter circuit.
+The extension is on the right, that means, additional inputs of the parameter 
+circuit which are not mentioned by the connection mapping are added after
+the inputs of the existing algorithm, while any outputs of the existing algorithm
+which are not mentioned by the mapping are added to the overall outputs before
+any output of the parameter algorithms.
+
+Note that extendBottomLeft can be implemented by swapping the current
+and the added circuit.
+@param addedCircuit a circuit to add to the existing circuit
+@param connection a specification to connect the outputs of the current
+circuit to the inputs of the parameter circuit.
+@return"
+      end
+
+      operation 130323 "extendLeft"
+	public return_type class_ref 128531 // Circuit
+	nparams 2
+	  param inout name "addedCircuit" type class_ref 128531 // Circuit
+	  param inout name "connection" explicit_type "Map<Integer, Integer>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This adds the parameter circuit to the left of the current circuit.
+The addition is done on the same level, that means, the two 
+circuits to not communicate with each other. 
+The addition is done to the left, that means, the inputs of the
+parameter circuit are added before any inputs of the current 
+circuit to the resulting circuits inputs and any outputs
+of the parameter circuit are added to the resulting circuit
+before any outputs of the current circuit.
+
+Note that extendRight can be implemented by swapping the
+current circuit and the added circuit.
+@param addedCircuit
+@param connection
+@return"
+      end
+
+      operation 130451 "garble"
+	public return_type class_ref 128147 // GarbledCircuit
+	nparams 1
+	  param inout name "inputMapping" explicit_type "Map<Integer, int[]>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "garbles the boolean circuit into a garbled circuit, with the
+given input mapping.
+@param inputMapping For each input index, the entry[0] defines the
+garbled input value for an input 0, while the entry[1] defines the
+garbled input value for an input 1
+@return a garbled circuit which does the same as this circuit 
+but is garbled for yaos protocol"
+      end
+    end
+
+    class 128787 "CircuitBuilder"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class contains methods to construct the various
+circuits used in the application.
+
+This was changed from using objects for the various circuits
+as the current means of constructing a circuit are easier to use
+this way.
+
+@author hk
+"
+      operation 130579 "extendWithSeparateOutputs"
+	class_operation public return_type class_ref 128531 // Circuit
+	nparams 2
+	  param inout name "input" type class_ref 128531 // Circuit
+	  param inout name "owner" explicit_type "boolean"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1}[] ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This applies the extension to separate the outputs for each user
+to an existing circuit. The extension adds a layer of xor-gates
+to the existing circuit and adds new input gates for each user
+in order to provide some sort of key. Thus, we achieve something
+resembling a onetime pad for the output part of each user and
+thus the output is separated into a part each user can use
+and decode and a part the user cannot decode and thus, not read.
+
+The parameter assigns each output to either the sender of the
+circuit (alice, value true) or the receiver (bob, if the value
+is false)/ The key bits must be the first bits of the input
+of each user.
+@param input the circuit to extend
+@param owner maps the output to owners.
+@return the modified circuit"
+      end
+
+      operation 130707 "extendWithShareSeparation"
+	class_operation public return_type class_ref 128531 // Circuit
+	nparams 1
+	  param inout name "input" type class_ref 128531 // Circuit
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This applies the extension for turning the output into shares
+to a given input circuit. This extension adds a layer of
+the distribution net (compare the specification for details)
+onto each output gate according to the xor of a bit in an 
+additional input of each user. 
+The new inputs of the user are required to prefix the already
+existing inputs of the user.
+@param input the circuit to extend
+@return the modified circuit"
+      end
+
+      operation 130835 "createDominatingOutputCircuit"
+	class_operation public return_type class_ref 128531 // Circuit
+	nparams 1
+	  param in name "mailCount" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs the dominating output circuit. Compare to the
+specification for details. We require the inputs for alice to be
+the first emails with the first bit of the label encoding to be
+on even positions (counting from 0) and the second bits of the
+label encoding to be on odd positions (counting from 0). Bobs mail
+encodings follow Alice mail encodings in the same fashion.
+@param mailCount the number of mails to handle
+@return A circuit which does this"
+      end
+
+      operation 130963 "createFullAdder"
+	class_operation private return_type class_ref 128531 // Circuit
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This creates a full adder of one bit. The first input of the
+full adder is the carry bit, while the second bit is the
+first bit to add and the third bit is the second bit to add.
+@return a full adder"
+      end
+
+      operation 131091 "createAdder"
+	class_operation private return_type class_ref 128531 // Circuit
+	nparams 1
+	  param in name "bitwidth" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This creates a ripple carry adder for two bit numbers.
+The first number is required to be the first half of the input
+while the second number is required to be the second half of the input.
+We don't care for overflows, as we use bitwidths large enough, so the
+output is as wide as the inputs.
+@return a ripple carry adder"
+      end
+
+      operation 131219 "createFirstHalfOfFirstApproximation"
+	class_operation public return_type class_ref 128531 // Circuit
+	nparams 2
+	  param in name "N" explicit_type "int"
+	  param in name "bitwidth" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a circuit which computes the first shares
+of the first approximation (called alpha in the paper).
+
+This implements the first part of the described circuit which
+shifts the sum of the input values by some magic values. This
+does not handle the separation into shares yet, as we can
+simply apply the extensions in the phase. "
+      end
+
+      operation 131347 "createSecondHalfOfFirstApproximation"
+	class_operation public return_type class_ref 128531 // Circuit
+	nparams 2
+	  param in name "N" explicit_type "int"
+	  param in name "bitwidth" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a table which uses a lookup table to compute
+the second shares of the first approximation output circuit
+(called beta in the paper). 
+
+TODO: design lookup table (with automata, in doubt).
+This creation just handles the creation of the circuit, the separation
+into shares and the separation of the output is done in
+the phase by applying the extensions."
+      end
+    end
+  end
+
+  deploymentview 128147 "circuit"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 128403 "Circuit"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import java.util.Map;
+${definition}"
+      associated_classes
+	class_ref 128531 // Circuit
+      end
+    end
+
+    artifact 128531 "CircuitBuilder"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 128787 // CircuitBuilder
+      end
+    end
+
+    artifact 128659 "GarbledCircuit"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 128147 // GarbledCircuit
+      end
+    end
+  end
+
+  package_ref 128275 // base
+end

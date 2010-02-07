@@ -1,0 +1,6 @@
+class OutputPhase
+!!!148627.java!!!	OutputPhase(inout concertedClassifier : InputKnowledge, inout localOutput : InputKnowledge)
+		this.concertedClassifier = concertedClassifier;
+		this.localOutput = localOutput;
+!!!148755.java!!!	execute(inout connection : Connection) : void
+		// TODO execute

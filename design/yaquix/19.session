@@ -1,0 +1,23 @@
+window_sizes 1272 921 256 1006 717 118
+diagrams
+  active  classdiagram_ref 128019 // todo diagram
+    1014 720 100 2 0 614
+end
+show_stereotypes
+selected classrelation_ref 128915 // <generalisation>
+open
+  classview_ref 128019 // yaquix
+  classview_ref 128147 // circuit
+  class_ref 128915 // And
+  class_ref 129043 // Constant
+  class_ref 129171 // Negation
+  class_ref 129299 // Or
+  class_ref 129427 // Shuffle
+  class_ref 129555 // Split
+  class_ref 129683 // Xor
+  class_ref 132499 // SymmetricPhase
+  
+  package_ref 128787 // unknown
+  classview_ref 129939 // todo diagram
+end
+end

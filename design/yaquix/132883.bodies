@@ -1,0 +1,8 @@
+class LimitComputation
+!!!141587.java!!!	LimitComputation(inout concertedWordlist : InputKnowledge, inout localMails : InputKnowledge, inout concertedAttributes : OutputKnowledge)
+		this.concertedWordlist = concertedWordlist;
+		this.localMails = localMails;
+		this.concertedAttributes = concertedAttributes;
+!!!141715.java!!!	execute(inout connection : Connection) : void
+		// TODO execute
+

@@ -1,0 +1,4 @@
+class LimitTooLargeException
+!!!136083.java!!!	LimitTooLargeException(in line : int, in column : int, in limit : double)
+		super(line, column, "foo");
+		// TODO: constructor

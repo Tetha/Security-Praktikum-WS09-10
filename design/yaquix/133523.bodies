@@ -1,0 +1,9 @@
+class WordlistMerging
+!!!142995.java!!!	WordlistMerging(inout localWordlist : InputKnowledge, inout concertedWordlist : OutputKnowledge)
+		this.localWordlist = localWordlist;
+		this.concertedWordlist = concertedWordlist;
+!!!143123.java!!!	execute(inout connection : Connection) : void
+		// TODO Auto-generated method stub
+!!!143251.java!!!	mergeWordlists(inout localWordlist : List<String>, inout remoteWordlist : List<String>) : List<String>
+		// TODO: mergeWordlists
+		return null;

@@ -1,0 +1,9 @@
+class MaxGainComputation
+!!!145043.java!!!	MaxGainComputation(inout localEntropyShares : InputKnowledge, inout concertedAttributes : InputKnowledge, inout concertedBestAttribute : OutputKnowledge)
+		this.localEntropyShares = localEntropyShares;
+		this.concertedAttributes = concertedAttributes;
+		this.concertedBestAttribute = concertedBestAttribute;
+!!!145171.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO clientExecute
+!!!145299.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO serverExecute

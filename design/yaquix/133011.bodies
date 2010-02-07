@@ -1,0 +1,6 @@
+class LimitMerging
+!!!141843.java!!!	LimitMerging(inout localLimits : InputKnowledge, inout concertedAttributes : OutputKnowledge)
+		this.localLimits = localLimits;
+		this.concertedAttributes = concertedAttributes;
+!!!141971.java!!!	execute(inout connection : Connection) : void
+		// TODO execute

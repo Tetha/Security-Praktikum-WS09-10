@@ -1,0 +1,12 @@
+class OneOutOfMObliviousTransfer
+!!!145939.java!!!	OneOutOfMObliviousTransfer(inout serverMessages : InputKnowledge)
+		this.serverMessages = serverMessages;
+!!!146067.java!!!	OneOutOfMObliviousTransfer(inout clientIndex : InputKnowledge, inout clientMessage : OutputKnowledge)
+		this.clientIndex = clientIndex;
+		this.clientMessage = clientMessage;
+!!!146195.java!!!	clientExecute(inout connection : Connection) : void
+		// TODO client execute
+
+!!!146323.java!!!	serverExecute(inout connection : Connection) : void
+		// TODO server execute
+

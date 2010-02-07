@@ -1,0 +1,816 @@
+format 70
+"entropy" // yaquix::phase::classifier::entropy
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/phase/classifier/entropy"
+  java_package "yaquix.phase.classifier.entropy"
+  classview 129555 "entropy"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 134547 "ApproximationImprovement"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class improves a first approximation of ln(x) by
+evaluating a taylor approximation privately. 
+
+We construct a polynomial defined in the paper, which
+is deduced from the taylor approximation of ln(x) and
+evaluate this privately. The polynomial evaluation is
+implemented in a separate phase.
+
+@author hk
+"
+      classrelation 138003 // <generalisation>
+	relation 138003 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 138003 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 138131 // localFirstShare (<unidirectional association>)
+	relation 138131 --->
+	  a role_name "localFirstShare" private
+	    comment "
+This contains the local share of the first pair of shares
+computed by the first approximation phase, called alpha
+in the paper.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 138131 // localFirstShare (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 138259 // localXLnXShareTerm (<unidirectional association>)
+	relation 138259 --->
+	  a role_name "localXLnXShareTerm" private
+	    comment "
+This requires the computed term share of x*ln(x) to be stored.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 138259 // localXLnXShareTerm (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 146451 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 146579 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 146707 "constructPolynomial"
+	private return_type class_ref 134675 // UnivariantPolynomial
+	nparams 2
+	  param in name "localFirstShare" explicit_type "int"
+	  param in name "randomShare" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+      end
+
+      classrelation 142611 // <dependency>
+	relation 142611 -_->
+	  a default
+	    classrelation_ref 142611 // <dependency>
+	  b parent class_ref 135059 // PolynomialEvaluation
+      end
+    end
+
+    class 134803 "EntropySharesComputation"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class takes the attributes and attribute values and computes
+a vector of shares such that the point wise sum of this share
+vector is an approximation to the information gain obtained
+if splitting the data according to this attribute.
+
+This is achieved by computing a first approximation of ln(x),
+improving this approximation with the taylor expansion of ln(x)
+and finally multiplying this with x, all in private. These 
+steps are implemented as separate sub phases.
+
+@author hk
+"
+      classrelation 138387 // <generalisation>
+	relation 138387 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 138387 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 138515 // localAttributeValues (<unidirectional association>)
+	relation 138515 --->
+	  a role_name "localAttributeValues" private
+	    comment "
+contains the values of the attributes to compute the
+entropies from.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<AttributeValueTable> ${name}${value};
+"
+	    classrelation_ref 138515 // localAttributeValues (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 138643 // concertedAttributes (<unidirectional association>)
+	relation 138643 --->
+	  a role_name "concertedAttributes" private
+	    comment "
+contains the attribute list to compute the entropies from.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<List<Attribute>> ${name}${value};
+"
+	    classrelation_ref 138643 // concertedAttributes (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 138771 // localShares (<unidirectional association>)
+	relation 138771 --->
+	  a role_name "localShares" private
+	    comment "
+contains a place to store the computed shares.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<int[]> ${name}${value};
+"
+	    classrelation_ref 138771 // localShares (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 146835 "EntropySharesComputation"
+	public explicit_return_type ""
+	nparams 4
+	  param inout name "localAttributeValues" type class_ref 131987 // InputKnowledge
+	  param inout name "concertedAttributes" type class_ref 131987 // InputKnowledge
+	  param inout name "localShares" type class_ref 132243 // OutputKnowledge
+	  param inout name "randomSource" explicit_type "Random"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<AttributeValueTable> ${p0}, ${t1}<List<Attribute>> ${p1}, ${t2}<int[]> ${p2}, ${t3} ${p3}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Creates a new entropy share computation phase.
+@param localAttributeValues the attribute values to compute the entropy of
+@param concertedAttributes the attributes to compute the entropy of
+@param localShares a place to store the computes entropy shares
+@param randomSource the random number generate used"
+      end
+
+      operation 146963 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 147091 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 142099 // <dependency>
+	relation 142099 -_->
+	  a default
+	    classrelation_ref 142099 // <dependency>
+	  b parent class_ref 134931 // FirstApproximation
+      end
+
+      classrelation 142227 // <dependency>
+	relation 142227 -_->
+	  a default
+	    classrelation_ref 142227 // <dependency>
+	  b parent class_ref 135187 // PrivateMultiplication
+      end
+
+      classrelation 142355 // <dependency>
+	relation 142355 -_->
+	  a default
+	    classrelation_ref 142355 // <dependency>
+	  b parent class_ref 134547 // ApproximationImprovement
+      end
+    end
+
+    class 134931 "FirstApproximation"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase evaluates the first approximation circuit in order
+to obtain a first rough approximation of ln(x), with x being
+the servers local term + the clients local term. This is its
+own phase in order to encapsulate the encoding of the input
+for the circuit and the decoding of the output.
+
+@author hk
+"
+      classrelation 138899 // <generalisation>
+	relation 138899 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 138899 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 139027 // localTerm (<unidirectional association>)
+	relation 139027 --->
+	  a role_name "localTerm" private
+	    comment "
+This is the local term.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 139027 // localTerm (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 139155 // localFirstShare (<unidirectional association>)
+	relation 139155 --->
+	  a role_name "localFirstShare" private
+	    comment "
+This is the first share computed, alpha in the
+id3-paper.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 139155 // localFirstShare (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      classrelation 139283 // localSecondShare (<unidirectional association>)
+	relation 139283 --->
+	  a role_name "localSecondShare" private
+	    comment "
+This is the second share computed, beta
+in the id3 paper.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 139283 // localSecondShare (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 147219 "FirstApproximation"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "localTerm" type class_ref 131987 // InputKnowledge
+	  param inout name "localFirstShare" type class_ref 132243 // OutputKnowledge
+	  param inout name "localSecondShare" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Integer> ${p0}, ${t1}<Integer> ${p1}, ${t2}<Integer> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This constructs a new first approximation phase.
+@param localTerm the local term to sum with the remote term
+@param localFirstShare a first private share, alpha
+@param localSecondShare a second private share, beta"
+      end
+
+      operation 147347 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 147475 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 144659 // <dependency>
+	relation 144659 -_->
+	  a default
+	    classrelation_ref 144659 // <dependency>
+	  b parent class_ref 133779 // CircuitEvaluation
+      end
+
+      classrelation 144787 // <dependency>
+	relation 144787 -_->
+	  a default
+	    classrelation_ref 144787 // <dependency>
+	  b parent class_ref 133779 // CircuitEvaluation
+      end
+    end
+
+    class 135059 "PolynomialEvaluation"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This phase privately evaluates a given polynomial on the server
+at a point only the client knows such that the server does not 
+learn the point and the client does not learn the polynomial.
+
+Compare to the detailed algorithm in the specification. This class
+uses the OneOutOfMObliviousTransfer and the Polynomials.
+@author hk
+"
+      classrelation 139411 // <generalisation>
+	relation 139411 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 139411 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      classrelation 139539 // serverPolynomial (<unidirectional association>)
+	relation 139539 --->
+	  a role_name "serverPolynomial" private
+	    comment "
+If the server constructor was called and serverExecute is called,
+this contains the polynomial to evaluate.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<UnivariantPolynomial> ${name}${value};
+"
+	    classrelation_ref 139539 // serverPolynomial (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 139667 // clientParameter (<unidirectional association>)
+	relation 139667 --->
+	  a role_name "clientParameter" private
+	    comment "
+If the client constructor was called and clientExecute is called,
+this contains the point to evaluate the polynomial in.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 139667 // clientParameter (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 139795 // clientResult (<unidirectional association>)
+	relation 139795 --->
+	  a role_name "clientResult" private
+	    comment "
+If the client construct was called and the clientExecute is called,
+this requires the result of evaluating the polynomial in the
+client point to be stored.
+
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 139795 // clientResult (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 147603 "PolynomialEvaluation"
+	public explicit_return_type ""
+	nparams 1
+	  param inout name "serverPolynomial" type class_ref 131987 // InputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<UnivariantPolynomial> ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the server side constructor of the polynomial evaluation
+phase. Note that if you call this constructor, you MUST call 
+serverExecute or undefined behavior happens.
+@param serverPolynomial this has to contain the polynomial to
+evaluate."
+      end
+
+      operation 147731 "PolynomialEvaluation"
+	public explicit_return_type ""
+	nparams 2
+	  param inout name "clientParameter" type class_ref 131987 // InputKnowledge
+	  param inout name "clientResult" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0}<Integer> ${p0}, ${t1}<Integer> ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This is the clientside constructor of the polynomial evaluation
+phase. Note that if you call this constructor, you MUST call
+clientExecute or undefined behavior happens.
+@param clientParameter This contains the point to evaluate the
+polynomial in
+@param clientResult ther esult of the evaluation of the polynomial"
+      end
+
+      operation 147859 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 147987 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      classrelation 143379 // <dependency>
+	relation 143379 -_->
+	  a default
+	    classrelation_ref 143379 // <dependency>
+	  b parent class_ref 134419 // OneOutOfMObliviousTransfer
+      end
+
+      classrelation 144915 // <dependency>
+	relation 144915 -_->
+	  a default
+	    classrelation_ref 144915 // <dependency>
+	  b parent class_ref 134675 // UnivariantPolynomial
+      end
+
+      classrelation 145043 // <dependency>
+	relation 145043 -_->
+	  a default
+	    classrelation_ref 145043 // <dependency>
+	  b parent class_ref 135571 // BiVariantPolynomial
+      end
+    end
+
+    class 135187 "PrivateMultiplication"
+      visibility package 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class takes one factor from each of the two users and
+computes one random term for each user such that the sum of the
+terms is identical to the product of the factors.
+
+This is implemented by selecting a simple univariant linear
+polynomial which uses the term of the server user as the
+factor of the variable and adds a random value to it. Then
+we privately evaluate the polynomial and output the result
+of the evaluation for the client user and the random value
+we added to the polynomial (negated) as the term for the
+server user.
+
+@author hk
+"
+      classrelation 139923 // <generalisation>
+	relation 139923 ---|>
+	  a public
+	    java "${type}"
+	    classrelation_ref 139923 // <generalisation>
+	  b parent class_ref 132371 // Phase
+      end
+
+      attribute 132755 "randomSource"
+	private explicit_type "Random"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+      end
+
+      classrelation 140051 // localFactor (<unidirectional association>)
+	relation 140051 --->
+	  a role_name "localFactor" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 140051 // localFactor (<unidirectional association>)
+	  b parent class_ref 131987 // InputKnowledge
+      end
+
+      classrelation 140179 // localTerm (<unidirectional association>)
+	relation 140179 --->
+	  a role_name "localTerm" private
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}<Integer> ${name}${value};
+"
+	    classrelation_ref 140179 // localTerm (<unidirectional association>)
+	  b parent class_ref 132243 // OutputKnowledge
+      end
+
+      operation 148115 "PrivateMultiplication"
+	public explicit_return_type ""
+	nparams 3
+	  param inout name "randomSource" explicit_type "Random"
+	  param inout name "localFactor" type class_ref 131987 // InputKnowledge
+	  param inout name "localTerm" type class_ref 132243 // OutputKnowledge
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1}<Integer> ${p1}, ${t2}<Integer> ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs a new private multiplication phase
+@param randomSource the random number generator in progress at the moment
+@param localFactor the factor of the current user
+@param localTerm a place to store the computed term."
+      end
+
+      operation 148243 "clientExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 148371 "serverExecute"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "connection" type class_ref 128019 // Connection
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	java_annotation "@Override
+"
+	
+	
+	
+      end
+
+      operation 148499 "createPolynomial"
+	private return_type class_ref 134675 // UnivariantPolynomial
+	nparams 2
+	  param in name "factor" explicit_type "int"
+	  param in name "randomValue" explicit_type "int"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}, ${t1} ${p1}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs the linear polynomial factor * x + randomValue
+@param factor the local factor
+@param randomValue the random value to become the local share
+@return  the linear polynomial to evaluate"
+      end
+
+      classrelation 142483 // <dependency>
+	relation 142483 -_->
+	  a default
+	    classrelation_ref 142483 // <dependency>
+	  b parent class_ref 135059 // PolynomialEvaluation
+      end
+    end
+  end
+
+  deploymentview 129427 "entropy"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 134291 "ApproximationImprovement"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.Connection;
+import yaquix.phase.Phase;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.polynomial.UnivariantPolynomial;
+${definition}"
+      associated_classes
+	class_ref 134547 // ApproximationImprovement
+      end
+    end
+
+    artifact 134419 "EntropySharesComputation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import java.util.Random;
+import yaquix.Connection;
+import yaquix.knowledge.Attribute;
+import yaquix.knowledge.AttributeValueTable;
+import yaquix.phase.Phase;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+${definition}"
+      associated_classes
+	class_ref 134803 // EntropySharesComputation
+      end
+    end
+
+    artifact 134547 "FirstApproximation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.Connection;
+import yaquix.phase.Phase;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+${definition}"
+      associated_classes
+	class_ref 134931 // FirstApproximation
+      end
+    end
+
+    artifact 134675 "PolynomialEvaluation"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import yaquix.Connection;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+import yaquix.polynomial.UnivariantPolynomial;
+${definition}"
+      associated_classes
+	class_ref 135059 // PolynomialEvaluation
+      end
+    end
+
+    artifact 134803 "PrivateMultiplication"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.Random;
+import yaquix.Connection;
+import yaquix.phase.InputKnowledge;
+import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
+import yaquix.polynomial.UnivariantPolynomial;
+${definition}"
+      associated_classes
+	class_ref 135187 // PrivateMultiplication
+      end
+    end
+  end
+end

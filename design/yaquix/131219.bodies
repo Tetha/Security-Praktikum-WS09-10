@@ -1,0 +1,4 @@
+class NotEnoughSubtreesException
+!!!136211.java!!!	NotEnoughSubtreesException(in line : int, in column : int, in requiredNumberOfSubtrees : int, inout subTrees : Classifier)
+		super(line, column, "");
+		// TODO: constructor

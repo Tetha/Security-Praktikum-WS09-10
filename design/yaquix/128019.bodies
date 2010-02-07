@@ -1,0 +1,32 @@
+class Connection
+!!!128275.java!!!	sendInteger(in localInteger : int) : void
+		// TODO sendInt
+!!!128403.java!!!	receiveInteger() : int
+		// TODO receiveInt
+		return -1;
+!!!128531.java!!!	sendListOfBitStrings(inout localBitstrings : List<boolean[]>) : void
+		// TODO sendListOfBitStrings
+!!!128659.java!!!	receiveListOfBitStrings() : List<boolean[]>
+		// TODO receiveListOfBitStrings
+		return null;
+!!!128787.java!!!	sendIntegers(inout localIntegers : int) : void
+		// TODO sendInts
+!!!128915.java!!!	receiveIntegers() : int
+		// TODO receiveIntegers
+		return null;
+!!!129043.java!!!	exchangeWordlist(inout localWordlist : List<String>) : List<String>
+		// TODO exchangeWordlist
+		return null;
+!!!129171.java!!!	exchangeLimits(inout localLimits : Map<String, Double>) : Map<String, Double>
+		// TODO exchangeLimits
+		return null;
+!!!129299.java!!!	sendGarbledCircuit(inout localCircuit : GarbledCircuit) : void
+		// TODO sendGarbledCircuit
+!!!129427.java!!!	receiveGarbledCircuit() : GarbledCircuit
+		// TODO receiveGarbledCircuit
+		return null;
+!!!129555.java!!!	sendBitstring(inout localBitstring : boolean) : void
+		//TODO sendBitstring
+!!!129683.java!!!	receiveBitstring() : boolean
+		//TODO receiveBitstring
+		return null;

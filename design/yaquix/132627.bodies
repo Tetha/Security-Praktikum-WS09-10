@@ -1,0 +1,8 @@
+class Discretization
+!!!141075.java!!!	Discretization(inout localMails : InputKnowledge, inout localAttributeValues : OutputKnowledge, inout concertedAttributes : OutputKnowledge)
+		this.localMails = localMails;
+		this.localAttributeValues = localAttributeValues;
+		this.concertedAttributes = concertedAttributes;
+!!!141203.java!!!	execute(inout connection : Connection) : void
+		// TODO execute
+		

@@ -1,0 +1,10 @@
+class LocalWordlistComputation
+!!!142355.java!!!	LocalWordlistComputation(inout localMails : InputKnowledge, inout localWordlist : OutputKnowledge)
+		this.localMails = localMails;
+		this.localWordlist = localWordlist;
+!!!142483.java!!!	execute(inout connection : Connection) : void
+		// TODO execute
+
+!!!142611.java!!!	chooseWords(inout words : List<String>, inout spamPercentage : List<Double>, inout nonSpamPercentage : List<Double>) : List<String>
+		//TODO: chooseWords
+		return null;

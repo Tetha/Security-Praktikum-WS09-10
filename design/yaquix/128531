@@ -1,0 +1,786 @@
+format 70
+"knowledge" // yaquix::knowledge
+  revision 2
+  modified_by 19 "hk"
+  // class settings
+  //class diagram settings
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  //use case diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default class_drawing_mode default shadow default show_stereotype_properties default
+  //sequence diagram settings
+  show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+  //collaboration diagram settings
+  show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+  //object diagram settings
+   write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+  //component diagram settings
+  package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //deployment diagram settings
+  package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+  draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+  //state diagram settings
+  package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+  show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+  //activity diagram settings
+  package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+  show_infonote default drawing_language default show_stereotype_properties default
+  
+  java_dir "yaquix/knowledge"
+  java_package "yaquix.knowledge"
+  classview 128531 "knowledge"
+    //class diagram settings
+    draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+    //collaboration diagram settings
+    show_full_operations_definition default show_hierarchical_rank default write_horizontally default drawing_language default package_name_in_tab default show_context default draw_all_relations default shadow default show_stereotype_properties default
+    //object diagram settings
+     write_horizontally default package_name_in_tab default show_context default auto_label_position default draw_all_relations default shadow default show_stereotype_properties default
+    //sequence diagram settings
+    show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+    //state diagram settings
+    package_name_in_tab default show_context default auto_label_position default write_trans_label_horizontally default show_trans_definition default draw_all_relations default shadow default
+    show_activities default region_horizontally default drawing_language default show_stereotype_properties default
+    //class settings
+    //activity diagram settings
+    package_name_in_tab default show_context default show_opaque_action_definition default auto_label_position default write_flow_label_horizontally default draw_all_relations default shadow default
+    show_infonote default drawing_language default show_stereotype_properties default
+    class 130067 "MailType"
+      visibility public stereotype "enum"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}enum ${name}${implements} {
+${items};
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Contains the types a mail might be classified as.
+@author hk
+"
+      attribute 131731 "SPAM"
+	public type class_ref 130067 // MailType
+	cpp_decl ""
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "describes that a mail is spam.
+"
+      end
+
+      attribute 131859 "NONSPAM"
+	public type class_ref 130067 // MailType
+	cpp_decl ""
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "describes that a mail is not spam."
+      end
+    end
+
+    class 130195 "Mail"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class contains the content of an mail and implements
+several operations on it.
+@author hk
+"
+      attribute 131603 "content"
+	private explicit_type "String"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "contains the string content of the mail
+"
+      end
+
+      operation 137747 "parseWords"
+	private explicit_return_type "List<String>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This parses the words contained in content. A word is a sequence of
+alphanumeric characters, non-alphanumeric characters between words
+are ignored.
+@return"
+      end
+
+      operation 137875 "getWords"
+	public explicit_return_type "Set<String>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "returns the set of words contained in this mail.
+@return the set of words in th mail"
+      end
+
+      operation 138003 "countWords"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the number of words in the mail content. Note that this is
+different from the magnitude of getWords(), because getWords
+eliminates duplicates, while this counts duplicates.
+@return the number of words in the email."
+      end
+
+      operation 138131 "countWord"
+	public explicit_return_type "int"
+	nparams 1
+	  param in name "word" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This counts the number of occurrences of the word in the email content.
+@param word the word to count
+@return the number of occurrences"
+      end
+    end
+
+    class 130323 "Attribute"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "The attribute contains a word and two limits which classify
+the relative occurences of a word in an email as rare,
+middle and often. 
+@author hk
+"
+      attribute 130963 "word"
+	private explicit_type "String"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "the word the attribute cares about.
+"
+      end
+
+      attribute 131091 "low"
+	private explicit_type "double"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "the lower threshold
+"
+      end
+
+      attribute 131219 "high"
+	private explicit_type "double"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "the higher threshold
+"
+      end
+
+      operation 136595 "Attribute"
+	public explicit_return_type ""
+	nparams 3
+	  param in name "word" explicit_type "String"
+	  param in name "localLimit" explicit_type "double"
+	  param in name "remoteLimit" explicit_type "double"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${t0} ${p0}, ${t1} ${p1}, ${t2} ${p2}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Constructs an attribute from local and remote limit.
+Note that local and remote limit are not ordererd (in fact,
+if low and high are different, they must be in wrong order
+on the client or the server), so it is necessary to
+sort them.
+@param word the word to care about
+@param localLimit the local limit 
+@param remoteLimit the remote limit"
+      end
+
+      operation 136723 "classify"
+	public return_type class_ref 130067 // MailType
+	nparams 1
+	  param inout name "mail" type class_ref 130195 // Mail
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "classifies a single mail.
+@param mail the mail to classify
+@return the number of occurences in the mail"
+      end
+
+      operation 136851 "formatAsOutput"
+	public explicit_return_type "String"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Formats the output in a way the classifier parser can parse.
+@return a representation of the attribute to parse"
+      end
+    end
+
+    class 131603 "AttributeValueTable"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This table stores the attribute values for each mail. If one
+looks at an example for the ID3-algorithm, the table with the
+values (\"sunny? yes\") is implemented by this class.
+@author hk
+"
+      attribute 131347 "spamMails"
+	private explicit_type "Map<Attribute, Occurrences>"
+	stereotype "List"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "This contains the attribute value mappings for mails classified
+as spam.
+"
+      end
+
+      attribute 131475 "nonSpamMails"
+	private explicit_type "Map<Attribute, Occurrences>"
+	stereotype "List"
+	cpp_decl ""
+	java_decl "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "This contains the attribute value mappings for mails classified
+as non spam.
+"
+      end
+
+      operation 136979 "AttributeValueTable"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "constructs a new empty attribute value table"
+      end
+
+      operation 137107 "addSpamMail"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "newMail" explicit_type "Map<Attribute, Occurrences>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds a new mail classified as spam to the attribute value table.
+@param newMail the new mail to add"
+      end
+
+      operation 137235 "addNonSpamMail"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "newMail" explicit_type "Map<Attribute, Occurrences>"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds a new mail, classified as non spam to the attribute value table.
+@param newMail the new mail to add."
+      end
+
+      operation 137363 "countSpamMails"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the spam mails in the table
+@return the number of spam mails in the table."
+      end
+
+      operation 137491 "countNonSpamMails"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the non spam mails in the table
+@return the number of non spam mails in the table"
+      end
+
+      operation 137619 "partition"
+	public return_type class_ref 131731 // Occurrences
+	nparams 1
+	  param inout name "partitionAttribute" type class_ref 130323 // Attribute
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}EnumMap<${type}, AttributeValueTable> ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This partitions the table into new tables, one for each possible
+value of the attribute.
+@param partitionAttribute the attribute to partition on
+@return the new tables, identified by the attribute value"
+      end
+    end
+
+    class 131731 "Occurrences"
+      visibility public stereotype "enum"
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}enum ${name}${implements} {
+${items};
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "Contains the possible values for the attributes we use.
+@author hk
+"
+      attribute 131987 "RARE"
+	public type class_ref 131731 // Occurrences
+	cpp_decl ""
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "This describes that a word occurs less often than both
+limits of the classifying attribute.
+"
+      end
+
+      attribute 132115 "MEDIUM"
+	public type class_ref 131731 // Occurrences
+	cpp_decl ""
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "This describes that a word occurs more than one limit
+of the classifying attribute, but less often than the
+other limit of the same attribute.
+"
+      end
+
+      attribute 132243 "OFTEN"
+	public type class_ref 131731 // Occurrences
+	cpp_decl ""
+	java_decl "  ${@}${name}${value},${comment}"
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	comment "This describes that a word occurs more often than
+both limits of the classifying attribute."
+      end
+    end
+
+    class 131859 "Mails"
+      visibility public 
+      cpp_decl ""
+      java_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      
+      comment "This class is responsible for storing the mails and storing
+for each mail if the mail is spam or if the mail is not spam.
+@author hk
+"
+      classrelation 130451 // spamMails (<unidirectional association>)
+	relation 130451 --->
+	  stereotype "List"
+	  a role_name "spamMails" private
+	    comment "contains all spam mails.
+This is a list in order to implement a multiset like behavior.
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 130451 // spamMails (<unidirectional association>)
+	  b parent class_ref 130195 // Mail
+      end
+
+      classrelation 130579 // nonSpamMails (<unidirectional association>)
+	relation 130579 --->
+	  stereotype "List"
+	  a role_name "nonSpamMails" private
+	    comment "contains all non spam mails.
+"
+	    java "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+"
+	    classrelation_ref 130579 // nonSpamMails (<unidirectional association>)
+	  b parent class_ref 130195 // Mail
+      end
+
+      operation 138259 "Mails"
+	public explicit_return_type ""
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${synchronized}${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This creates a new empty set of mails.
+This is a list in order to implement a multiset like behavior."
+      end
+
+      operation 138387 "getSpamMails"
+	public return_type class_ref 130195 // Mail
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}List<${type}> ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This returns the list of all spam mails. 
+This is an independent view of the spam mails so the copy
+can be modified at will.
+@return an independent view on the spam mails"
+      end
+
+      operation 138515 "getNonSpamMails"
+	public return_type class_ref 130195 // Mail
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}List<${type}> ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This returns the list of all non spam mails.
+This is an independent view of the non spam mails so
+the copy can be modified at will.
+@return an independent view on the non spam mails"
+      end
+
+      operation 138643 "getAllMails"
+	public return_type class_ref 130195 // Mail
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}List<${type}> ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This returns the set of all mails.
+This is an independent view of the mails, so the
+copy can be modified at will.
+@return an independent view on all mails"
+      end
+
+      operation 138771 "getAllWords"
+	public explicit_return_type "Set<String>"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "This returns the set of unique words in all mails.
+@return the set of all unique words"
+      end
+
+      operation 138899 "countWordInSpamMails"
+	public explicit_return_type "int"
+	nparams 1
+	  param in name "word" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the occurrences of the given word in the contents of the spam 
+mails.
+@param word the word to count
+@return the number of occurences of the word in spam mails"
+      end
+
+      operation 139027 "countWordInNonSpamMails"
+	public explicit_return_type "int"
+	nparams 1
+	  param in name "word" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the occurrences of the given word in the contents of 
+non spam mails.
+@param word the word to count
+@return the number of occurrences of the word in non spam mails"
+      end
+
+      operation 139155 "countWordInAllEmails"
+	public explicit_return_type "int"
+	nparams 1
+	  param in name "word" explicit_type "String"
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Counts the occurrences of the word in all words.
+@param word the word to count
+@return the number of occurrences of the word in all 
+mails."
+      end
+
+      operation 139283 "countSpamWords"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the number of words in spam mails.
+@return the number of words in spam mails."
+      end
+
+      operation 139411 "countNonSpamWords"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the number of words in non spam mails.
+@return the number of words in non spam mails"
+      end
+
+      operation 139539 "countAllWords"
+	public explicit_return_type "int"
+	nparams 0
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "counts the number of words in all e-mails.
+Note that this is different from the size of the result of getWords, as
+this counts duplicates, while the set returned by getWords removes 
+duplicates.
+@return the number of words in all emails"
+      end
+
+      operation 139667 "addSpamMail"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "newMail" type class_ref 130195 // Mail
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "Adds a new spam mail to the set of all mails
+@param newMail the new mail to store"
+      end
+
+      operation 139795 "addNonSpamMail"
+	public explicit_return_type "void"
+	nparams 1
+	  param inout name "newMail" type class_ref 130195 // Mail
+	
+	preserve_java_body_indent java_def "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${t0} ${p0}${)}${throws}${staticnl}{
+  ${body}}
+"
+	
+	
+	
+	comment "adds a new non spam mail to the set of all mails
+@param newMail the new mail to store"
+      end
+    end
+  end
+
+  deploymentview 128659 "knowledge"
+    //deployment diagram settings
+    package_name_in_tab default show_context default write_horizontally default auto_label_position default draw_all_relations default shadow default
+    draw_component_as_icon default show_component_req_prov default show_component_rea default show_stereotype_properties default
+    artifact 130963 "Attribute"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 130323 // Attribute
+      end
+    end
+
+    artifact 131091 "AttributeValueTable"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+${definition}"
+      associated_classes
+	class_ref 131603 // AttributeValueTable
+      end
+    end
+
+    artifact 131219 "Mail"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import java.util.Set;
+${definition}"
+      associated_classes
+	class_ref 130195 // Mail
+      end
+    end
+
+    artifact 131347 "Mails"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+import java.util.List;
+import java.util.Set;
+${definition}"
+      associated_classes
+	class_ref 131859 // Mails
+      end
+    end
+
+    artifact 131475 "MailType"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 130067 // MailType
+      end
+    end
+
+    artifact 131603 "Occurrences"
+      stereotype "source"
+      java_src "${comment}
+${package}
+${imports}
+${definition}"
+      associated_classes
+	class_ref 131731 // Occurrences
+      end
+    end
+  end
+end
