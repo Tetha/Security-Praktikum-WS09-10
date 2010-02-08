@@ -1,5 +1,8 @@
 package yaquix.knowledge;
 
+import java.util.Formattable;
+import java.util.Formatter;
+
 /**
  * The attribute contains a word and two limits which classify
  * the relative occurences of a word in an email as rare,
@@ -7,7 +10,7 @@ package yaquix.knowledge;
  * @author hk
  *
  */
-public class Attribute {
+public class Attribute implements Formattable {
 	/**
 	 * the word the attribute cares about.
 	 */
@@ -50,12 +53,8 @@ public class Attribute {
 		return null;
 	}
 	
-	/**
-	 * Formats the output in a way the classifier parser can parse.
-	 * @return a representation of the attribute to parse
-	 */
-	public String formatAsOutput() {
-		// TODO formatAsOutput
-		return null;
+	@Override
+	public void formatTo(Formatter arg0, int arg1, int arg2, int arg3) {
+		// TODO formatTo
 	}
 }

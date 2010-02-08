@@ -1,6 +1,7 @@
 package yaquix.classifier;
 
 import java.util.EnumMap;
+import java.util.Formatter;
 
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.Mail;
@@ -41,9 +42,8 @@ public class Branch implements Classifier {
 	}
 
 	@Override
-	public String formatAsOutput() {
-		// TODO formatAsOutput
-		return null;
+	public void formatTo(Formatter formatter, int flags, int width,
+			int precision) {
+		// TODO formatTo
 	}
-
 }

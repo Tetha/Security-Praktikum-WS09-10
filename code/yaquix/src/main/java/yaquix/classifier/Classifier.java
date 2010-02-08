@@ -1,5 +1,7 @@
 package yaquix.classifier;
 
+import java.util.Formattable;
+
 import yaquix.knowledge.Mail;
 import yaquix.knowledge.MailType;
 
@@ -11,7 +13,7 @@ import yaquix.knowledge.MailType;
  * @author hk
  *
  */
-public interface Classifier {
+public interface Classifier extends Formattable {
 	
 	/**
 	 * Classifies the given mail
@@ -19,11 +21,4 @@ public interface Classifier {
 	 * @return Spam or Not Spam, depending on the tree and the mail
 	 */
 	MailType classify(Mail input);
-	
-	/**
-	 * Turns the Classifier into a string which can be parsed by
-	 * the ClassifierParser.
-	 * @return a parse-able representation of the Classifier
-	 */
-	String formatAsOutput();
 }
