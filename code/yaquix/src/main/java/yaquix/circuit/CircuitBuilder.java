@@ -37,13 +37,76 @@ public class CircuitBuilder {
 	 * is false)/ The key bits must be the first bits of the input
 	 * of each user.
 	 * @param input the circuit to extend
+	 * @param aliceInputSize number of inputbits of alice
+	 * @param bobOnputSize numer of inputbits of bob
 	 * @param owner maps the output to owners.
 	 * @return the modified circuit
 	 */
 	public static Circuit extendWithSeparateOutputs(Circuit input, 
-													boolean[] owner) {
-		// TODO extendWithSeparateOutputs
-		return null;
+													boolean[] owner,
+													int aliceInputSize,
+													int bobInputSize) {
+		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
+
+		int outputSize = owner.length;
+		int aliceKeySize = countAliceBits(owner, outputSize);
+		int aliceXorSeen=0;
+		int bobXorSeen=0;
+		for (int i=0; i<outputSize; i++) {
+			connection.clear();
+			connection.put(i, 0);
+			input=input.extendTopLeft(new Xor(), connection);
+			if (owner[i]) {
+				//alice-bit
+				shuffleMap.put(outputSize-i-1, aliceXorSeen);
+				aliceXorSeen++;
+			} else {
+				//bob-bit
+				shuffleMap.put(outputSize-i-1, bobXorSeen+aliceInputSize+aliceKeySize);
+				bobXorSeen++;
+			}
+		}
+		for (int k=0; k<aliceInputSize; k++) {
+			shuffleMap.put(k,k+aliceXorSeen);
+		}
+		for (int l=0; l<bobInputSize; l++) {
+			shuffleMap.put(aliceInputSize+l, aliceXorSeen+bobXorSeen+aliceInputSize+l);
+		}
+		int monsterLength=aliceXorSeen+aliceInputSize+bobXorSeen+bobInputSize;
+		Shuffle shuffle=new Shuffle(monsterLength, shuffleMap);
+		connection.clear();
+		for (int i=0; i<monsterLength; i++) {
+			connection.put(i, i);
+		}
+		input=shuffle.extendTopLeft(input, connection);
+		
+		shuffleMap.clear();
+		connection.clear();
+		for (int i=0; i<outputSize; i++) {
+			shuffleMap.put(i, outputSize-i-1);
+			connection.put(i,i);
+		}
+		
+		shuffle=new Shuffle(outputSize, shuffleMap);
+		input=shuffle.extendTopLeft(input, connection);
+		return input;
+	}
+
+	/**
+	 * @param owner
+	 * @param outputSize
+	 * @param aliceInputSize
+	 * @return
+	 */
+	private static int countAliceBits(boolean[] owner, int outputSize) {
+		int aliceInputSize=0;
+		for (int j=0; j<outputSize; j++){
+			if (owner[j]) {
+				aliceInputSize++;
+			}
+		}
+		return aliceInputSize;
 	}
 	
 	/**
