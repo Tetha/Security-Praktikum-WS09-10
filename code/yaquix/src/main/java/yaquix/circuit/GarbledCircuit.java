@@ -1,6 +1,9 @@
 package yaquix.circuit;
 
-public class GarbledCircuit {
+import java.io.Serializable;
+
+public class GarbledCircuit implements Serializable {
+	private static final long serialVersionUID = -4330491556897226784L;
 
 	/**
 	 * adds an input to the circuit and returns the id of the input gate.
