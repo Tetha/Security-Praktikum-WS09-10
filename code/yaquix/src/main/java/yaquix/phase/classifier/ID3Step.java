@@ -76,7 +76,7 @@ public class ID3Step extends SymmetricPhase {
 		this.localValues = localValues;
 		this.concertedClassifier = concertedClassifier;
 		
-		logger = LoggerFactory.getLogger("phase.classifier");
+		logger = LoggerFactory.getLogger("yaquix.phase.classifier.ID3Step");
 	}
 
 	@Override
