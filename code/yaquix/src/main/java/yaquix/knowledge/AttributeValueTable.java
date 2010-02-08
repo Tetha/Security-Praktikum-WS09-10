@@ -1,6 +1,7 @@
 package yaquix.knowledge;
 
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,8 @@ public class AttributeValueTable {
 	 * constructs a new empty attribute value table
 	 */
 	public AttributeValueTable() {
-		// TODO: constructor
+		spamMails = new LinkedList<Map<Attribute,Occurrences>>();
+		nonSpamMails = new LinkedList<Map<Attribute,Occurrences>>();
 	}
 	
 	/**
@@ -36,7 +38,7 @@ public class AttributeValueTable {
 	 * @param newMail the new mail to add
 	 */
 	public void addSpamMail(Map<Attribute, Occurrences> newMail) {
-		// TODO: addSpamMail
+		spamMails.add(newMail);
 	}
 	
 	/**
@@ -44,7 +46,7 @@ public class AttributeValueTable {
 	 * @param newMail the new mail to add.
 	 */
 	public void addNonSpamMail(Map<Attribute, Occurrences> newMail) {
-		// TODO: addNonSpamMail
+		nonSpamMails.add(newMail);
 	}
 	
 	/**
@@ -52,8 +54,7 @@ public class AttributeValueTable {
 	 * @return the number of spam mails in the table.
 	 */
 	 public int countSpamMails() {
-		 // TODO: countSpamMails
-		 return -1;
+		 return spamMails.size();		 
 	 }
 	 
 	 /**
@@ -61,8 +62,7 @@ public class AttributeValueTable {
 	  * @return the number of non spam mails in the table
 	  */
 	 public int countNonSpamMails() {
-		 // TODO: countNonSpamMails
-		 return -1;
+		 return nonSpamMails.size();
 	 }
 	 
 	 /**
@@ -72,6 +72,20 @@ public class AttributeValueTable {
 	  * @return the new tables, identified by the attribute value
 	  */
 	 public EnumMap<Occurrences, AttributeValueTable> partition(Attribute partitionAttribute) {
-		 return null;
+		 EnumMap<Occurrences, AttributeValueTable> result = 
+			 new EnumMap<Occurrences, AttributeValueTable>(Occurrences.class);
+		 result.put(Occurrences.RARE, new AttributeValueTable());
+		 result.put(Occurrences.MEDIUM, new AttributeValueTable());
+		 result.put(Occurrences.OFTEN, new AttributeValueTable());
+		 
+		 for (Map<Attribute, Occurrences> mail : spamMails) {
+			 result.get(mail.get(partitionAttribute)).addSpamMail(mail);
+		 }
+		 
+		 for (Map<Attribute, Occurrences> mail : nonSpamMails) {
+			 result.get(mail.get(partitionAttribute)).addNonSpamMail(mail);
+		 }
+		 
+		 return result;
 	 }
 }

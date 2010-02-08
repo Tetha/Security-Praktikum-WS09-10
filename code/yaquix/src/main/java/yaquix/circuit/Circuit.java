@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Implements a boolean circuit, the bane of our existance.
+ * Implements a boolean circuit, the bane of our existence.
  * @author hk
  *
  */
@@ -71,10 +71,10 @@ public class Circuit {
 	 * The parameter circuit is added on top of the existing circuit. That means, the
 	 * outputs of the existing circuit are connected to the inputs of the 
 	 * newly added circuit. These connections are controlled via the connection
-	 * parameter: if connection.get(i) = j, then output output number i of the
+	 * parameter: if connection.get(i) = j, then output number i of the
 	 * existing circuit is connected to input number j of the parameter circuit.
 	 * The new circuit is added to the left of the existing circuit. That means,
-	 * whatever inputs of the parameter circuit are not mentioned in the connection
+	 * the inputs of the parameter circuit which are not mentioned in the connection
 	 * relation are added as inputs to the resulting circuit before copying
 	 * all inputs of the current circuit to the resulting circuit and outputs
 	 * of the current algorithm which are not mentioned by the mapping are added 
@@ -135,8 +135,7 @@ public class Circuit {
 	 * @param connection
 	 * @return
 	 */
-	public Circuit extendLeft(Circuit addedCircuit,
-							  Map<Integer, Integer> connection) {
+	public Circuit extendLeft(Circuit addedCircuit) {
 		// TODO extendLeft
 		return null;
 	}

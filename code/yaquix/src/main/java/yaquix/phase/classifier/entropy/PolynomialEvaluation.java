@@ -4,7 +4,7 @@ import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
-import yaquix.polynomial.UnivariantPolynomial;
+import yaquix.polynomial.CoefficientDefinedPolynomial;
 
 /**
  * This phase privately evaluates a given polynomial on the server
@@ -21,7 +21,7 @@ class PolynomialEvaluation extends Phase {
 	 * If the server constructor was called and serverExecute is called,
 	 * this contains the polynomial to evaluate.
 	 */
-	private InputKnowledge<UnivariantPolynomial> serverPolynomial;
+	private InputKnowledge<CoefficientDefinedPolynomial> serverPolynomial;
 	
 	/**
 	 * If the client constructor was called and clientExecute is called,
@@ -45,7 +45,7 @@ class PolynomialEvaluation extends Phase {
 	 * evaluate.
 	 */
 	public PolynomialEvaluation(
-			InputKnowledge<UnivariantPolynomial> serverPolynomial) {
+			InputKnowledge<CoefficientDefinedPolynomial> serverPolynomial) {
 		this.serverPolynomial = serverPolynomial;
 	}
 

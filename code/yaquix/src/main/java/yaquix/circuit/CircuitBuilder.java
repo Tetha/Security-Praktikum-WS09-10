@@ -1,5 +1,16 @@
 package yaquix.circuit;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import yaquix.circuit.base.And;
+import yaquix.circuit.base.Constant;
+import yaquix.circuit.base.Input;
+import yaquix.circuit.base.Or;
+import yaquix.circuit.base.Shuffle;
+import yaquix.circuit.base.Split;
+import yaquix.circuit.base.Xor;
+
 /**
  * This class contains methods to construct the various
  * circuits used in the application.
@@ -70,11 +81,70 @@ public class CircuitBuilder {
 	 * This creates a full adder of one bit. The first input of the
 	 * full adder is the carry bit, while the second bit is the
 	 * first bit to add and the third bit is the second bit to add.
+	 * The first bit output is the new carry bit while the second
+	 * bit is the sum of the two bits.
 	 * @return a full adder
 	 */
 	private static Circuit createFullAdder() {
-		// TODO createFullAdder
-		return null;
+		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		Circuit B = new Input();
+		Circuit A = new Input();
+		Circuit fullAdder=B.extendLeft(A);
+		//output: A B
+		fullAdder=fullAdder.extendLeft(new Input());
+		//output C A B
+		//input C A B
+		
+		//splitten der inputs
+		connection.put(0, 0);
+		fullAdder=fullAdder.extendTopLeft(new Split(2), connection);
+		//output C C A B
+		connection.clear();
+		connection.put(2, 0);
+		fullAdder.extendTopLeft(new Split(3), connection);
+		//output A A A C C B
+		connection.clear();
+		connection.put(5, 0);
+		fullAdder.extendTopLeft(new Split(3), connection);
+		//outputs till now: B B B A A A C C
+		
+		connection.clear();
+		connection.put(3, 0);
+		connection.put(2, 1);
+		fullAdder.extendTopLeft(new Xor(), connection);
+		//output: BxA B B A A C C
+		
+		connection.clear();
+		connection.put(1, 0);
+		connection.put(3, 1);
+		fullAdder.extendTopLeft(new And(), connection);
+		//output: B*A BxA B A C C
+		
+		connection.clear();
+		connection.put(2, 0);
+		connection.put(3, 1);
+		fullAdder.extendTopLeft(new Or(), connection);
+		//output: B+A B*A BxA C C
+		
+		connection.clear();
+		connection.put(2, 0);
+		connection.put(3, 1);
+		fullAdder.extendTopLeft(new Xor(), connection);
+		//output: (BxA)xC B+A B*A C
+		
+		connection.clear();
+		connection.put(1, 0);
+		connection.put(3, 1);
+		fullAdder.extendTopLeft(new And(), connection);
+		//output (B+A)*C (BxA)xC B*A
+		
+		connection.clear();
+		connection.put(0, 0);
+		connection.put(2, 1);
+		fullAdder.extendTopLeft(new Or(), connection);
+		//output ((B+A)*C)+(B*A) (BxA)xC
+		
+		return fullAdder;
 	}
 	
 	/**
@@ -86,8 +156,35 @@ public class CircuitBuilder {
 	 * @return a ripple carry adder
 	 */
 	private static Circuit createAdder(int bitwidth) {
-		// TODO createAdder
-		return null;
+		Map<Integer, Integer> connection= new HashMap<Integer, Integer>();
+		connection.put(0, 0);
+		if (bitwidth < 1) {
+			throw new IllegalArgumentException();
+		}
+		Circuit adder=new Constant(false);
+		for (int i=0; i<bitwidth; i++) {
+			adder=adder.extendTopLeft(createFullAdder(), connection);
+		}
+		
+		// shuffleMap establishes a relationship between the alternating 
+		// bits of the input number bits the adder reads and the
+		// continuous sequences of bits of each number the user wants
+		// to input
+		//connection represents the identity
+		Map<Integer, Integer> shuffleMap= new HashMap<Integer, Integer>();
+		shuffleMap.clear();
+		connection.clear();
+		for (int j=0; j<bitwidth; j++) {
+			shuffleMap.put(j, 2*j);
+			shuffleMap.put(bitwidth+j, 2*j+1);
+			connection.put(j, j);
+			connection.put(bitwidth+j, bitwidth+j);
+		}
+		
+		Shuffle shuffle = new Shuffle(2*bitwidth, shuffleMap);
+		adder=shuffle.extendTopLeft(adder, connection);
+		
+		return adder;
 	}
 	
 	/**

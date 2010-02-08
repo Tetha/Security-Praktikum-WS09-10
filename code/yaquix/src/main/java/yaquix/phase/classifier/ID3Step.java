@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.slf4j.LoggerFactory;
+
 import yaquix.Connection;
 import yaquix.classifier.Branch;
 import yaquix.classifier.Classifier;
@@ -73,14 +75,19 @@ public class ID3Step extends SymmetricPhase {
 		this.concertedRemainingAttributes = concertedRemainingAttributes;
 		this.localValues = localValues;
 		this.concertedClassifier = concertedClassifier;
+		
+		logger = LoggerFactory.getLogger("phase.classifier");
 	}
 
 	@Override
 	protected void execute(Connection connection) {
+		logger.info("Entering Phase: ID3 Step");
 		Knowledge<List<MailType>> emailLabels = 
 			new Knowledge<List<MailType>>();
+		emailLabels.put(buildLabelList());
+		
 		Knowledge<MailType> uniqueLabel = new Knowledge<MailType>();
-		// TODO: fill local email labels
+		
 		Phase uniqueDecider = 
 			new AgreedLabelComputation(emailLabels, uniqueLabel);
 		executePhase(connection, uniqueDecider);		
@@ -98,6 +105,7 @@ public class ID3Step extends SymmetricPhase {
 			executePhase(connection, dominationDecider);			
 			Classifier result = new Leaf(dominatingLabel.get());
 			concertedClassifier.put(result);
+			return;
 		}
 		
 		
@@ -112,6 +120,7 @@ public class ID3Step extends SymmetricPhase {
 									concertedRemainingAttributes,
 									bestAttribute);
 		executePhase(connection, maxGainPhase);		
+		
 		
 		Knowledge<List<Attribute>> recursionAttributes = new Knowledge<List<Attribute>>();
 		List<Attribute> unusedAttributes = new LinkedList<Attribute>();
@@ -134,5 +143,24 @@ public class ID3Step extends SymmetricPhase {
 		
 		Classifier result = new Branch(bestAttribute.get(), subTrees);
 		concertedClassifier.put(result);
+		logger.info("Leaving Phase: ID3 Step");
+	}
+
+	/**
+	 * This extracts the email labels from the attribute value table
+	 * and puts them into a list. For now, they are just put in there
+	 * tightly packed from the beginning.
+	 * @return a list of email labels
+	 */
+	private List<MailType> buildLabelList() {
+		List<MailType> localLabels = new LinkedList<MailType>();
+		for (int i = 0; i < localValues.get().countSpamMails(); i++) {
+			localLabels.add(MailType.SPAM);
+		}
+		
+		for (int i = 0; i < localValues.get().countNonSpamMails(); i++) {
+			localLabels.add(MailType.NONSPAM);
+		}
+		return localLabels;
 	}
 }
