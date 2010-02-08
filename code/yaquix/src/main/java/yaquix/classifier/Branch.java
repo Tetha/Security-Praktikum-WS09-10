@@ -6,6 +6,7 @@ import java.util.Formatter;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.Mail;
 import yaquix.knowledge.MailType;
+import yaquix.knowledge.Occurrences;
 
 /**
  * Implements a branch in a decision tree.
@@ -23,14 +24,14 @@ public class Branch implements Classifier {
 	/**
 	 * contains the subtrees to deserialize recursively in.
 	 */
-	private EnumMap<MailType, Classifier> subTrees;
+	private EnumMap<Occurrences, Classifier> subTrees;
 	
 	/**
 	 * Constructs a new decision tree branch.
 	 * @param label the label to store
 	 * @param subTrees the subtrees to use.
 	 */
-	public Branch(Attribute label, EnumMap<MailType, Classifier> subTrees) {
+	public Branch(Attribute label, EnumMap<Occurrences, Classifier> subTrees) {
 		this.label = label;
 		this.subTrees = subTrees;
 	}
