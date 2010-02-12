@@ -1,11 +1,14 @@
 package yaquix;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import yaquix.circuit.GarbledCircuit;
 
@@ -36,6 +39,8 @@ public class Connection {
 	 * the socket providing the connection
 	 */
 	private Socket connection;
+	private ServerSocket serverSocket;
+	private Logger logger;
 	
 	/**
 	 * constructs the server side of the connection.
@@ -46,8 +51,19 @@ public class Connection {
 	 * otherwise, a deadlock occurs if the output streams wait
 	 * for the stream header. 
 	 * @param socket the socket to wait for a connection
+	 * @throws Exception 
 	 */
-	public Connection(ServerSocket socket) {
+	public Connection(ServerSocket socket) throws IOException {
+		logger.info("initializing serverside connection");
+		serverSocket = socket;		
+		
+		logger.info("connection: connecting client");
+		connection = socket.accept();
+		logger.info("client connected");
+		
+		logger.info("setting streams");
+		toRemote= new ObjectOutputStream(connection.getOutputStream());
+		fromRemote = new ObjectInputStream(connection.getInputStream());
 	}
 	
 	
@@ -55,26 +71,38 @@ public class Connection {
 	 * constructs the client side of the connection.
 	 * 
 	 * @param socket
+	 * @throws Exception 
 	 */
-	public Connection(Socket socket) {
+	public Connection(Socket socket) throws IOException {
+			logger.info("initializing clientside connection");
+
+			connection = socket;
+			
+			logger.info("setting streams");
+			toRemote = new ObjectOutputStream(connection.getOutputStream());
+			fromRemote= new ObjectInputStream(connection.getInputStream());
 	}
 	
 	/**
 	 * sends an integer to the other side. According to
 	 * the prototype, flushing is crucial.
 	 * @param localInteger the integer to send
+	 * @throws IOException 
 	 */
-	public void sendInteger(int localInteger) {
-		// TODO sendInt
+	public void sendInteger(int localInteger) throws IOException {
+		logger.info("connection: sending integer ");
+		toRemote.writeInt(localInteger);
+		toRemote.flush();
 	}
 	
 	/**
 	 * receives an integer from the other side.
 	 * @return the integer received
+	 * @throws IOException 
 	 */
-	public int receiveInteger() {
-		// TODO receiveInt
-		return -1;
+	public int receiveInteger() throws IOException {
+		logger.info("connection: receiving integer");
+		return fromRemote.readInt();
 	}
 	
 	/**
@@ -82,35 +110,47 @@ public class Connection {
 	 * to the prototype, flushing is crucial.
 	 * @param localBitstrings the bitstrings to send
 	 */
-	public void sendListOfBitStrings(List<boolean[]> localBitstrings) {
-		// TODO sendListOfBitStrings
+	public void sendListOfBitStrings(List<boolean[]> localBitstrings) throws IOException{
+		logger.info("connection: sending list of bitstrings ");
+		toRemote.writeObject(localBitstrings);
+		toRemote.flush();
 	}
 	
 	/**
 	 * Receives a list of bitstrings from the other side.
 	 * @return the bitstrings received.
+	 * @throws Exception 
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	public List<boolean[]> receiveListOfBitStrings() {
-		// TODO receiveListOfBitStrings
-		return null;
+	public List<boolean[]> receiveListOfBitStrings() throws IOException, ClassNotFoundException {
+		logger.info("connection: receiving list of bitstrings ");
+		
+		return (List<boolean[]>) fromRemote.readObject();
 	}
 	
 	/**
 	 * sends a list of integers to the other side. According
 	 * to the prototype, flushing is crucial.
 	 * @param localIntegers the integers to send
+	 * @throws IOException 
 	 */
-	public void sendIntegers(int[] localIntegers) {
-		// TODO sendInts
+	public void sendIntegers(int[] localIntegers) throws IOException {
+		logger.info("connection: sending list of integers ");
+		toRemote.writeObject(localIntegers);
+		toRemote.flush();
 	}
+
 	
 	/**
 	 * receives a list of integers from the other side
 	 * @return the received integers.
+	 * @throws Exception 
+	 * @throws IOException 
 	 */
-	public int[] receiveIntegers() {
-		// TODO receiveIntegers
-		return null;
+	public int[] receiveIntegers() throws IOException, ClassNotFoundException {
+		logger.info("connection: receiving list of integers ");
+		return (int[]) fromRemote.readObject();
 	}
 	
 	/**
@@ -122,10 +162,27 @@ public class Connection {
 	 * 
 	 * @param localWordlist the local word list
 	 * @return the remote word list
+	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public List<String> exchangeWordlist(List<String> localWordlist) {
-		// TODO exchangeWordlist
-		return null;
+	public List<String> exchangeWordlist(List<String> localWordlist)
+										throws IOException, ClassNotFoundException {
+		logger.info("connection: exchanging wordlists " + localWordlist.toString());
+		if(isServer){
+			logger.info("connection: sending wordlist");
+			toRemote.writeObject(localWordlist);
+			toRemote.flush();
+			logger.info("connection: receiving wordlist");
+			return (List<String>) fromRemote.readObject();
+		} else {
+			logger.info("connection: receiving wordlist");
+			List<String> receivedWordlist = (List<String>) fromRemote.readObject();
+			logger.info("connection: sending wordlist");
+			toRemote.writeObject(localWordlist);
+			toRemote.flush();
+			
+			return receivedWordlist;
+		}
 	}
 	
 	/**
@@ -137,51 +194,84 @@ public class Connection {
 	 * 
 	 * @param localLimits the local limits
 	 * @return the remote limits
+	 * @throws Exception 
+	 * @throws IOException 
 	 */	
-	public Map<String, Double> exchangeLimits(Map<String, Double> localLimits) {
-		// TODO exchangeLimits
-		return null;
+	public Map<String, Double> exchangeLimits(Map<String, Double> localLimits) 
+										throws IOException, ClassNotFoundException {
+		logger.info("connection: exchanging limits");
+		if(isServer){
+			logger.info("connection: sending limit");
+			toRemote.writeObject(localLimits);
+			toRemote.flush();
+			
+			logger.info("connection: receiving limit");
+			return (Map<String, Double>) fromRemote.readObject();
+		} else {
+			logger.info("connection: receiving limit");
+			Map<String, Double> receivedLimits = (Map<String, Double>) fromRemote.readObject();
+
+			logger.info("connection: sending limit");
+			toRemote.writeObject(localLimits);
+			toRemote.flush();
+			
+			return receivedLimits;
+		}
 	}
 	
 	/**
 	 * Sends a garbled circuit to the other side. According to the
 	 * prototype, flushing is crucial. 
 	 * @param localCircuit the circuit to transmit
+	 * @throws IOException 
 	 */
-	public void sendGarbledCircuit(GarbledCircuit localCircuit) {
-		// TODO sendGarbledCircuit
+	public void sendGarbledCircuit(GarbledCircuit localCircuit) throws IOException {
+		logger.info("connection: sending garbled circuit");
+
+		toRemote.writeObject(localCircuit);
+		toRemote.flush();
 	}
 	
 	/**
 	 * receives a sent garbled circuit.
 	 * @return the received garbled circuit
+	 * @throws Exception 
+	 * @throws IOException 
 	 */
-	public GarbledCircuit receiveGarbledCircuit() {
-		// TODO receiveGarbledCircuit
-		return null;
+	public GarbledCircuit receiveGarbledCircuit() throws IOException, ClassNotFoundException {
+		logger.info("connection: receiving garbled circuit");
+		return (GarbledCircuit) fromRemote.readObject();
 	}
 	
 	/**
 	 * sends a bitstring to the other side. According
 	 * to the prototype, flushing is crucial.
 	 * @param localBitstring the local bitstring
+	 * @throws Exception 
 	 */
-	public void sendBitstring(boolean[] localBitstring) {
-		//TODO sendBitstring
+	public void sendBitstring(boolean[] localBitstring) throws IOException {
+		logger.info("connection: sending bitstring");
+		toRemote.writeObject(localBitstring);
+		toRemote.flush();
 	}
 	
 	/**
 	 * receives a sent bitstring
 	 * @return the remote bistring
+	 * @throws Exception 
+	 * @throws IOException 
 	 */
-	public boolean[] receiveBitstring() {
-		//TODO receiveBitstring
-		return null;
+	public boolean[] receiveBitstring() throws IOException, ClassNotFoundException {
+		logger.info("connection: receiving bitstring");
+		return (boolean[]) fromRemote.readObject();
 	}
 	
 	/**
 	 * closes the connection.
+	 * @throws Exception 
 	 */
-	public void close() {
+	public void close() throws IOException {
+		if(isServer) serverSocket.close();
+		connection.close();
 	}
 }
