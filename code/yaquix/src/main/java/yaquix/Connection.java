@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Iterator;
+import java.security.Key;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -273,5 +274,26 @@ public class Connection {
 	public void close() throws IOException {
 		if(isServer) serverSocket.close();
 		connection.close();
+	}
+
+
+	/**
+	 * sends a key to the other side. According to the
+	 * prototype, flushing is crucial.
+	 * @param publicKey
+	 */
+	public void sendKey(Key publicKey) {
+		// TODO sendKey
+		
+	}
+
+
+	/**
+	 * receives the sent key.
+	 * @return
+	 */
+	public Key receiveKey() {
+		// TODO receiveKey
+		return null;
 	}
 }
