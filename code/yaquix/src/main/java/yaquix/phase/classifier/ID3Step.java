@@ -50,6 +50,7 @@ public class ID3Step extends SymmetricPhase {
 	 */
 	private InputKnowledge<AttributeValueTable> localValues;
 	
+	private InputKnowledge<Integer> remoteMailCountLimit;
 	/**
 	 * requires the resulting classifier to be set.
 	 */
@@ -70,10 +71,12 @@ public class ID3Step extends SymmetricPhase {
 	public ID3Step(
 			InputKnowledge<List<Attribute>> concertedRemainingAttributes,
 			InputKnowledge<AttributeValueTable> localValues,
+			InputKnowledge<Integer> remoteMailCountLimit,
 			OutputKnowledge<Classifier> concertedClassifier,
 			Random randomSource) {
 		this.concertedRemainingAttributes = concertedRemainingAttributes;
 		this.localValues = localValues;
+		this.remoteMailCountLimit = remoteMailCountLimit;
 		this.concertedClassifier = concertedClassifier;
 		
 		logger = LoggerFactory.getLogger("yaquix.phase.classifier.ID3Step");
@@ -101,7 +104,7 @@ public class ID3Step extends SymmetricPhase {
 		if (concertedRemainingAttributes.get().isEmpty()) {
 			Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
 			Phase dominationDecider = 
-				new DominatingOutputComputation(emailLabels, dominatingLabel);
+				new DominatingOutputComputation(emailLabels, remoteMailCountLimit, dominatingLabel);
 			executePhase(connection, dominationDecider);			
 			Classifier result = new Leaf(dominatingLabel.get());
 			concertedClassifier.put(result);
@@ -136,7 +139,7 @@ public class ID3Step extends SymmetricPhase {
 			values.put(localValues.get().partition(bestAttribute.get()).get(o));
 
 			Phase recursion = new ID3Step(recursionAttributes, values, 
-										  subResult, randomSource);
+										  remoteMailCountLimit, subResult, randomSource);
 			executePhase(connection, recursion);			
 			subTrees.put(o, subResult.get());
 		}
