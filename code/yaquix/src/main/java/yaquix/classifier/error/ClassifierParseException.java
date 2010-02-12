@@ -8,7 +8,7 @@ package yaquix.classifier.error;
  */
 public class ClassifierParseException extends IllegalArgumentException {
 	private static final long serialVersionUID = 4470584941747234698L;
-	
+
 	/**
 	 * Contains the line the error occured.
 	 */
@@ -17,7 +17,7 @@ public class ClassifierParseException extends IllegalArgumentException {
 	 * Contains the column the error occured.
 	 */
 	private int column;
-	
+
 	/**
 	 * Constructs a new Parse exception with the given input position.
 	 * @param line the line where the error occurred
@@ -25,16 +25,16 @@ public class ClassifierParseException extends IllegalArgumentException {
 	 * @param reason what went wrong.
 	 */
 	public ClassifierParseException(int line, int column, String reason) {
-		// TODO: constructor
+		super(reason);
+		this.line = line;
+		this.column = column;
 	}
-	
+
 	public int getLine() {
-		// TODO getLine;
-		return -1;
+		return line;
 	}
-	
+
 	public int getColumn() {
-		// TODO getColumn
-		return -1;
+		return column;
 	}
 }

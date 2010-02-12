@@ -18,7 +18,8 @@ public class TooManySubtreesException extends ClassifierParseException {
 	 * @param subTrees the sub trees we found
 	 */
 	public TooManySubtreesException(int line, int column, int requiredSubTrees, Classifier[] subTrees) {
-		super(line, column, "");
-		// TODO: constructor
+		super(line, column, "error: there are too many subtrees" +
+							"\n \t --> max allowed: " + requiredSubTrees + ", found as many as: " + subTrees.length +
+							"\n \t --> found: " + subTrees.toString());
 	}
 }

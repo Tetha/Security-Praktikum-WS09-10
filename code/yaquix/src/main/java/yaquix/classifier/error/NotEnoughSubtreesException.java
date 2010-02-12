@@ -16,7 +16,8 @@ public class NotEnoughSubtreesException extends ClassifierParseException {
 	 * @param subTrees the subtrees we actually found
 	 */
 	public NotEnoughSubtreesException(int line, int column, int requiredNumberOfSubtrees, Classifier[] subTrees) {
-		super(line, column, "");
-		// TODO: constructor
+		super(line, column, "error: there are not enough subtrees" +
+							"\n \t --> min required: " + requiredNumberOfSubtrees + ", found only: " + subTrees.length +
+							"\n \t --> found: " + subTrees.toString());
 	}
 }

@@ -15,7 +15,8 @@ public class SyntaxException extends ClassifierParseException {
 	 * @param expectedPrefixes the number of prefixes we'd expect to be here
 	 */
 	public SyntaxException(int line, int column, String foundPrefix, String[] expectedPrefixes) {
-		super(line, column, "");
-		// TODO: constructor
+		super(line, column, "error: syntax-error, meh...this was just not supposed to happen, not now" +
+							"\n \t --> found prefix: " + foundPrefix +
+				", there were " + expectedPrefixes.length + " different prefixes that were good, none of them matched though");
 	}
 }

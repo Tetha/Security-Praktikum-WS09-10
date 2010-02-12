@@ -16,7 +16,7 @@ public class LimitsUnsortedException extends ClassifierParseException {
 	 * @param limti2 the second limit that caused an error
 	 */
 	public LimitsUnsortedException(int line, int column, double limit1, double limit2) {
-		super(line, column, "");
-		// TODO: constructor
+		super(line, column, "error: limits are not sorted, when they should be " +
+							"\n \t --> 1st limit: " + limit1 + ", 2nd limit" + limit2);
 	}
 }
