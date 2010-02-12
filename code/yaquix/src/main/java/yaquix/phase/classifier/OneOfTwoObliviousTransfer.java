@@ -1,5 +1,6 @@
 package yaquix.phase.classifier;
 
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -24,7 +25,7 @@ import yaquix.phase.Phase;
 
 /**
  * This phase implements 1-out-of-2 oblivious transfer.
- * 
+ *
  * We implement the 1-out-of-2 oblivious transfer using RSA.
  * Compare to the specification for the detailed algorithm to
  * implement, compare with java.crypto for an RSA implementation.
@@ -38,33 +39,33 @@ class OneOfTwoObliviousTransfer extends Phase {
 	 * messages to select one from.
 	 */
 	private InputKnowledge<int[]> serverMessages;
-	
+
 	/**
 	 * If the client side constructor was used and clientExecute
 	 * is called, this knowledge will be examined for the
 	 * bit the client wants to select.
 	 */
 	private InputKnowledge<Boolean> clientBit;
-	
+
 	/**
 	 * If the client side constructor was used and clientExecute
 	 * is called, this knowledge requires the received
 	 * message to be put.
 	 */
 	private OutputKnowledge<Integer> clientReceivedMessage;
-	
+
 	/**
 	 * contains a source of random bits.
 	 */
 	private SecureRandom randomSource;
-	
+
 	/**
 	 * contains the logger for this phase
 	 */
 	private Logger logger;
-	
+
 	/**
-	 * This is the server side constructor. It sets the two messages to 
+	 * This is the server side constructor. It sets the two messages to
 	 * have the client select from. Note that if you use this constructor,
 	 * you MUST call serverExecute or undefined behavior happens.
 	 * @param serverMessages contains the two messages to select one from.
@@ -73,7 +74,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 		this.serverMessages = serverMessages;
 		this.randomSource = randomSource;
 		logger = LoggerFactory.getLogger("yaquix.phase.classifier.OneOfTwoObliviousTransfer");
-		
+
 	}
 
 	/**
@@ -105,7 +106,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 		}
 		return cipher;
 	}
-	
+
 	private static final byte[] intToByteArray(int value) {
         return new byte[] {
                 (byte)(value >>> 24),
@@ -114,7 +115,7 @@ class OneOfTwoObliviousTransfer extends Phase {
                 (byte)value};
 	}
 
-	
+
 	private static final int byteArrayToInt(byte [] b) {
         return (b[0] << 24)
                 + ((b[1] & 0xFF) << 16)
@@ -123,9 +124,9 @@ class OneOfTwoObliviousTransfer extends Phase {
 	}
 
 	@Override
-	public void clientExecute(Connection connection) {
+	public void clientExecute(Connection connection) throws IOException {
 		logger.info("Entering Phase: 1-2 OT");
-		Key publicKey = connection.receiveKey();		
+		Key publicKey = connection.receiveKey();
 		int x0 = connection.receiveInteger();
 		int x1 = connection.receiveInteger();
 		int k = randomSource.nextInt();
@@ -137,7 +138,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 		} catch (InvalidKeyException e) {
 			throw new RuntimeException(e); // TODO exception
 		}
-			
+
 		try {
 			kPrime = byteArrayToInt(cipher.doFinal(intToByteArray(k)));
 		} catch(BadPaddingException e) {
@@ -145,7 +146,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 		} catch (IllegalBlockSizeException e) {
 			throw new RuntimeException(e); // TODO exception
 		}
-		
+
 		int v;
 		if (clientBit.get()) {
 			v = x1;
@@ -156,13 +157,13 @@ class OneOfTwoObliviousTransfer extends Phase {
 		// N has 1024 bits now, which means that N is around 2^1000,
 		// which is more than java integers can ever handle, so the modulo
 		// should not matter.
-		v = (v + kPrime); 
-		
+		v = (v + kPrime);
+
 		connection.sendInteger(v);
-		
+
 		int l0 = connection.receiveInteger();
 		int l1 = connection.receiveInteger();
-		
+
 		int result;
 		if (clientBit.get()) {
 			result = l0 - kPrime;
@@ -174,7 +175,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	}
 
 	@Override
-	public void serverExecute(Connection connection) {
+	public void serverExecute(Connection connection) throws IOException {
 		logger.info("Entering Phase: 1-2 OT");
 		KeyPairGenerator keyGenerator;
 		try {
@@ -184,14 +185,14 @@ class OneOfTwoObliviousTransfer extends Phase {
 		}
 		keyGenerator.initialize(1024, randomSource);
 		KeyPair keys = keyGenerator.generateKeyPair();
-		
+
 		int m0 = serverMessages.get()[0];
 		int m1 = serverMessages.get()[1];
 		Key privateKey = keys.getPrivate();
 		Key publicKey = keys.getPublic();
 		int x0 = randomSource.nextInt();
 		int x1 = randomSource.nextInt();
-		
+
 		Cipher cipher = getCipher();
 		Key key;
 		try {
@@ -199,11 +200,11 @@ class OneOfTwoObliviousTransfer extends Phase {
 		} catch (InvalidKeyException exc) {
 			throw new RuntimeException(exc); // TODO exception
 		}
-		
+
 		connection.sendKey(publicKey);
 		connection.sendInteger(x0);
 		connection.sendInteger(x1);
-		
+
 		int v = connection.receiveInteger();
 		int k0;
 		int k1;
@@ -215,7 +216,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 		} catch (BadPaddingException exc) {
 			throw new RuntimeException(exc);
 		}
-		
+
 		connection.sendInteger(m0+k0);
 		connection.sendInteger(m1+k1);
 		logger.info("Leaving Phase: 1-2 OT");

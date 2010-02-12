@@ -1,5 +1,7 @@
 package yaquix.phase;
 
+import java.io.IOException;
+
 import yaquix.Connection;
 
 /**
@@ -23,21 +25,22 @@ public abstract class SymmetricPhase extends Phase {
 	 * This executes the symmetric operations of the phase. Note
 	 * that inside the symmetric execution, you must not use send
 	 * and receive-methods, but exchange-methods or no communication
-	 * at all, as send/receive is intrinsically asymmetric. (if 
+	 * at all, as send/receive is intrinsically asymmetric. (if
 	 * the server sends, the client must receive, otherwise we
 	 * have a deadlock.)
 	 * @param connection the connection to communicate with the other part
+	 * @throws IOException
 	 */
-	protected abstract void execute(Connection connection);
-	
+	protected abstract void execute(Connection connection) throws IOException;
+
 	@Override
-	public void serverExecute(Connection connection) {
+	public void serverExecute(Connection connection) throws IOException {
 		wasServer = true;
 		execute(connection);
 	}
-	
+
 	@Override
-	public void clientExecute(Connection connection) {
+	public void clientExecute(Connection connection) throws IOException {
 		wasServer = false;
 		execute(connection);
 	}
@@ -46,8 +49,9 @@ public abstract class SymmetricPhase extends Phase {
 	 * calls the appropriate execution method on the phase.
 	 * @param connection the connection to pass to the sub phase
 	 * @param subPhase the phase to execute
+	 * @throws IOException
 	 */
-	protected void executePhase(Connection connection, Phase subPhase) {
+	protected void executePhase(Connection connection, Phase subPhase) throws IOException {
 		if (wasServer) {
 			subPhase.serverExecute(connection);
 		} else {

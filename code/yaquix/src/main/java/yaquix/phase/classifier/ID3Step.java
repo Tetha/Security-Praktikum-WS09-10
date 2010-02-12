@@ -1,5 +1,6 @@
 package yaquix.phase.classifier;
 
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +25,7 @@ import yaquix.phase.classifier.entropy.EntropySharesComputation;
 
 /**
  * This class executes a single step in the ID3 algorithm.
- * 
+ *
  * It at first checks if the output is unique using a subphase,
  * then it checks if the remaing attributes are empty, and if this
  * is the case, applies another sub phase to compute the dominating
@@ -44,23 +45,23 @@ public class ID3Step extends SymmetricPhase {
 	 * decision tree.
 	 */
 	private InputKnowledge<List<Attribute>> concertedRemainingAttributes;
-	
+
 	/**
 	 * contains the values of mails for these attributes.
 	 */
 	private InputKnowledge<AttributeValueTable> localValues;
-	
+
 	private InputKnowledge<Integer> remoteMailCountLimit;
 	/**
 	 * requires the resulting classifier to be set.
 	 */
 	private OutputKnowledge<Classifier> concertedClassifier;
-	
+
 	/**
 	 * contains a source of randomness.
 	 */
 	private Random randomSource;
-	
+
 	/**
 	 * constructs a new ID3 step computation phase.
 	 * @param concertedRemainingAttributes the remaining attributes
@@ -78,72 +79,72 @@ public class ID3Step extends SymmetricPhase {
 		this.localValues = localValues;
 		this.remoteMailCountLimit = remoteMailCountLimit;
 		this.concertedClassifier = concertedClassifier;
-		
+
 		logger = LoggerFactory.getLogger("yaquix.phase.classifier.ID3Step");
 	}
 
 	@Override
-	protected void execute(Connection connection) {
+	protected void execute(Connection connection) throws IOException {
 		logger.info("Entering Phase: ID3 Step");
-		Knowledge<List<MailType>> emailLabels = 
+		Knowledge<List<MailType>> emailLabels =
 			new Knowledge<List<MailType>>();
 		emailLabels.put(buildLabelList());
-		
+
 		Knowledge<MailType> uniqueLabel = new Knowledge<MailType>();
-		
-		Phase uniqueDecider = 
+
+		Phase uniqueDecider =
 			new AgreedLabelComputation(emailLabels, uniqueLabel);
-		executePhase(connection, uniqueDecider);		
+		executePhase(connection, uniqueDecider);
 		if (uniqueLabel.get() != null) {
 			Classifier result = new Leaf(uniqueLabel.get());
 			concertedClassifier.put(result);
 			return;
 		}
-		
-		
+
+
 		if (concertedRemainingAttributes.get().isEmpty()) {
 			Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
-			Phase dominationDecider = 
+			Phase dominationDecider =
 				new DominatingOutputComputation(emailLabels, remoteMailCountLimit, dominatingLabel);
-			executePhase(connection, dominationDecider);			
+			executePhase(connection, dominationDecider);
 			Classifier result = new Leaf(dominatingLabel.get());
 			concertedClassifier.put(result);
 			return;
 		}
-		
-		
+
+
 		Knowledge<int[]> entropyShares = new Knowledge<int[]>();
 		Phase entropyShareComputation =
-			new EntropySharesComputation(localValues, 
+			new EntropySharesComputation(localValues,
 					concertedRemainingAttributes, entropyShares, randomSource);
-		executePhase(connection, entropyShareComputation);		
-		
+		executePhase(connection, entropyShareComputation);
+
 		Knowledge<Attribute> bestAttribute = new Knowledge<Attribute>();
-		Phase maxGainPhase = new MaxGainComputation(entropyShares, 
+		Phase maxGainPhase = new MaxGainComputation(entropyShares,
 									concertedRemainingAttributes,
 									bestAttribute);
-		executePhase(connection, maxGainPhase);		
-		
-		
+		executePhase(connection, maxGainPhase);
+
+
 		Knowledge<List<Attribute>> recursionAttributes = new Knowledge<List<Attribute>>();
 		List<Attribute> unusedAttributes = new LinkedList<Attribute>();
 		unusedAttributes.addAll(concertedRemainingAttributes.get());
 		unusedAttributes.remove(bestAttribute.get());
 		recursionAttributes.put(unusedAttributes);
-		
-		EnumMap<Occurrences, Classifier> subTrees = 
+
+		EnumMap<Occurrences, Classifier> subTrees =
 			new EnumMap<Occurrences, Classifier>(Occurrences.class);
 		Knowledge<AttributeValueTable> values = new Knowledge<AttributeValueTable>();
 		Knowledge<Classifier> subResult = new Knowledge<Classifier>();
 		for (Occurrences o : Occurrences.values()) {
 			values.put(localValues.get().partition(bestAttribute.get()).get(o));
 
-			Phase recursion = new ID3Step(recursionAttributes, values, 
+			Phase recursion = new ID3Step(recursionAttributes, values,
 										  remoteMailCountLimit, subResult, randomSource);
-			executePhase(connection, recursion);			
+			executePhase(connection, recursion);
 			subTrees.put(o, subResult.get());
 		}
-		
+
 		Classifier result = new Branch(bestAttribute.get(), subTrees);
 		concertedClassifier.put(result);
 		logger.info("Leaving Phase: ID3 Step");
@@ -160,7 +161,7 @@ public class ID3Step extends SymmetricPhase {
 		for (int i = 0; i < localValues.get().countSpamMails(); i++) {
 			localLabels.add(MailType.SPAM);
 		}
-		
+
 		for (int i = 0; i < localValues.get().countNonSpamMails(); i++) {
 			localLabels.add(MailType.NONSPAM);
 		}

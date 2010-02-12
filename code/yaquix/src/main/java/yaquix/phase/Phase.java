@@ -1,12 +1,14 @@
 package yaquix.phase;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 
 import yaquix.Connection;
 
 /**
  * A phase is the main design idea in this application.
- * 
+ *
  * A phase syncronizes the actions on the client and the
  * server, because by construction, the server and the
  * client will execute the same phase at the same time.
@@ -17,7 +19,7 @@ import yaquix.Connection;
  * that is, if one calls sendFoo on the connection, the other
  * must call receiveFoo on the connection, otherwise the
  * application will hang.
- * 
+ *
  * @author hk
  *
  */
@@ -28,18 +30,20 @@ public abstract class Phase {
 	protected Logger logger;
 
 	/**
-	 * This implements the actions the server side has to perform 
+	 * This implements the actions the server side has to perform
 	 * in order to complete the desired goal of the phase.
 	 * @param connection the connection used to communicate to
 	 * the other part
+	 * @throws IOException
 	 */
-	public abstract void serverExecute(Connection connection);
-	
+	public abstract void serverExecute(Connection connection) throws IOException;
+
 	/**
 	 * This implements the actions the client has to perform
 	 * in order to complete the desired goal of the phase.
 	 * @param connection the connection used to communicate to
 	 *  the other part
+	 * @throws IOException
 	 */
-	public abstract void clientExecute(Connection connection);
+	public abstract void clientExecute(Connection connection) throws IOException;
 }
