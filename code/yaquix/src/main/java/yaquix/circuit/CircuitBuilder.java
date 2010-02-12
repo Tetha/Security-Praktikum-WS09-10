@@ -127,15 +127,24 @@ public class CircuitBuilder {
 	
 	/**
 	 * This constructs the dominating output circuit. Compare to the
-	 * specification for details. We require the inputs for alice to be
-	 * the first emails with the first bit of the label encoding to be
-	 * on even positions (counting from 0) and the second bits of the
-	 * label encoding to be on odd positions (counting from 0). Bobs mail
-	 * encodings follow Alice mail encodings in the same fashion.
-	 * @param mailCount the number of mails to handle
+	 * specification for details.
+	 *  We require the following input structure:
+	 *   - at first, log2(aliceMails) bits in order to encode the number
+	 *     of spam-mails alice has
+	 *   - second, log2(aliceMails) bits in order to encode the number of
+	 *     non-spam-mails alice has
+	 *   - third, log2(bobmails) bits in order to encode the number of
+	 *     spam-mails bob has
+	 *   - fourth, log2(bobmails) bits in order to encode the number of nonspam
+	 *     mails bob has.
+	 * The logarithms must be rounded up if they are not natural numbers.
+	 * The only output bit of the circuit must be 0 if the nonspam mails dominate
+	 * and 1 if the spam mails dominate.
+	 * @param aliceMails the number of mails alice provides at most
+	 * @param bobMail the number of mails bob provides at most.
 	 * @return A circuit which does this
 	 */
-	public static Circuit createDominatingOutputCircuit(int mailCount) {
+	public static Circuit createDominatingOutputCircuit(int aliceMails, int bobMails) {
 		// TODO createDominatingOutputcircuit
 		return null;
 	}
