@@ -72,7 +72,7 @@ public class Attribute implements Formattable {
 	
 	@Override
 	public void formatTo(Formatter arg0, int arg1, int arg2, int arg3) {
-		// TODO formatTo
+		arg0.format(this.toString());
 	}
 	
 	/**

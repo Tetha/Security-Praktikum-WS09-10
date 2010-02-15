@@ -25,15 +25,17 @@ public class Leaf implements Classifier {
 
 	@Override
 	public MailType classify(Mail input) {
-		// TODO classify
-		return null;
+		return label;
 	}
 
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width,
 			int precision) {
-		// TODO formatTo
-		
+		formatter.format(this.toString());
+	}
+	
+	public String toString() {
+		return String.format("Output(%s)", this.label);
 	}
 
 }

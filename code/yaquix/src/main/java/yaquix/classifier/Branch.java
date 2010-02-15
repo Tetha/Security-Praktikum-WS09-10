@@ -3,6 +3,8 @@ package yaquix.classifier;
 import java.util.EnumMap;
 import java.util.Formatter;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Occurs;
+
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.Mail;
 import yaquix.knowledge.MailType;
@@ -38,13 +40,20 @@ public class Branch implements Classifier {
 
 	@Override
 	public MailType classify(Mail input) {
-		// TODO classify
-		return null;
+		Occurrences occ = this.label.classify(input);
+		return subTrees.get(occ).classify(input);
 	}
 
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width,
 			int precision) {
-		// TODO formatTo
+		formatter.format(this.toString());
+	}
+	
+	public String toString() {
+		return String.format("Decide(%s,%s,%s,%s)",
+				label, subTrees.get(Occurrences.RARE),
+				subTrees.get(Occurrences.MEDIUM),
+				subTrees.get(Occurrences.OFTEN));
 	}
 }
