@@ -6,9 +6,11 @@ import java.util.Map;
 import yaquix.circuit.base.And;
 import yaquix.circuit.base.Constant;
 import yaquix.circuit.base.Input;
+import yaquix.circuit.base.Negation;
 import yaquix.circuit.base.Or;
 import yaquix.circuit.base.Shuffle;
 import yaquix.circuit.base.Split;
+import yaquix.circuit.base.Stop;
 import yaquix.circuit.base.Xor;
 
 /**
@@ -75,21 +77,15 @@ public class CircuitBuilder {
 		}
 		int monsterLength=aliceXorSeen+aliceInputSize+bobXorSeen+bobInputSize;
 		Shuffle shuffle=new Shuffle(monsterLength, shuffleMap);
-		connection.clear();
-		for (int i=0; i<monsterLength; i++) {
-			connection.put(i, i);
-		}
-		input=shuffle.extendTopLeft(input, connection);
+		input=shuffle.extendTopLeft(input, createIdentityMapping(monsterLength));
 		
 		shuffleMap.clear();
-		connection.clear();
 		for (int i=0; i<outputSize; i++) {
 			shuffleMap.put(i, outputSize-i-1);
-			connection.put(i,i);
 		}
 		
 		shuffle=new Shuffle(outputSize, shuffleMap);
-		input=shuffle.extendTopLeft(input, connection);
+		input=shuffle.extendTopLeft(input, createIdentityMapping(outputSize));
 		return input;
 	}
 
@@ -124,6 +120,184 @@ public class CircuitBuilder {
 		// TODO extendWithShareSeparation
 		return null;
 	}
+
+	/**
+	 * This is the state transition network for the comparer automaton
+	 * computing a <=> b.
+	 * The inputs are:
+	 *  - the input with index 0 is the bit of a
+	 *  - the input with index 1 is the bit of b
+	 *  - the input with index 2 is the first bit of the
+	 *    current state (s0 in the specification)
+	 *  - the input with index 3 is the second bit of the
+	 *    current state (s1 in the specification)
+	 *    
+	 * The outputs are:
+	 *  - the output with index 0 is the first bit
+	 *    of the encoding of the next state (s0' in the
+	 *    specification)
+	 *  - the output with index 1 is the second bit
+	 *    of the encoding of the next state (s1' in the
+	 *    specification)
+	 *    
+	 * @return a circuit to compute the state transition of the
+	 *         comparision automaton.
+	 */
+	private static Circuit createComparerStateTransition() {
+		Circuit result;
+		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		// Outputs: 
+		result = new Split(2);
+		
+		// Inputs: s1
+		// Outputs: s1 s1
+		
+		result = result.extendLeft(new Split(2));
+	
+		// Inputs s0 s1
+		// Outputs: s0 s0 s1 s1
+		
+		result = result.extendLeft(new Split(2));
+		
+		// Inputs: b s0 s1
+		// Outputs: b b s0 s0 s1 s1
+		
+		result = result.extendLeft(new Split(2));
+		
+		// Inputs: a b s0 s1
+		// Outputs: a a b b s0 s0 s1 s1
+		
+		connection.clear();
+		connection.put(6, 0);
+		result = result.extendTopLeft(new Negation(), connection);
+		
+		// Outputs: -s1 a a b b s0 s0 s1
+		
+		connection.clear();
+		connection.put(5, 0);
+		result = result.extendTopLeft(new Negation(), connection);
+		
+		// Outputs: -s0 -s1 a a b b s0 s1
+		
+		connection.clear();
+		connection.put(2, 0);
+		result = result.extendTopLeft(new Negation(), connection);
+		
+		// Outputs: -a -s0 -s1 a b b s0 s1
+		
+		connection.clear();
+		connection.put(1, 0);
+		connection.put(2, 1);
+		result = result.extendTopLeft(new And(), connection);
+		
+		// Outputs: (-s0)*(-s1) -a a b b s0 s1
+		
+		connection.clear();
+		connection.put(1, 0);
+		connection.put(3, 1);
+		result = result.extendTopLeft(new And(), connection);
+		
+		// Outputs: (-a)*b (-s0)*(-s1) a b s0 s1
+		
+		connection.clear();
+		connection.put(0, 0);
+		connection.put(1, 1);
+		result = result.extendTopLeft(new And(), connection);
+		
+		// Outputs: (((-a)*b)*((-s0)*(-s1))) a b s0 s1
+		
+		connection.clear();
+		connection.put(0, 0);
+		connection.put(4, 1);
+		result = result.extendTopLeft(new Or(), connection);
+		
+		// Outputs: ((((-a)*b)*((-s0)*(-s1)))+s1) a b s0
+		
+		connection.clear();
+		connection.put(1, 0);
+		connection.put(2, 1);
+		result = result.extendTopLeft(new Xor(), connection);
+		
+		// Outputs: axb ((((-a)*b)*((-s0)*(-s1)))+s1) s0
+		
+		connection.clear();
+		connection.put(0, 0);
+		connection.put(2, 1);
+		result = result.extendTopLeft(new Or(), connection);
+		
+		// Outputs: (axb)+s0 ((((-a)*b)*((-s0)*(-s1)))+s1)
+		
+		return result;
+	}
+	
+	
+	/**
+	 * creates a circuit that compares two number a, bof equal bitwidth
+	 * and outputs if a < b, a = b, a > b. 
+	 * 
+	 * The first bitWidth inputs are the bits for the first number a with
+	 * bit 0 being the most significant bit and bit bitWidth-1 being the
+	 * least significant bit of a.
+	 * 
+	 * The second bitWidth inputs are the bits for the second number b
+	 * with bit bitWidth being the most significant bit of b and 
+	 * with with 2*bitWidth -1 being the least significant bit of b.
+	 * 
+	 * The first bit of the output must be 0 iff a = b. Thus, if
+	 * a != b, the first bit of the output must be 1. If the first
+	 * bit of the output is 1, then the second bit of the output
+	 * must be 0 iff a > b and it must be 1 iff a < b. If the first 
+	 * bit of the output is 0, the second bit of the output is not
+	 * defined.
+	 * 
+	 * @param bitWidth the bitWidth of the numbers to compare
+	 * @return a circuit to compute the comparision.
+	 */
+	private static Circuit createComparer(int bitWidth) {
+		Circuit result = new Constant(false);
+		result = result.extendLeft(new Constant(false));
+		int inputWidth = 2*bitWidth;
+		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		connection.put(0, 2);
+		connection.put(1, 3);
+		
+		for (int i = 0; i < bitWidth; i++) {
+			result = result.extendTopLeft(createComparerStateTransition(), connection);			
+		}
+		
+		// this reverses the pairs of bits with odd and even index
+		// that is, a1 b1 a2 b2 is reversed into a2 b2 a1 b1
+		Map<Integer, Integer> pairReversalShuffle = new HashMap<Integer, Integer>();
+		for(int i = 0; i < bitWidth-1; i++) {
+			pairReversalShuffle.put(2*i, inputWidth-2*i-1 -1);
+			pairReversalShuffle.put(2*i+1, inputWidth-2*i -1);
+		}
+		Circuit pairReversal = new Shuffle(inputWidth, pairReversalShuffle);
+		result = pairReversal.extendTopLeft(result, createIdentityMapping(inputWidth));		
+		Circuit interleaver = createInterleavingCircuit(inputWidth);
+		result = interleaver.extendTopLeft(result, createIdentityMapping(inputWidth));
+		
+		// output 0 is now the first state bit s0
+		// output 1 is now the second state bit s1
+		// from specification: s0s1 == 00 iff a=b
+		// from specification: s0s1 == 10 iff a>b
+		// from specification: s0s1 == 11 iff a<b
+		
+		return result;
+	}
+
+	/**
+	 * creates a mapping with i -> i forall i in 0 .. bitwidth
+	 * @param bitWidth the width of the identity mapping
+	 * @return the described mapping
+	 */
+	private static Map<Integer, Integer> createIdentityMapping(int bitWidth) {
+		Map<Integer, Integer> identity = new HashMap<Integer, Integer>();
+		for (int i = 0; i < bitWidth; i++) {
+			identity.put(i,i);
+		}
+		return identity;
+	}
 	
 	/**
 	 * This constructs the dominating output circuit. Compare to the
@@ -144,9 +318,44 @@ public class CircuitBuilder {
 	 * @param bobMail the number of mails bob provides at most.
 	 * @return A circuit which does this
 	 */
-	public static Circuit createDominatingOutputCircuit(int aliceMails, int bobMails) {
-		// TODO createDominatingOutputcircuit
-		return null;
+	public static Circuit createDominatingOutputCircuit(int mailCountBound) {
+		int inputSize = 4*mailCountBound;
+		// swap bits from mailCountBound until mailCountBound*2-1 with
+		// bits from mailCountBound*2 until mailCountBound*3-1
+		Map<Integer, Integer> sortByType = new HashMap<Integer, Integer>();
+		for (int i = 0; i < inputSize; i++) {
+			if (0 <= i && i < mailCountBound) {
+				sortByType.put(i,i);
+			} else if (mailCountBound <= i && i < mailCountBound*2) {
+				sortByType.put(i, i+mailCountBound);
+			} else if (mailCountBound * 2 <= i &&  i < mailCountBound * 3) {
+				sortByType.put(i, i-mailCountBound);
+			} else if (3*mailCountBound <= i && i < 4*mailCountBound) {
+				sortByType.put(i,i);
+			}
+		}
+		
+		Map<Integer, Integer> putNonSpamFirst = new HashMap<Integer, Integer>();
+		for (int i = 0; i < inputSize; i++) {
+			if (0 <= i && i < 2*mailCountBound) {
+				putNonSpamFirst.put(i, i+2*mailCountBound);
+			} else {
+				putNonSpamFirst.put(i, i-2*mailCountBound);
+			}
+		}
+		
+		Circuit result = new Shuffle(inputSize, sortByType);
+		result = result.extendTopLeft(new Shuffle(inputSize, putNonSpamFirst),
+								createIdentityMapping(inputSize));
+		
+		Circuit parallelAdders = createAdder(mailCountBound);
+		parallelAdders = parallelAdders.extendLeft(createAdder(mailCountBound));
+		
+		result = result.extendTopLeft(parallelAdders, createIdentityMapping(inputSize));
+		result = result.extendTopLeft(createComparer(mailCountBound), createIdentityMapping(mailCountBound*2));
+		result = result.extendTopLeft(new Stop(), createIdentityMapping(1));
+
+		return result;
 	}
 	
 	/**
@@ -238,25 +447,41 @@ public class CircuitBuilder {
 			adder=adder.extendTopLeft(createFullAdder(), connection);
 		}
 		
-		// shuffleMap establishes a relationship between the alternating 
-		// bits of the input number bits the adder reads and the
-		// continuous sequences of bits of each number the user wants
-		// to input
+
 		//connection represents the identity
-		Map<Integer, Integer> shuffleMap= new HashMap<Integer, Integer>();
-		shuffleMap.clear();
 		connection.clear();
-		for (int j=0; j<bitwidth; j++) {
-			shuffleMap.put(j, 2*j);
-			shuffleMap.put(bitwidth+j, 2*j+1);
+		for (int j = 0; j < bitwidth; j++) {
 			connection.put(j, j);
-			connection.put(bitwidth+j, bitwidth+j);
+			connection.put(bitwidth+j, bitwidth+j);		
 		}
-		
-		Shuffle shuffle = new Shuffle(2*bitwidth, shuffleMap);
+
+		Shuffle shuffle = createInterleavingCircuit(bitwidth);
 		adder=shuffle.extendTopLeft(adder, connection);
 		
 		return adder;
+	}
+
+	/**
+	 * Given a bit sequence A and a bit sequence B, this
+	 * creates a circuit that turns the concatenation of A and B
+	 * into the interleaving of A and B such that all bits
+	 * on even positions come from A and all bits on odd positions
+	 * come from B. In the result, the bits of A and the bits of B
+	 * are in the same order as they are in A or B alone.
+	 * 
+	 * a1 a2 a3 b1 b2 b3 -> a1 b1 a2 b2 a3 b3.
+	 * @param bitwidth
+	 * @return
+	 */
+	private static Shuffle createInterleavingCircuit(int bitwidth) {
+		Map<Integer, Integer> shuffleMap= new HashMap<Integer, Integer>();
+		for (int j = 0; j < bitwidth; j++) {
+			shuffleMap.put(j, 2*j);
+			shuffleMap.put(bitwidth+j, 2*j+1);
+		}
+		
+		Shuffle shuffle = new Shuffle(2*bitwidth, shuffleMap);
+		return shuffle;
 	}
 	
 	/**

@@ -94,9 +94,9 @@ public class DominatingOutputComputation extends Phase {
 	public void serverExecute(Connection connection) {
 		logger.info("Entering Phase: Dominating Output Computation");
 		List<MailType> labels = localLabels.get();
+		int maximumMailBound = Math.max(labels.size(), remoteMailCountLimit.get());
 		Circuit dominationCircuit =
-			CircuitBuilder.createDominatingOutputCircuit(labels.size(), 
-					remoteMailCountLimit.get());
+			CircuitBuilder.createDominatingOutputCircuit(maximumMailBound);
 		
 		Knowledge<Circuit> circuitInput = new Knowledge<Circuit>();
 		circuitInput.put(dominationCircuit);
