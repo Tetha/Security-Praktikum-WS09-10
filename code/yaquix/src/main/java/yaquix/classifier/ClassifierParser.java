@@ -75,7 +75,7 @@ public class ClassifierParser {
 	 * @param input the string to parse
 	 */
 	public ClassifierParser(String input) {
-		// TODO constructor
+		this.input = input;
 	}
 	
 	/**
@@ -140,8 +140,22 @@ public class ClassifierParser {
 	 * @return a string or null on failure
 	 */
 	private String parseWord() {
-		// TODO parseWord
-		return null;
+		String tmpString = "";
+		boolean found = false;
+		char tmpChar; 
+		
+		for(int i = 0; ;i++){
+			tmpChar = input.charAt(i);
+			if(tmpChar >= 'a' && tmpChar <= 'Z'){
+				positionInInput++;
+				column++;
+				found = true;
+				tmpString += tmpChar;
+			}
+			else break;
+		}		
+		if(!found)return null;
+		return tmpString;
 	}
 	
 	/**
@@ -163,8 +177,19 @@ public class ClassifierParser {
 	 * @return an integer on success or -1 on failure.
 	 */
 	private int parseNumber() {
-		// TODO parseNumber
-		return -1;
+		String tmpString = "";
+		char tmpChar; 
+		
+		for(int i = 0;; i++){
+			tmpChar = input.charAt(i);
+			if(tmpChar >= '0' && tmpChar <= '9'){
+				positionInInput++;
+				column++;
+				tmpString += tmpChar;
+			}
+			else break;
+		}		
+		return Integer.parseInt(tmpString);
 	}
 	
 	/**
@@ -173,7 +198,17 @@ public class ClassifierParser {
 	 * column counter is increased. This may also skip nothing.
 	 */
 	private void skipWhitespace() {
-		// TODO skipWhitespace
+		for(int i = 0;; i++){
+			if(input.charAt(i) == ' ' || input.charAt(i) == '\t'){
+				positionInInput++;
+				column++;
+			}
+			if(input.charAt(i) == '\n'){
+				positionInInput++;
+				column = 0;
+				line++;
+			}				
+		}
 	}
 	
 	/**
@@ -184,7 +219,6 @@ public class ClassifierParser {
 	 * @return true if the literal is a prefix, false otherwise. 
 	 */
 	private boolean matchLiteral(String literal) {
-		// TODO matchLiteral
-		return false;
+		return input.startsWith(literal, positionInInput);
 	}
 }
