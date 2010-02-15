@@ -39,7 +39,13 @@ public class Attribute implements Formattable {
 	 */
 	public Attribute(String word, double localLimit, double remoteLimit) {
 		this.word = word;
-		// TODO: constructor
+		if (localLimit<remoteLimit) {
+			this.low=localLimit;
+			this.high=remoteLimit;
+		} else {
+			this.low=remoteLimit;
+			this.high=localLimit;
+		}
 	}
 
 
@@ -48,13 +54,33 @@ public class Attribute implements Formattable {
 	 * @param mail the mail to classify
 	 * @return the number of occurences in the mail
 	 */
-	public MailType classify(Mail mail) {
-		// TODO classify
-		return null;
+	public Occurrences classify(Mail mail) {
+		double seen=mail.countWord(word);
+		seen=seen/mail.countWords();
+		Occurrences occurrence;
+		if (seen<this.low) {
+			occurrence = Occurrences.RARE;
+		} else if (seen<this.high) {
+			//must be between low and high
+			occurrence=Occurrences.MEDIUM;
+		} else {
+			//must be above high
+			occurrence=Occurrences.OFTEN;
+		}
+		return occurrence;
 	}
 	
 	@Override
 	public void formatTo(Formatter arg0, int arg1, int arg2, int arg3) {
 		// TODO formatTo
+	}
+	
+	/**
+	 * returns a description of the attribute as a string
+	 * @return the describing string
+	 * 
+	 */
+	public String toString() {
+		return String.format("(%s,%f,%f)",word,low,high);
 	}
 }
