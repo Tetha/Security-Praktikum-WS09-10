@@ -63,7 +63,8 @@ class LocalWordlistComputation extends SymmetricPhase {
 		List<Double> spamPercentage = new Vector<Double>();
 		List<Double> nonSpamPercentage = new Vector<Double>();
 		
-		logger.info("localWordlistComputation: computing words in our emails and corresponding spam-/nonSpam-percentages...");
+		logger.info("localWordlistComputation: computing words in our emails" +
+							" and corresponding spam-/nonSpam-percentages...");
 		
 		Set<String> wordset = mails.getAllWords();
 		

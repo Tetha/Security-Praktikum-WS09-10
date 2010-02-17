@@ -1,5 +1,6 @@
 package yaquix.phase.attribute.wordlist;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -32,27 +33,33 @@ public class WordlistComputation extends SymmetricPhase {
 	 * @param concertedWordlist a place to store the word list
 	 */
 	public WordlistComputation(InputKnowledge<Mails> localMails,
-			OutputKnowledge<List<String>> concertedWordlist) {
+							OutputKnowledge<List<String>> concertedWordlist) {
 		logger.info("wordlistComputation");
 		
 		this.localMails = localMails;
 		this.concertedWordlist = concertedWordlist;
 	}
 
-
 	@Override
-	protected void execute(Connection connection) {
+	protected void execute(Connection connection) 
+									throws IOException, ClassNotFoundException {
 		
 		logger.info("wordlistComputation: starting computation...");
 		
 		Knowledge<List<String>> tmpKnowledge = new Knowledge<List<String>>();
 		
 		logger.info("wordlistComputation: going into localWordlistcomputation");
-		LocalWordlistComputation localWordlistComputation = new LocalWordlistComputation(localMails, tmpKnowledge);
+		
+		LocalWordlistComputation localWordlistComputation = 
+						new LocalWordlistComputation(localMails, tmpKnowledge);
+		
 		localWordlistComputation.execute(connection);
 		
 		logger.info("wordlistComputation: going into wordlistMerging");
-		WordlistMerging wordlistMerging = new WordlistMerging(tmpKnowledge, concertedWordlist);
+		
+		WordlistMerging wordlistMerging = 
+							new WordlistMerging(tmpKnowledge, concertedWordlist);
+		
 		wordlistMerging.execute(connection);
 	}
 }

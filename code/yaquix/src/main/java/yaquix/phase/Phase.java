@@ -35,8 +35,9 @@ public abstract class Phase {
 	 * @param connection the connection used to communicate to
 	 * the other part
 	 * @throws IOException
+	 * @throws ClassNotFoundException 
 	 */
-	public abstract void serverExecute(Connection connection) throws IOException;
+	public abstract void serverExecute(Connection connection) throws IOException, ClassNotFoundException;
 
 	/**
 	 * This implements the actions the client has to perform
@@ -44,6 +45,7 @@ public abstract class Phase {
 	 * @param connection the connection used to communicate to
 	 *  the other part
 	 * @throws IOException
+	 * @throws ClassNotFoundException 
 	 */
-	public abstract void clientExecute(Connection connection) throws IOException;
+	public abstract void clientExecute(Connection connection) throws IOException, ClassNotFoundException;
 }
