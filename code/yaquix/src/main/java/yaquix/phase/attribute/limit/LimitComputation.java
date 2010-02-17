@@ -1,11 +1,15 @@
 package yaquix.phase.attribute.limit;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.Mails;
 import yaquix.phase.InputKnowledge;
+import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.SymmetricPhase;
 
@@ -36,6 +40,8 @@ public class LimitComputation extends SymmetricPhase {
 	 */
 	private OutputKnowledge<List<Attribute>> concertedAttributes;
 	
+	Logger logger;
+	
 	/**
 	 * This constructs a new limit computation class
 	 * @param concertedWordlist the list of words to compute attributes for
@@ -45,15 +51,24 @@ public class LimitComputation extends SymmetricPhase {
 	public LimitComputation(InputKnowledge<List<String>> concertedWordlist,
 			InputKnowledge<Mails> localMails,
 			OutputKnowledge<List<Attribute>> concertedAttributes) {
+		logger.info("limitComputation");
 		this.concertedWordlist = concertedWordlist;
 		this.localMails = localMails;
 		this.concertedAttributes = concertedAttributes;
 	}
 
 	@Override
-	protected void execute(Connection connection) {
-		// TODO execute
-
+	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
+		logger.info("limitComputation: starting computation...");
+		Knowledge<Map<String, Double>>  tmpKnowledge = new Knowledge<Map<String, Double>>();
+		
+		logger.info("limitComputation: going into localLimitComputation");
+		LocalLimitComputation localLimitcomputation = new LocalLimitComputation(concertedWordlist, localMails, tmpKnowledge);
+		localLimitcomputation.execute(connection);
+		
+		logger.info("limitComputation: going into LimitMerging");
+		LimitMerging limitMerging = new LimitMerging(tmpKnowledge, concertedAttributes);
+		limitMerging.execute(connection);
 	}
 
 }
