@@ -2,9 +2,9 @@ package yaquix.phase.io;
 
 
 import java.io.File;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.knowledge.Mail;
@@ -37,6 +37,8 @@ public class ReadFolders extends SymmetricPhase {
 	 */
 	private OutputKnowledge<Mails> localMails;
 	
+	Logger logger;
+	
 	/**
 	 * Constructs a new phase to read the input folders
 	 * @param localSpamFolder the folder containing spam mails
@@ -46,24 +48,39 @@ public class ReadFolders extends SymmetricPhase {
 	public ReadFolders(InputKnowledge<File> localSpamFolder,
 			InputKnowledge<File> localNonSpamFolder,
 			OutputKnowledge<Mails> localMails) {
+		
+		logger.info("readFolders");
 		this.localSpamFolder = localSpamFolder;
 		this.localNonSpamFolder = localNonSpamFolder;
 		this.localMails = localMails;
 	}
 
-
 	@Override
 	protected void execute(Connection connection) {
-		// TODO execute		
+		logger.info("readFolders: starting computation...");
+		Mails mails = new Mails();
+
+		//TODO
+		
+		localMails.put(mails);
 	}
 	
 	/**
 	 * reads a single mail from the file.
 	 * @param filename the file to read
 	 * @return the mail containing the file contents.
+	 * @throws IOException 
 	 */
-	private Mail readMail(File filename) {
-		// TODO: readMail
-		return null;
+	private Mail readMail(File filename) throws IOException {
+
+		FileReader reader = new FileReader(filename);
+        String tmpString;
+        
+        char[] tempChars = new char[(int) filename.length()];
+                   
+        reader.read(tempChars);        
+        tmpString = new String(tempChars);
+		
+        return new Mail();
 	}
 }

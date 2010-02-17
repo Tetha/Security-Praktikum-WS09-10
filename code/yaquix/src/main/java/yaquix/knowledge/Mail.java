@@ -28,7 +28,7 @@ public class Mail {
 	
 	/**
 	 * returns the set of words contained in this mail.
-	 * @return the set of words in th mail
+	 * @return the set of words in the mail
 	 */
 	public Set<String> getWords() {
 		// TODO: getWords
