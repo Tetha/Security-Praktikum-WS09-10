@@ -1,16 +1,14 @@
 package yaquix.classifier;
 
-import java.io.Reader;
 import java.util.EnumMap;
-
-import javax.swing.text.Position;
-
-import com.sun.activation.registries.MailcapTokenizer;
+import java.util.Vector;
 
 import yaquix.classifier.error.ClassifierParseException;
 import yaquix.classifier.error.LimitTooLargeException;
 import yaquix.classifier.error.LimitsUnsortedException;
+import yaquix.classifier.error.NotEnoughSubtreesException;
 import yaquix.classifier.error.SyntaxException;
+import yaquix.classifier.error.TooManySubtreesException;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.MailType;
 import yaquix.knowledge.Occurrences;
@@ -122,20 +120,48 @@ public class ClassifierParser {
 	 * @return a classifier or null on failure
 	 */
 	private Classifier parseTree() {
-		// TODO parseTree
 
 		if(matchLiteral("Decide")){
 			if(!matchLiteral("(")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {"("});
 
 			Attribute attribute = parseAttribute();
+			EnumMap<Occurrences, Classifier> map = new EnumMap<Occurrences, Classifier>(Occurrences.class);
+			
+			if(!matchLiteral(",")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {","});
+			
+			map.put(Occurrences.RARE, parseTree());
+			
+			if(map.get(Occurrences.RARE) == null)
+				throw new NotEnoughSubtreesException(line, column, 3, new Classifier[] {map.get(Occurrences.RARE)});
+			
+			if(!matchLiteral(",")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {","});
+			
+			map.put(Occurrences.MEDIUM, parseTree());
+			
+			if(map.get(Occurrences.MEDIUM) == null)
+				throw new NotEnoughSubtreesException(line, column, 3, 
+						new Classifier[] {map.get(Occurrences.RARE), map.get(Occurrences.MEDIUM)});
+			
+			if(!matchLiteral(",")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {","});
+			
+			map.put(Occurrences.OFTEN, parseTree());
+			
+			Vector<Classifier> testClassifier = new Vector<Classifier>();
+			
 			while(matchLiteral(",")){
-				parseTree();
+				testClassifier.add(parseTree());
 			}
+			
+			if(testClassifier != null) throw new TooManySubtreesException(line, column, 3, (Classifier[]) testClassifier.toArray());
+			
 			if(!matchLiteral(")")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {")"});
 
-			//TODO	return new Branch(attribute, subTrees);
+			return new Branch(attribute, map);
 
 		} else if(matchLiteral("Output")){
 			MailType lable;
@@ -152,8 +178,6 @@ public class ClassifierParser {
 			return new Leaf(lable);
 
 		} else throw new SyntaxException(line, column, input.substring(positionInInput, positionInInput+6), new String[] {"Decide", "Output"});
-
-		return null;
 	}
 
 	/**
