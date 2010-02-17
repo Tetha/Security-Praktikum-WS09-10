@@ -14,7 +14,7 @@ public class Circuit {
 	 * @author hk
 	 *
 	 */
-	private enum GateType {
+	protected enum GateType {
 		/**
 		 * describes the gate as an input gate
 		 */
@@ -44,27 +44,39 @@ public class Circuit {
 	/**
 	 * stores the type of all gates.
 	 */
-	GateType[] gateType;
+	protected GateType[] gateType;
 	
 	/**
 	 * stores the structure of the circuit.
+	 * adjacencyList[i] contains the followers of gate with index i.
 	 */
-	List<Integer>[] adjacencyList;
+	protected List<Integer>[] adjacencyList;
 	
 	/**
 	 * stores the annotations of the gates.
+	 * if a gate with index i is constant, then tables[i][0][0] contains
+	 * the value of the gate. 
+	 * if a gate with index i is unary, then tables[i][0][[0] contains 
+	 * the output of the gate for input 0 and tables[i][0][1] contains
+	 * the output of the gate for input 1.
+	 * if a gate with index i is binary, then tables[i] contains the 
+	 * outputs (with [left][right]).
 	 */
-	int[][][] tables;
+	protected boolean[][][] tables;
 	
 	/**
 	 * stores the gate indices of the inputs.
+	 * inputs[i] = j means: gate #j has type IN and the input i
+	 * goes into gate j
 	 */
-	int[] inputs;
+	protected int[] inputs;
 	
 	/**
 	 * stores the gate indices of the outputs;
+	 * outputs[i] = j means: the value of output i comes from
+	 * the output of gate j
 	 */
-	int[] outputs; 
+	protected int[] outputs; 
 
 	/**
 	 * This extends a given circuit with another circuit.
@@ -115,7 +127,7 @@ public class Circuit {
 	 */
 	public Circuit extendTopRight(Circuit addedCircuit,
 								  Map<Integer, Integer> connection) {
-		// TODO extendTopRight
+		// TODO extendTopRight -- check if we ever ever use this
 		return null;
 	}
 	
