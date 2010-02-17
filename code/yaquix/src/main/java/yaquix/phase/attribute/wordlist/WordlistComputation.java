@@ -1,10 +1,12 @@
 package yaquix.phase.attribute.wordlist;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.knowledge.Mails;
 import yaquix.phase.InputKnowledge;
+import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.SymmetricPhase;
 
@@ -21,15 +23,18 @@ public class WordlistComputation extends SymmetricPhase {
 	private InputKnowledge<Mails> localMails;
 	private OutputKnowledge<List<String>> concertedWordlist;
 	
+	private Logger logger;
 	
 	/**
 	 * Creates a new WordListComputation phase with the given
 	 * inputs and outputs.
 	 * @param localMails the local mail input
-	 * @param concertedWordlist a plcae to store the word list
+	 * @param concertedWordlist a place to store the word list
 	 */
 	public WordlistComputation(InputKnowledge<Mails> localMails,
 			OutputKnowledge<List<String>> concertedWordlist) {
+		logger.info("wordlistComputation");
+		
 		this.localMails = localMails;
 		this.concertedWordlist = concertedWordlist;
 	}
@@ -37,6 +42,17 @@ public class WordlistComputation extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) {
-		// TODO execute
+		
+		logger.info("wordlistComputation: starting computation...");
+		
+		Knowledge<List<String>> tmpKnowledge = new Knowledge<List<String>>();
+		
+		logger.info("wordlistComputation: going into localWordlistcomputation");
+		LocalWordlistComputation localWordlistComputation = new LocalWordlistComputation(localMails, tmpKnowledge);
+		localWordlistComputation.execute(connection);
+		
+		logger.info("wordlistComputation: going into wordlistMerging");
+		WordlistMerging wordlistMerging = new WordlistMerging(tmpKnowledge, concertedWordlist);
+		wordlistMerging.execute(connection);
 	}
 }
