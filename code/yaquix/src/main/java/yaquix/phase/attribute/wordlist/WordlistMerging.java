@@ -1,6 +1,11 @@
 package yaquix.phase.attribute.wordlist;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
@@ -19,6 +24,7 @@ class WordlistMerging extends SymmetricPhase {
 	private InputKnowledge<List<String>> localWordlist;
 	private OutputKnowledge<List<String>> concertedWordlist;
 	
+	private Logger logger;
 	
 	/**
 	 * Constructs a new word list merging phase
@@ -27,13 +33,20 @@ class WordlistMerging extends SymmetricPhase {
 	 */
 	public WordlistMerging(InputKnowledge<List<String>> localWordlist,
 			OutputKnowledge<List<String>> concertedWordlist) {
+		logger.info("wordlistMerging");
 		this.localWordlist = localWordlist;
 		this.concertedWordlist = concertedWordlist;
 	}
 
 	@Override
-	protected void execute(Connection connection) {
-		// TODO Auto-generated method stub
+	protected void execute(Connection connection) 
+						throws IOException, ClassNotFoundException {
+		
+		logger.info("wordlistMerging: starting computation...");
+
+		concertedWordlist.put(mergeWordlists(localWordlist.get(),
+				 connection.exchangeWordlist(localWordlist.get())));
+		
 	}
 
 	/**
@@ -44,7 +57,15 @@ class WordlistMerging extends SymmetricPhase {
 	 */
 	private List<String> mergeWordlists(List<String> localWordlist,
 									    List<String> remoteWordlist) {
-		// TODO: mergeWordlists
-		return null;
+		logger.info("wordlistMerging: merging wordlists...");
+		
+		Set<String> set = new HashSet<String>();
+		
+		for(String word : localWordlist)
+			set.add(word);
+		for(String word :remoteWordlist)
+			set.add(word);
+		
+		return new Vector<String>(set);
 	}
 }
