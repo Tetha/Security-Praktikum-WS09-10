@@ -1,14 +1,24 @@
 package yaquix.classifier;
 
 import java.io.Reader;
+import java.util.EnumMap;
 
+import javax.swing.text.Position;
+
+import com.sun.activation.registries.MailcapTokenizer;
+
+import yaquix.classifier.error.ClassifierParseException;
+import yaquix.classifier.error.LimitTooLargeException;
+import yaquix.classifier.error.LimitsUnsortedException;
+import yaquix.classifier.error.SyntaxException;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.MailType;
+import yaquix.knowledge.Occurrences;
 
 /**
  * This parses a classifier in the format defined in the
  * specification.
- * 
+ *
  * The parser implemented is a simple backtracking recursive
  * descent parser. That means, each parse method stores
  * the current input position and tries to parse whatever
@@ -17,21 +27,21 @@ import yaquix.knowledge.MailType;
  * their return type for validness until either all possibilities
  * are exhausted and the parse fails or until a parse succeeded.
  * Furthermore, some productions perform a semantic evaluation of
- * the parse result and potentially throw parse exceptions. 
- * 
- * Note the difference between a syntax error, a parse failure and a 
- * semantic error. 
- * 
+ * the parse result and potentially throw parse exceptions.
+ *
+ * Note the difference between a syntax error, a parse failure and a
+ * semantic error.
+ *
  * A syntax error occurs if we could deduce that
  * a certain production must be in effect now (which we can easily do,
  * as the grammar is LL(1)), but the production matches only partially.
  * Nothing can rescue us in this case, so we raise a syntax error.
- * 
+ *
  * A parse failure occurs if we try to match the first part of
  * a rule and this fails (for example, in the tree production, there is no
  * 'Decide' in the beginning of the string). This simply fails, because
  * another rule might still work.
- * 
+ *
  * A semantic error occurs if we managed to parse something, but
  * whatever we managed to parse violates some invariants (sorted limits,
  * small limits, number of sub trees). This is decided after actually
@@ -44,12 +54,12 @@ public class ClassifierParser {
 	 * contains the string to parse.
 	 */
 	private String input;
-	
+
 	/**
 	 * contains the position we are at right now in input.
 	 */
 	private int positionInInput;
-	
+
 	/**
 	 * contains the column in the line we are in.
 	 * Note that this is different from positionInInput
@@ -57,40 +67,47 @@ public class ClassifierParser {
 	 * to 0 on a line break, while positionInInput just increases.
 	 */
 	private int column;
-	
+
 	/**
 	 * contains the line we are in (which essentially is the number
 	 * of linebreaks we have seen so far + 1)
 	 */
 	private int line;
-	
+
 	/**
-	 * This creates a new Parser that parses the entire contents from 
-	 * the 
+	 * This creates a new Parser that parses the entire contents from
+	 * the
 	public ClassifierParser(Reader input) {
-		
+
 	}
 	/**
 	 * This creates a new Parser to parse the given input.
 	 * @param input the string to parse
 	 */
 	public ClassifierParser(String input) {
+		positionInInput = 0;
+		line = 0;
+		column = 0;
 		this.input = input;
 	}
-	
+
 	/**
 	 * parses the given input. This basically parses a tree
-	 * and checks that the entire input was consumed. If 
-	 * something other than whitespace follows the 
+	 * and checks that the entire input was consumed. If
+	 * something other than whitespace follows the
 	 * classifier, a SyntaxError must be raised, as something
 	 * is strange then.
 	 * @return
 	 */
 	public Classifier parse() {
-		// TODO parse
-		return null;
+		Classifier classifier = parseTree();
+		skipWhitespace();
+		if(positionInInput != input.length()){
+			throw new ClassifierParseException(line, column, "There is something strange here...");
+		}
+		return classifier;
 	}
-	
+
 	/**
 	 * Parses the tree production:
 	 * tree -> 'Decide' '(' attribute (',' tree)+ ')'
@@ -106,23 +123,59 @@ public class ClassifierParser {
 	 */
 	private Classifier parseTree() {
 		// TODO parseTree
+
+		if(matchLiteral("Decide")){
+			if(!matchLiteral("(")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {"("});
+
+			Attribute attribute = parseAttribute();
+			while(matchLiteral(",")){
+				parseTree();
+			}
+			if(!matchLiteral(")")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {")"});
+
+			//TODO	return new Branch(attribute, subTrees);
+
+		} else if(matchLiteral("Output")){
+			MailType lable;
+			if(!matchLiteral("(")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {"("});
+
+			lable = parseClass();
+			if(lable == null)
+					throw(new ClassifierParseException(line, column, "Something went wrong while parsing a lable."));
+
+			if(!matchLiteral(")")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {")"});
+
+			return new Leaf(lable);
+
+		} else throw new SyntaxException(line, column, input.substring(positionInInput, positionInInput+6), new String[] {"Decide", "Output"});
+
 		return null;
 	}
-	
+
 	/**
 	 * Parses the class production:
 	 * class -> 'Spam' | 'Not Spam'.
 	 * @return the class label or null on failure.
 	 */
 	private MailType parseClass() {
-		// TODO parseClass
-		return null;
+		MailType lable = null;
+		if(matchLiteral("Spam")){
+			lable = MailType.SPAM;
+		}
+		else if(matchLiteral("Not Spam")){
+			lable = MailType.NONSPAM;
+		}
+		return lable;
 	}
-	
+
 	/**
 	 * Parses the attribute production
 	 * attribute -> '(' word ',' probability ',' probability ')'.
-	 * If the limits are not ordered properly, this raises 
+	 * If the limits are not ordered properly, this raises
 	 * a LimitsUnsortedException. If the parse does not work at
 	 * all (e.g. by matching '(' word, but not the ','), we can
 	 * see that no parse will ever succeed here and thus, we raise
@@ -130,47 +183,89 @@ public class ClassifierParser {
 	 * @return an Attribute or null on failure
 	 */
 	private Attribute parseAttribute() {
-		// TODO parseAttribute
-		return null;
+		String word;
+		double low;
+		double high;
+
+		if(!matchLiteral("(")) throw new SyntaxException(line, column,
+				Character.toString(input.charAt(positionInInput)), new String[] {"("});
+
+		word = parseWord();
+
+		if(!matchLiteral(",")) throw new SyntaxException(line, column,
+				Character.toString(input.charAt(positionInInput)), new String[] {","});
+
+		low = parseProbability();
+
+		if(!matchLiteral(",")) throw new SyntaxException(line, column,
+				Character.toString(input.charAt(positionInInput)), new String[] {","});
+
+		high = parseProbability();
+
+		if(!matchLiteral(")")) throw new SyntaxException(line, column,
+				Character.toString(input.charAt(positionInInput)), new String[] {")"});
+
+		if(low > high) throw new LimitsUnsortedException(line, column, low, high);
+
+		return new Attribute(word, low, high);
 	}
-	
+
 	/**
 	 * Parses the word production
-	 * word -> ('a'|'b'|...|'z'|'A'|...|'Z')+ 
+	 * word -> ('a'|'b'|...|'z'|'A'|...|'Z')+
 	 * @return a string or null on failure
 	 */
 	private String parseWord() {
 		String tmpString = "";
 		boolean found = false;
-		char tmpChar; 
-		
-		for(int i = 0; ;i++){
+		char tmpChar;
+
+		skipWhitespace();
+		for(int i = positionInInput;i < input.length() ;i++){
 			tmpChar = input.charAt(i);
-			if(tmpChar >= 'a' && tmpChar <= 'Z'){
+			if(Character.isLetter(tmpChar)){
 				positionInInput++;
 				column++;
 				found = true;
 				tmpString += tmpChar;
 			}
 			else break;
-		}		
-		if(!found)return null;
+		}
+		if(!found) tmpString = null;
 		return tmpString;
 	}
-	
+
 	/**
 	 * This parses the probability production:
 	 * probability -> number '.' number
 	 * If the Probability is larger than 1, a LmitTooLarge-Exception
 	 * is raised. If the parse does not work at all (e.g. if we
-	 * match number, but not ',', we raise a Syntax exception). 
+	 * match number, but not ',', we raise a Syntax exception).
 	 * @return the parsed number or -1 on failure
 	 */
 	private double parseProbability() {
-		// TODO parseProbability
-		return -1;
+		int integerPart;
+		int realPart;
+
+		skipWhitespace();
+		integerPart = parseNumber();
+
+		if(!matchLiteral(".")) throw new SyntaxException(line, column,
+					Character.toString(input.charAt(positionInInput)), new String[] {"."});
+
+		realPart = parseNumber();
+
+		if(integerPart == -1 || realPart == -1)
+			throw new ClassifierParseException(line, column, "Something went wrong while parsing a probability.");
+
+		double probability = Double.parseDouble(integerPart + "." + realPart);
+
+		if(probability > 1)
+			throw new LimitTooLargeException(line, column, probability);
+
+		return probability;
 	}
-	
+
 	/**
 	 * This parses the number production.
 	 * number -> ('0' | '1' | ... | '9')+
@@ -178,47 +273,58 @@ public class ClassifierParser {
 	 */
 	private int parseNumber() {
 		String tmpString = "";
-		char tmpChar; 
-		
-		for(int i = 0;; i++){
+		char tmpChar;
+		boolean found = false;
+
+		for(int i = positionInInput;i < input.length(); i++){
 			tmpChar = input.charAt(i);
-			if(tmpChar >= '0' && tmpChar <= '9'){
+			if(Character.isDigit(tmpChar)){
+				found = true;
 				positionInInput++;
 				column++;
 				tmpString += tmpChar;
 			}
 			else break;
-		}		
+		}
+		if(!found) tmpString = "-1";
 		return Integer.parseInt(tmpString);
 	}
-	
+
 	/**
 	 * This skips whitespaces. During skipping whitespaces, the line
 	 * counter is incremented whenever a '\n' is encountered and the
 	 * column counter is increased. This may also skip nothing.
 	 */
 	private void skipWhitespace() {
-		for(int i = 0;; i++){
+		for(int i = positionInInput; i < input.length(); i++){
 			if(input.charAt(i) == ' ' || input.charAt(i) == '\t'){
 				positionInInput++;
 				column++;
 			}
-			if(input.charAt(i) == '\n'){
+			else if(input.charAt(i) == '\n'){
 				positionInInput++;
 				column = 0;
 				line++;
-			}				
+			}
+			else break;
 		}
 	}
-	
+
 	/**
 	 * This checks if the given literal is a prefix of the remaining string,
-	 * starting at the positionInInput. In case of a successful match, the 
+	 * starting at the positionInInput. In case of a successful match, the
 	 * positionInString is updated.
 	 * @param literal the literal to match
-	 * @return true if the literal is a prefix, false otherwise. 
+	 * @return true if the literal is a prefix, false otherwise.
 	 */
 	private boolean matchLiteral(String literal) {
-		return input.startsWith(literal, positionInInput);
+		boolean matched = false;
+		skipWhitespace();
+		if(input.startsWith(literal, positionInInput)){
+			matched = true;
+			positionInInput += literal.length();
+			column += literal.length();
+		}
+		return matched;
 	}
 }
