@@ -11,6 +11,7 @@ import yaquix.circuit.base.Or;
 import yaquix.circuit.base.Shuffle;
 import yaquix.circuit.base.Split;
 import yaquix.circuit.base.Stop;
+import yaquix.circuit.base.Times;
 import yaquix.circuit.base.Xor;
 
 /**
@@ -106,6 +107,54 @@ public class CircuitBuilder {
 	}
 	
 	/**
+	 * This applies the separation into shares to a single bit. 
+	 * The inputs are:
+	 *  - input 0 is the distribution bit
+	 *  - input 1 is the distributed bit, ie the extended circuits output
+	 * The outputs are:
+	 *  - output 0 is the bit for Alices share
+	 *  - output 1 is the bit for bobs share
+	 *  @return a circuit for the separation of a single bit of the result
+	 */
+	private static Circuit createSingleBitSeparation() {
+		Circuit result;
+		HashMap<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		result = new Split(2);
+		
+		// Inputs: i
+		// Outputs: i i
+		result.extendLeft(new Split(2));
+		
+		// Inputs:  v i
+		// Outputs: v v i i
+		
+		connection.clear();
+		connection.put(0, 0);
+		result.extendTopLeft(new Negation(), connection);
+		
+		// Outputs: -v v i i
+
+		HashMap<Integer, Integer> shuffle = new HashMap<Integer, Integer>();
+		shuffle.put(0,2);
+		shuffle.put(1,0);
+		shuffle.put(2,1);
+		shuffle.put(3,3);
+		result.extendTopLeft(new Shuffle(4, shuffle), createIdentityMapping(4));
+		
+		// Outputs: v i -v i
+		
+		Circuit ands = new And();
+		ands = ands.extendLeft(new And());
+		// Input ands: a b c d
+		// Output ands: a*b c*d
+		
+		result.extendTopLeft(ands, createIdentityMapping(4));
+		
+		// Outputs: v*i (-v)*i
+		
+		return result;
+	}
+	/**
 	 * This applies the extension for turning the output into shares
 	 * to a given input circuit. This extension adds a layer of
 	 * the distribution net (compare the specification for details)
@@ -113,12 +162,37 @@ public class CircuitBuilder {
 	 * additional input of each user. 
 	 * The new inputs of the user are required to prefix the already
 	 * existing inputs of the user.
+	 * @param outputWidth the outputWidth to extend
 	 * @param input the circuit to extend
 	 * @return the modified circuit
 	 */
-	public static Circuit extendWithShareSeparation(Circuit input) {
-		// TODO extendWithShareSeparation
-		return null;
+	public static Circuit extendWithShareSeparation(Circuit input, int outputWidth,
+													int aliceInputWidth, int bobInputWidth) {
+		Circuit distVectComp = new Times(outputWidth, new Xor());
+		Circuit inputWithDistComp = input.extendLeft(distVectComp);
+		Circuit result = inputWithDistComp.extendTopLeft(
+											new Times(outputWidth, createSingleBitSeparation()), 
+											createIdentityMapping(outputWidth));
+		HashMap<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
+		for(int i = 0; i < 2*outputWidth + aliceInputWidth + bobInputWidth; i++) {
+			if (0 <= i && i < outputWidth) {
+				// KA
+				shuffleMap.put(i, i);
+			} else if (outputWidth <= i && i < outputWidth + aliceInputWidth) {
+				// IA
+				shuffleMap.put(i, i+outputWidth);
+			} else if (outputWidth + aliceInputWidth <= i && i < 2*outputWidth + aliceInputWidth) {
+				// KB
+				shuffleMap.put(i, i-aliceInputWidth);
+			} else if (2*outputWidth + aliceInputWidth <= i && i < 2*outputWidth + aliceInputWidth + bobInputWidth) {
+				// IB
+				shuffleMap.put(i, i);
+			}
+		}
+		Circuit shuffle = new Shuffle(2*outputWidth + aliceInputWidth + bobInputWidth, shuffleMap);
+		result = shuffle.extendTopLeft(result, createIdentityMapping(2*outputWidth + aliceInputWidth + bobInputWidth));
+
+		return result;
 	}
 
 	/**
@@ -437,6 +511,7 @@ public class CircuitBuilder {
 	 * @return a ripple carry adder
 	 */
 	private static Circuit createAdder(int bitwidth) {
+		// TODO
 		Map<Integer, Integer> connection= new HashMap<Integer, Integer>();
 		connection.put(0, 0);
 		if (bitwidth < 1) {
@@ -484,6 +559,158 @@ public class CircuitBuilder {
 		return shuffle;
 	}
 	
+	
+	/**
+	 * This performs a single step in the table lookups.
+	 * 
+	 * The first keyWidth bits of the input must be the key of the currently
+	 * examine key-value-pair.
+	 * The second valueWidth bits of the input must be the value of the current
+	 * key-value-pair.
+	 * The third keyWidth bits of the input must be the key we are searching.
+	 * The fourth valueWidth bits of the input are the value we have found
+	 * so far (or it is undefined).
+	 * @param keyWidth the bitwidth of the keys
+	 * @param valueWidth the width of the values
+	 */
+	private static Circuit createLookupTableStateTransition(int keyWidth, int valueWidth) {
+		HashMap<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		Circuit result = new Times(keyWidth, new Split(2));
+		// Inputs: [keyWidth S]
+		// Outputs: [keyWidth S] [keyWidth S]
+		
+		result = result.extendTopLeft(createComparer(keyWidth), createIdentityMapping(keyWidth));
+		
+		// Inputs: [keyWidth K] [keyWidth S]
+		// Outputs: C= C> [keyWidth S]
+		
+		connection.clear();
+		connection.put(1, 0);
+		
+		result = result.extendTopLeft(new Stop(), connection);
+		
+		// Outputs: C= [keyWidth S]
+		
+		result = result.extendTopLeft(new Split(2*valueWidth), createIdentityMapping(1));
+		
+		// Outputs: [valueWidth C=] [valueWidth C=] [keyWidth S]
+		
+		//--------------------------------------------------------------
+		Circuit middleLeft;
+		middleLeft = new Times(valueWidth, new And());
+		
+		// Inputs middleLeft: [valueWidth X] [valueWidth Y]
+		// Outputs middleLeft: [valueWidth X*Y]
+		
+		Circuit middleRight = new Times(valueWidth, new Negation());
+		// Inputs middleRight: [valueWidth A]
+		// Outputs middleRight: [valueWidth -A]
+		
+		middleRight = middleRight.extendTopLeft(new Times(valueWidth, new And()), createIdentityMapping(valueWidth));
+		
+		// Inputs middleRight: [valueWidth B] [valueWidth A]
+		// Outputs middleRight [valueWidth B*-A]
+		
+		Circuit middle = middleRight.extendLeft(middleLeft);
+		// Inputs middle: [valueWidth X] [valueWidth Y] [valueWidth B] [valueWidth A] 
+		// Outputs middle: [valueWidth X*Y] [valueWidth B*-A]
+		
+		Circuit fComputation = result.extendTopLeft(new Times(valueWidth, new Or()), createIdentityMapping(2*valueWidth));
+		
+		// Inputs fComputation: [valueWidth X] [valueWidth Y] [valueWidth B] [valueWidth A]
+		// Outputs fComputation: [valueWidth (X*Y)+(B*-A)]
+		//--------------------------------------------------------------
+		
+		connection.clear();
+		// Idenfity: X <- V; Y <- C=; B <- F; A <- C=
+		for(int i = 0; i < 2*valueWidth+keyWidth; i++) {
+			if (0 <= i && i < valueWidth) {
+				// first block C=
+				connection.put(i, i+valueWidth);
+			} else if(valueWidth <= i && i < 2*valueWidth) {
+				// second block C=
+				connection.put(i, i+2*valueWidth);
+			} else if(2*valueWidth <= i && i < 2*valueWidth + keyWidth) {
+				// S
+			}
+		}
+		result = result.extendTopLeft(fComputation, connection);
+		
+		// Inputs: [valueWidth V] [valueWidth F] [keyWidth K] [keyWidth S]
+		// Outputs: [valueWidth (V*C=)+(F*-C=)] [keyWidth S]
+		// Identify F' = (V*C=)+(F*-C=)
+		// Outputs: [valueWidth F'] [keyWidth S]
+		
+		HashMap<Integer, Integer> shuffleInput = new HashMap<Integer, Integer>();
+		for(int i = 0; i < 2*valueWidth + 2*keyWidth; i++) {
+			if(0 <= i && i < keyWidth) {
+				shuffleInput.put(i, i+2*valueWidth);
+			} else if (keyWidth <= i && i < keyWidth+valueWidth) {
+				shuffleInput.put(i, i-keyWidth);
+			} else if (keyWidth + valueWidth <= i && i < 2*keyWidth + valueWidth) {
+				shuffleInput.put(i, i+valueWidth);
+			} else if (2*keyWidth + valueWidth <= i && i < 2*keyWidth + 2*valueWidth) { 
+				shuffleInput.put(i, i-2*keyWidth);
+			}
+		}
+		
+		result = new Shuffle(2*valueWidth + 2*keyWidth, shuffleInput).extendTopLeft(result, createIdentityMapping(2*valueWidth+2*keyWidth));
+		
+		// Input: [keyWidth K] [valueWidth V] [keyWidth S] [valueWidth F]
+		// Outputs: [valueWidth F'] [keyWidth S]
+		
+		shuffleInput.clear();
+		for(int i = 0; i < valueWidth+keyWidth; i++) {
+			if (0 <= i && i < valueWidth) {
+				// in F'
+				shuffleInput.put(i, i+keyWidth);
+			} else if (valueWidth <= i && i < valueWidth+keyWidth) {
+				// in S
+				shuffleInput.put(i, i-valueWidth);
+			}
+		}
+		result = result.extendTopLeft(new Shuffle(valueWidth+keyWidth, shuffleInput), createIdentityMapping(valueWidth+keyWidth));
+		
+		// Input: [keyWidth K] [valueWidth V] [keyWidth S] [valueWidth F]
+		// Outputs: [keyWidth S] [valueWidth F']
+		return result;
+	}
+	
+	/**
+	 * Generates a lookup table.
+	 * 
+	 * The input has to be a sequence of key, value pairs followed by the
+	 * key to look up. That is, if ki are keys and vi are values and s is the
+	 * searched key, then the input  must be structured like k1 v1 k2 v2 ... s
+	 * 
+	 * The output consists of valueWidth bits with the entry of the lookup table.
+	 * If the element was not in the table, the result is not defined.
+	 * @param pairCount the number of entries in the lookup table
+	 * @param keyWidth the bit width of the keys
+	 * @param valueWidth the bit width of the values.
+	 * @return
+	 */
+	private static Circuit createLookUpTable(int pairCount, int keyWidth, int valueWidth) {
+		
+		HashMap<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		
+		Circuit sInput = new Times(keyWidth, new Input());
+		Circuit initialF = new Times(valueWidth, new Constant(false));		
+		Circuit result = initialF.extendLeft(sInput);
+		
+		for(int i = 0; i < valueWidth + keyWidth; i++) {
+			if (0 <= i && i < keyWidth) {
+				// S
+				connection.put(i, keyWidth+valueWidth+i);
+			} else if (keyWidth  <= i && i < keyWidth + valueWidth) {
+				connection.put(i, keyWidth+valueWidth+i);
+			}
+		}
+		for (int i = 0; i < pairCount; i++) {
+			result = result.extendTopLeft(createLookupTableStateTransition(keyWidth, valueWidth), connection);
+		}
+		return result;
+	}
 	/**
 	 * This constructs a circuit which computes the first shares
 	 * of the first approximation (called alpha in the paper).
