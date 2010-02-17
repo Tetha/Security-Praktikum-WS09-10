@@ -28,7 +28,9 @@ public class Shuffle extends Circuit {
 		outputs = new int[nodeCount];
 		tables = new boolean[nodeCount][4][4];
 		adjacencyList = new LinkedList[nodeCount];
+		
 		for (int i = 0; i < nodeCount; i++) {
+			adjacencyList[i] = new LinkedList<Integer>();
 			if (0 <= i && i < inputCount) {
 				// input
 				inputs[i] = i;

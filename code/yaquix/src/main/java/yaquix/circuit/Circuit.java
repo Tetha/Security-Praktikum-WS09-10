@@ -1,5 +1,6 @@
 package yaquix.circuit;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -99,10 +100,170 @@ public class Circuit {
 	 * circuit to the inputs of the parameter circuit.
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Circuit extendTopLeft(Circuit addedCircuit, 
 								 Map<Integer, Integer> connection) {
-		// TODO extendTopLeft
-		return null;
+		Circuit result = new Circuit();
+		result.inputs = new int[countSurvingInputs(connection, inputs, addedCircuit.inputs)];
+		result.outputs = new int[countSurvivingOutputs(connection, outputs, addedCircuit.outputs)];
+		int survivingGatesCount = countSurvivingGates(connection, gateType, addedCircuit.gateType);
+		result.adjacencyList = new LinkedList[survivingGatesCount];
+		result.gateType = new GateType[survivingGatesCount];
+		result.tables = new boolean[survivingGatesCount][4][4];
+
+		int survivingAddedInputs = 0;
+		int existingInputs = inputs.length;
+		int addedGates = addedCircuit.countInnerGates();
+		int existingGates = countInnerGates();
+		int addedOutputs = addedCircuit.outputs.length;
+		int survivingAddedOutputs = 0;
+		
+		// the destination of X input lists associate the input index with 
+		// gate indexes in the result circuit
+		// the destination of X gate associates gate indexes in the existing
+		// or added circuit with gate indexes in the result circuit
+		// the destination of output associates output indexes with 
+		// gate indexes in the result circuit.
+		List<Integer> destinationOfAddedInput = new LinkedList<Integer>();
+		int[] destinationOfAddedGate = new int[addedCircuit.gateType.length];
+		int[] destinationOfExistingGate = new int[gateType.length];
+		for(int i = 0; i < addedCircuit.inputs.length; i++) {
+			if (connection.containsValue(i)) {
+				destinationOfAddedInput.add(-1);
+				destinationOfAddedGate[addedCircuit.inputs[i]] = -1;
+			} else {
+				destinationOfAddedInput.add(survivingAddedInputs);
+				destinationOfAddedGate[addedCircuit.inputs[i]] = survivingAddedInputs;
+				survivingAddedInputs++;
+			}
+		}
+		
+		List<Integer> destinationOfExistingInput = new LinkedList<Integer>(); 
+		for(int i = 0; i < inputs.length; i++) {
+			int destinationIndex = i+survivingAddedInputs;
+			destinationOfExistingInput.add(destinationIndex);
+			destinationOfExistingGate[inputs[i]] = destinationIndex;
+		}
+		
+		for(int i = 0; i < addedCircuit.gateType.length; i++) {
+			if (addedCircuit.gateType[i] == GateType.IN
+					|| addedCircuit.gateType[i] == GateType.OUT) continue;
+			
+			destinationOfAddedGate[i] = i+existingInputs+survivingAddedInputs;
+		}
+		
+		
+		for(int i = 0; i < gateType.length; i++) {
+			if (gateType[i] == GateType.IN
+					|| gateType[i] == GateType.OUT) continue;
+			destinationOfExistingGate[i] = i+existingInputs+survivingAddedInputs+addedGates;
+		}
+		
+		List<Integer> destinationOfAddedOutput =  new LinkedList<Integer>();
+		for(int i = 0 ; i < addedCircuit.outputs.length; i++) {
+			int destinationIndex = survivingAddedInputs + existingInputs + addedGates + existingGates + i;
+			destinationOfAddedOutput.add(destinationIndex);
+			destinationOfAddedGate[addedCircuit.outputs[i]] = destinationIndex; 
+		}
+		
+		List<Integer> destinationOfExistingOutput = new LinkedList<Integer>();
+		for(int i = 0; i < outputs.length; i++) {
+			if(connection.containsKey(i)) {
+				destinationOfExistingOutput.add(-1);
+				destinationOfExistingGate[outputs[i]] = -1;
+			} else {
+				
+				int destinationIndex = survivingAddedInputs + existingInputs 
+												+ addedGates + existingGates 
+												+ addedOutputs + survivingAddedOutputs;
+				destinationOfExistingOutput.add(destinationIndex);
+				destinationOfExistingGate[outputs[i]] = destinationIndex;
+				survivingAddedOutputs++;
+				
+			}
+		}
+		
+		// copy the gates in a meaningful fashion.
+		int newInputsAdded = 0;
+		
+		for(int i = 0; i < addedCircuit.inputs.length; i++) {
+			int newGateIndex = destinationOfAddedInput.get(i);
+			if (newGateIndex == -1) {
+				// the successor of the delete output corresponding to
+				// this index will do all the work, we just die
+			} else {
+				result.gateType[newGateIndex] = GateType.IN;
+				result.inputs[newInputsAdded] = newGateIndex;
+				newInputsAdded++;
+				
+				result.adjacencyList[newGateIndex] = new LinkedList<Integer>();
+				int inputGateIndex = addedCircuit.inputs[i];
+				for(Integer follower : addedCircuit.adjacencyList[inputGateIndex]) {
+					GateType followerType = addedCircuit.gateType[follower];
+				}
+			}
+		}
+		
+		for(int i = 0; i < inputs.length; i++) {
+			int newGateIndex = destinationOfExistingInput.get(i);
+			result.gateType[newGateIndex] = GateType.IN;
+			result.inputs[newInputsAdded] = newGateIndex;
+			newInputsAdded++;
+		}
+		
+		
+		return result;
+	}
+	
+	/**
+	 * counts the non-input-output-gates.
+	 * @return the number of the non-input-output-gates
+	 */
+	private int countInnerGates() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	/**
+	 * Counts the number of gates the resulting circuit will have.
+	 * @param connection the connection relation
+	 * @param existingGateTypes the gate types of the existing circuit
+	 * @param addedGateTypes the gate types of the added circuit.
+	 * @return
+	 */
+	private int countSurvivingGates(Map<Integer, Integer> connection,
+			GateType[] existingGateTypes, GateType[] addedGateTypes) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * This counts the number of outputs surviving the connection process. These
+	 * are all outputs from the added circuit and those outputs from the existing
+	 * circuit which area not mentioned in the connection
+	 * @param connection the connection relation
+	 * @param existingOutputs the existing outputs
+	 * @param addedOutputs the added outputs
+	 * @return the number of outputs surviving
+	 */
+	private int countSurvivingOutputs(Map<Integer, Integer> connection,
+			int[] existingOutputs, int[] addedOutputs) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * counts how many inputs will be in the resulting circuit. Those are
+	 * all inputs from either of the two inputs - those inputs from the
+	 * added inputs which are mentioned in the connection
+	 * @param connection the connection mapping
+	 * @param existingInputs the inputs of the existing circuit
+	 * @param addedInputs the inputs of the extension curcuit
+	 * @return the number of still external inputs
+	 */
+	private int countSurvingInputs(Map<Integer, Integer> connection,
+			int[] existingInputs, int[] addedInputs) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	/**

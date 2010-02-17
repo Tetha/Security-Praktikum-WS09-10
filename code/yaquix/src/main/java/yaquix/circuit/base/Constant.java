@@ -20,7 +20,7 @@ public class Constant extends Circuit {
 		gateType[0] = GateType.CONSTANT;
 		
 		adjacencyList = new LinkedList[1];
-		
+		adjacencyList[0] = new LinkedList<Integer>();
 		tables = new boolean[1][4][4];
 		tables[0][0][0] = isTrue;
 		

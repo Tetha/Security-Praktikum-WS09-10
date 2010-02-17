@@ -21,6 +21,9 @@ public class Negation extends Circuit {
 		gateType[2] = GateType.OUT;
 		
 		adjacencyList = new LinkedList[3];
+		adjacencyList[0] = new LinkedList<Integer>();
+		adjacencyList[1] = new LinkedList<Integer>();
+		adjacencyList[2] = new LinkedList<Integer>();
 		adjacencyList[0].add(1);
 		adjacencyList[1].add(2);
 		

@@ -19,7 +19,9 @@ public class Input extends Circuit {
 		gateType[1] = GateType.OUT;
 		
 		adjacencyList = new LinkedList[2];
+		adjacencyList[0] = new LinkedList<Integer>();
 		adjacencyList[0].add(1);
+		adjacencyList[1] = new LinkedList<Integer>();
 		
 		tables = new boolean[2][4][4];
 		
