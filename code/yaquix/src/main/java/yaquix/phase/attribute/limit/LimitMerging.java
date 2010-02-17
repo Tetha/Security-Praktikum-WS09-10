@@ -1,7 +1,10 @@
 package yaquix.phase.attribute.limit;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.knowledge.Attribute;
@@ -28,6 +31,8 @@ class LimitMerging extends SymmetricPhase {
 	 */
 	private OutputKnowledge<List<Attribute>> concertedAttributes;
 	
+	Logger logger;
+	
 	/**
 	 * This constructs a new ListMergingPhase
 	 * @param localLimits the source of the limits to merge
@@ -35,13 +40,29 @@ class LimitMerging extends SymmetricPhase {
 	 */
 	public LimitMerging(InputKnowledge<Map<String, Double>> localLimits,
 			OutputKnowledge<List<Attribute>> concertedAttributes) {
+		logger.info("limitMerging");
 		this.localLimits = localLimits;
 		this.concertedAttributes = concertedAttributes;
 	}
 
 	@Override
-	protected void execute(Connection connection) {
-		// TODO execute
+	protected void execute(Connection connection) 
+									throws IOException, ClassNotFoundException {
+		logger.info("limitMerging: starting computation");
+
+		List<Attribute> list = new Vector<Attribute>();
+
+		logger.info("limitMerging: exchanging limits...");
+		Map<String, Double> remoteMap = 
+								connection.exchangeLimits(localLimits.get());
+
+		logger.info("limitMerging: concerting attributes...");
+		for(String word : localLimits.get().keySet())
+			list.add(new Attribute(word, localLimits.get().get(word),
+														remoteMap.get(word)));
+
+		concertedAttributes.put(list);
+		
 	}
 
 }

@@ -84,7 +84,7 @@ public class ID3Step extends SymmetricPhase {
 	}
 
 	@Override
-	protected void execute(Connection connection) throws IOException {
+	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: ID3 Step");
 		Knowledge<List<MailType>> emailLabels =
 			new Knowledge<List<MailType>>();
