@@ -1,9 +1,12 @@
 package yaquix.phase.attribute.limit;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
+import yaquix.knowledge.Mail;
 import yaquix.knowledge.Mails;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
@@ -32,6 +35,8 @@ class LocalLimitComputation extends SymmetricPhase {
 	 */
 	private OutputKnowledge<Map<String, Double>> localLimits;
 	
+	Logger logger;
+	
 	/**
 	 * This constructs a new LocalLimitComputation.
 	 * @param concertedWordlist the list of words to compute the limits for
@@ -41,6 +46,9 @@ class LocalLimitComputation extends SymmetricPhase {
 	public LocalLimitComputation(InputKnowledge<List<String>> concertedWordlist,
 			InputKnowledge<Mails> localMails,
 			OutputKnowledge<Map<String, Double>> localLimits) {
+		
+		logger.info("localLimitComputation");
+		
 		this.concertedWordlist = concertedWordlist;
 		this.localMails = localMails;
 		this.localLimits = localLimits;
@@ -48,8 +56,24 @@ class LocalLimitComputation extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) {
-		// TODO execute
-
+		
+		double tmpValue;
+		Map<String, Double>  map;
+		
+		logger.info("localLimitComputation: starting computation...");
+		
+		for(String word : concertedWordlist.get()){
+		
+			tmpValue = 0;
+			map = new HashMap<String, Double>();
+			
+			for(Mail mail : localMails.get().getAllMails()){
+			
+				tmpValue += mail.countWords()/mail.countWord(word);
+				map.put(word, tmpValue);
+			}
+			
+			localLimits.put(map);			
+		}
 	}
-
 }
