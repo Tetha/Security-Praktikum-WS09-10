@@ -1,11 +1,18 @@
 package yaquix.phase.attribute;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.AttributeValueTable;
+import yaquix.knowledge.Mail;
 import yaquix.knowledge.Mails;
+import yaquix.knowledge.Occurrences;
+
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.SymmetricPhase;
@@ -34,6 +41,7 @@ class LocalDiscretization extends SymmetricPhase {
 	 * This requires the resulting attribute value table.
 	 */
 	private OutputKnowledge<AttributeValueTable> localAttributeValues;
+	Logger logger;
 	
 	/**
 	 * Constructs a new Local Discretization phase.
@@ -44,6 +52,7 @@ class LocalDiscretization extends SymmetricPhase {
 	public LocalDiscretization(InputKnowledge<List<Attribute>> commonAttributes,
 			InputKnowledge<Mails> localEmails,
 			OutputKnowledge<AttributeValueTable> localAttributeValues) {
+		logger.info("localDiscretization:");
 		this.commonAttributes = commonAttributes;
 		this.localEmails = localEmails;
 		this.localAttributeValues = localAttributeValues;
@@ -51,8 +60,36 @@ class LocalDiscretization extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) {
-		// TODO Auto-generated method stub
+		List<Attribute> attributeList = new Vector<Attribute>();	
+		AttributeValueTable valueTable = new AttributeValueTable();
+		Map<Attribute,Occurrences> map;
+		
 
+		logger.info("localDiscretization: discretizing SpamMails...");
+		List<Mail> mailList = localEmails.get().getSpamMails();
+		
+		for(Mail mail: mailList){
+			map = new HashMap<Attribute,Occurrences>();
+			attributeList = commonAttributes.get();
+			
+			for(Attribute attribute : attributeList){
+				map.put(attribute, attribute.classify(mail));
+			}
+			valueTable.addSpamMail(map);
+		}
+		
+		logger.info("localDiscretization: discretizing nonSpamMails...");
+		mailList = localEmails.get().getNonSpamMails();
+		
+		for(Mail mail: mailList){
+			map = new HashMap<Attribute,Occurrences>();
+			
+			for(Attribute attribute : attributeList){
+				map.put(attribute, attribute.classify(mail));
+			}
+			valueTable.addNonSpamMail(map);
+		}
+		
+		localAttributeValues.put(valueTable);
 	}
-
 }
