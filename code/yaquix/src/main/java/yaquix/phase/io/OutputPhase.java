@@ -1,5 +1,6 @@
 package yaquix.phase.io;
 
+import java.io.IOException;
 import java.io.Writer;
 
 import yaquix.Connection;
@@ -38,7 +39,9 @@ public class OutputPhase extends SymmetricPhase {
 
 
 	@Override
-	protected void execute(Connection connection) {
-		// TODO execute
+	protected void execute(Connection connection) throws IOException {
+		logger.info("Entering Output phase");
+		localOutput.get().write(String.format("%s", concertedClassifier.get()));
+		logger.info("Exiting Output phase");
 	}
 }

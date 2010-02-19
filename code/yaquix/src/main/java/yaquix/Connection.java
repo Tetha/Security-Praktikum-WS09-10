@@ -296,4 +296,8 @@ public class Connection {
 		// TODO receiveKey
 		return null;
 	}
+	
+	public Integer exchangeInteger(Integer localKey) {
+		return null;
+	}
 }

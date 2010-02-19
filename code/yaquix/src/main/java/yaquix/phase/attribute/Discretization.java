@@ -1,5 +1,6 @@
 package yaquix.phase.attribute;
 
+import java.io.IOException;
 import java.util.List;
 
 import yaquix.Connection;
@@ -7,8 +8,11 @@ import yaquix.knowledge.Attribute;
 import yaquix.knowledge.AttributeValueTable;
 import yaquix.knowledge.Mails;
 import yaquix.phase.InputKnowledge;
+import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.SymmetricPhase;
+import yaquix.phase.attribute.limit.LimitComputation;
+import yaquix.phase.attribute.wordlist.WordlistComputation;
 
 /**
  * This phase computes a list of attributes and an attribute value table
@@ -49,9 +53,23 @@ public class Discretization extends SymmetricPhase {
 
 
 	@Override
-	protected void execute(Connection connection) {
-		// TODO execute
+	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
+		logger.info("Entering discretization phase...");
 		
+		Knowledge<List<String>> concertedWordlist = new Knowledge<List<String>>();
+		WordlistComputation p1 = new WordlistComputation(localMails, concertedWordlist);
+		executePhase(connection, p1);
+
+		Knowledge<List<Attribute>> commonAttributes = new Knowledge<List<Attribute>>();
+		LimitComputation p2 = new LimitComputation(concertedWordlist, localMails, commonAttributes);
+		executePhase(connection, p2);
+		
+		
+		LocalDiscretization p3 = new LocalDiscretization(commonAttributes, localMails, localAttributeValues);
+		concertedAttributes.put(commonAttributes.get());
+		executePhase(connection, p3);
+		
+		logger.info("Finishing discretization phase");
 	}
 
 }

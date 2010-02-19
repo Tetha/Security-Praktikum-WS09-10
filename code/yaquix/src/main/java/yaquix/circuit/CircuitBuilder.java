@@ -739,4 +739,21 @@ public class CircuitBuilder {
 		// TODO createSecondHalfOfFirstApproximation
 		return null;
 	}
+	
+	/**
+	 * This constructs a circuit which checks if all mail labels are the same.
+	 * The input has to be structured as follows:
+	 *  - every even and odd bit encode a mail label. The encoding is defined in the specification
+	 * The output has to be structured as follows:
+	 *  - if the labels agree "Spam", then the first bit of the output must be 1 and the second
+	 *    bit of the output must be 0
+	 *  - if the labels agree "Non Spam", then the first bit of the output must be 1 and the second
+	 *    bit of the output must be 1
+	 *  - if the labels disagree, the first bit must be 0 and the second bit is undefined. 
+	 * @param mailCount the overall amount of e-mails used
+	 * @return a circuit computing this.
+	 */
+	public static Circuit createAgreeingLabelComputation(int mailCount) {
+		return null;
+	}
 }
