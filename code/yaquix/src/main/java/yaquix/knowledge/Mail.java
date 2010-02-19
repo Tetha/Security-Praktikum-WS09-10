@@ -1,5 +1,7 @@
 package yaquix.knowledge;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,8 +28,32 @@ public class Mail {
 	 * @return
 	 */
 	private List<String> parseWords() {
-		// TODO: parseWords;
-		return null;
+		List<String> words = new LinkedList<String>();
+		StringBuilder currentWord = new StringBuilder();
+		boolean inWord = false;
+		for (int i = 0; i < content.length(); i++) {
+			if (inWord) {
+				if ('a' <= content.charAt(i) && content.charAt(i) <= 'z') {
+					// still in word
+					currentWord.append(content.charAt(i));
+				} else {
+					// word ended
+					words.add(currentWord.toString());			
+					inWord = false;
+				}
+			} else {
+				if ('a' <= content.charAt(i) && content.charAt(i) <= 'z') {
+					// now in word
+					currentWord = new StringBuilder();
+					inWord = true;
+				} else {
+					// still not in word
+					continue;
+				}
+			}
+		}
+		if (inWord) words.add(currentWord.toString()); // last word has no following non-wordy-character
+		return words;
 	}
 	
 	/**
@@ -35,8 +61,7 @@ public class Mail {
 	 * @return the set of words in the mail
 	 */
 	public Set<String> getWords() {
-		// TODO: getWords
-		return null;
+		return new HashSet<String>(parseWords());
 	}
 	
 	/**
@@ -46,17 +71,21 @@ public class Mail {
 	 * @return the number of words in the email.
 	 */
 	public int countWords() {
-		// TODO: countWords
-		return -1;
+		return parseWords().size();
 	}
 	
 	/**
 	 * This counts the number of occurrences of the word in the email content.
-	 * @param word the word to count
+	 * @param needle the word to count
 	 * @return the number of occurrences
 	 */
-	public int countWord(String word) {
-		// TODO: countWord
-		return -1;
+	public int countWord(String needle) {
+		int occurrences = 0;
+		for (String word : parseWords()) {
+			if (needle.equals(word)) {
+				occurrences++;
+			}
+		}
+		return occurrences;
 	}
 }

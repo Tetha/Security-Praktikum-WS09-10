@@ -88,4 +88,9 @@ public class AttributeValueTable {
 		 
 		 return result;
 	 }
+
+	public int countAllMails() {
+		// TODO Auto-generated method stub
+		return -1;
+	}
 }

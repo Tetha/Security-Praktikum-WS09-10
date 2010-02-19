@@ -1,5 +1,7 @@
 package yaquix.knowledge;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +28,8 @@ public class Mails {
 	 * This is a list in order to implement a multiset like behavior.
 	 */
 	public Mails() {
-		// TODO Constructor
+		spamMails = new LinkedList<Mail>();
+		nonSpamMails = new LinkedList<Mail>();
 	}
 	
 	/**
@@ -36,8 +39,7 @@ public class Mails {
 	 * @return an independent view on the spam mails
 	 */
 	public List<Mail> getSpamMails() {
-		// TODO: getSpamMails
-		return null;
+		return spamMails;
 	}
 	
 	/**
@@ -47,8 +49,7 @@ public class Mails {
 	 * @return an independent view on the non spam mails
 	 */
 	public List<Mail> getNonSpamMails() {
-		// TODO: getNonSpamMails
-		return null;
+		return nonSpamMails;
 	}
 	
 	/**
@@ -58,8 +59,7 @@ public class Mails {
 	 * @return an independent view on all mails
 	 */
 	public List<Mail> getAllMails() {
-		// TODO: getAllMails
-		return null;
+		return spamMails;
 	}
 	
 	/**
@@ -67,8 +67,15 @@ public class Mails {
 	 * @return the set of all unique words
 	 */
 	public Set<String> getAllWords() {
-		// TODO: getAllWords
-		return null;
+		Set<String> allWords = new HashSet<String>();
+		for (Mail mail : nonSpamMails) {
+			allWords.addAll(mail.getWords());
+		}
+		
+		for (Mail mail : spamMails) {
+			allWords.addAll(mail.getWords());
+		}
+		return allWords;
 	}
 		
 	/**
@@ -78,8 +85,11 @@ public class Mails {
 	 * @return the number of occurences of the word in spam mails
 	 */
 	public int countWordInSpamMails(String word) {
-		// TODO: countWordInSpamMails
-		return -1;
+		int count = 0;
+		for (Mail mail : spamMails) {
+			count += mail.countWord(word);
+		}
+		return count;
 	}
 	
 	/**
@@ -89,8 +99,11 @@ public class Mails {
 	 * @return the number of occurrences of the word in non spam mails
 	 */
 	public int countWordInNonSpamMails(String word) {
-		// TODO: countWordInNonSpamMails
-		return -1;
+		int count = 0;
+		for (Mail mail : nonSpamMails) {
+			count += mail.countWord(word);
+		}
+		return count;
 	}
 	
 	/**
@@ -100,17 +113,19 @@ public class Mails {
 	 * mails.
 	 */
 	public int countWordInAllEmails(String word) {
-		// TODO: countWordInAllEmails
-		return -1;
+		return countWordInSpamMails(word) + countWordInNonSpamMails(word);
 	}
 	
 	/**
-	 * counts the number of words in spam mails.
+	 * counts the number of non-unique words in spam mails.
 	 * @return the number of words in spam mails.
 	 */
 	public int countSpamWords() {
-		// TODO countSpamWords
-		return -1;
+		int amount = 0;
+		for (Mail mail : spamMails) {
+			amount += mail.countWords();
+		}
+		return amount;
 	}
 	
 	/**
@@ -118,8 +133,11 @@ public class Mails {
 	 * @return the number of words in non spam mails
 	 */
 	public int countNonSpamWords() {
-		// TODO countNonSpamWords
-		return -1;
+		int amount = 0;
+		for (Mail mail : nonSpamMails) {
+			amount += mail.countWords();
+		}
+		return amount;
 	}
 	
 	/**
@@ -130,8 +148,7 @@ public class Mails {
 	 * @return the number of words in all emails
 	 */
 	public int countAllWords() {
-		// TODO countAllWords
-		return -1;
+		return countSpamWords() + countNonSpamWords();
 	}
 	
 	/**
@@ -139,7 +156,7 @@ public class Mails {
 	 * @param newMail the new mail to store
 	 */
 	public void addSpamMail(Mail newMail) {
-		// TODO: addSpamMail
+		spamMails.add(newMail);
 	}
 	
 	/**
@@ -147,6 +164,6 @@ public class Mails {
 	 * @param newMail the new mail to store
 	 */
 	public void addNonSpamMail(Mail newMail) {
-		// TODO addNonSpamMail
+		nonSpamMails.add(newMail);
 	}
 }

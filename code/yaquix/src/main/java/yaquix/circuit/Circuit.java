@@ -1,5 +1,6 @@
 package yaquix.circuit;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -199,7 +200,8 @@ public class Circuit {
 				result.adjacencyList[newGateIndex] = new LinkedList<Integer>();
 				int inputGateIndex = addedCircuit.inputs[i];
 				for(Integer follower : addedCircuit.adjacencyList[inputGateIndex]) {
-					GateType followerType = addedCircuit.gateType[follower];
+					int followerDestination = destinationOfAddedGate[follower];
+					result.adjacencyList[newGateIndex].add(followerDestination);
 				}
 			}
 		}
@@ -209,9 +211,86 @@ public class Circuit {
 			result.gateType[newGateIndex] = GateType.IN;
 			result.inputs[newInputsAdded] = newGateIndex;
 			newInputsAdded++;
+		
+			result.adjacencyList[newGateIndex] = new LinkedList<Integer>();
+			int inputGateIndex = inputs[i];
+			for(Integer follower : adjacencyList[inputGateIndex]) {
+				int followerDestination = destinationOfExistingGate[follower];
+				result.adjacencyList[newGateIndex].add(followerDestination);
+			}
+		
 		}
 		
+		// inner gates
+		for(int i= 0; i < addedCircuit.gateType.length; i++) {
+			if (addedCircuit.gateType[i] == GateType.IN
+					|| addedCircuit.gateType[i] == GateType.OUT) continue;
+			
+			int gateDestinationIndex = destinationOfAddedGate[i];
+			result.gateType[gateDestinationIndex] = addedCircuit.gateType[i];
+			result.tables[gateDestinationIndex] = addedCircuit.tables[i];
+			result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
+			for (Integer follower : addedCircuit.adjacencyList[i]) {
+				int followerDestinationIndex = destinationOfAddedGate[follower];
+				result.adjacencyList[gateDestinationIndex].add(followerDestinationIndex);
+			}
+		}
 		
+		for (int i = 0; i < gateType.length; i++) {
+			if(gateType[i] == GateType.IN || gateType[i] == GateType.OUT) continue;
+			int gateDestinationIndex = destinationOfExistingGate[i];
+			result.gateType[gateDestinationIndex] = gateType[i];
+			result.tables[gateDestinationIndex] = tables[i];
+			result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
+			for (Integer follower : adjacencyList[i]) {
+				if (gateType[follower] == GateType.OUT) {
+					int outputIndex = -1;
+					for (int j = 0; j < outputs.length; j++) {
+						if (outputs[j] == follower) {
+							outputIndex = j;
+							break;
+						}
+					}
+					assert (outputIndex != -1);
+					if (connection.containsKey(outputIndex)) {
+						int associatedAddedInput = connection.get(outputIndex);
+						int assoiciatedAddedGate = addedCircuit.inputs[associatedAddedInput];
+						for (Integer inputFollower : addedCircuit.adjacencyList[assoiciatedAddedGate]) {
+							int inputFollowerDestination = destinationOfAddedGate[inputFollower];
+							adjacencyList[gateDestinationIndex].add(inputFollowerDestination);
+						}
+					} else {
+						int outputDestination = destinationOfExistingOutput.get(follower);
+						adjacencyList[gateDestinationIndex].add(outputDestination);
+					}
+				} else {
+					int followerDestination = destinationOfExistingGate[follower];
+					adjacencyList[gateDestinationIndex].add(followerDestination);
+				}
+			}
+		}
+		
+		// outputs
+		int outputsAdded = 0;
+		for (int i = 0; i < addedCircuit.outputs.length; i++) {
+			int gateDestinationIndex = destinationOfAddedOutput.get(i);
+			result.gateType[gateDestinationIndex] = GateType.OUT;
+			result.outputs[outputsAdded] = gateDestinationIndex;
+			result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
+			outputsAdded++;
+		}
+		
+		for (int i = 0; i < outputs.length; i++) {
+			int gateDestinationIndex = destinationOfExistingOutput.get(i);
+			if (gateDestinationIndex == -1) {
+				continue;
+			} else {
+				result.gateType[gateDestinationIndex] = GateType.OUT;
+				result.outputs[outputsAdded] = gateDestinationIndex;
+				result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
+				outputsAdded++;
+			}
+		}
 		return result;
 	}
 	
@@ -220,8 +299,13 @@ public class Circuit {
 	 * @return the number of the non-input-output-gates
 	 */
 	private int countInnerGates() {
-		// TODO Auto-generated method stub
-		return 0;
+		int gateCount = 0;
+		for(GateType g : gateType) {
+			if (g != GateType.IN && g != GateType.OUT) {
+				gateCount++;
+			}
+		}
+		return gateCount;
 	}
 	/**
 	 * Counts the number of gates the resulting circuit will have.
@@ -232,8 +316,7 @@ public class Circuit {
 	 */
 	private int countSurvivingGates(Map<Integer, Integer> connection,
 			GateType[] existingGateTypes, GateType[] addedGateTypes) {
-		// TODO Auto-generated method stub
-		return 0;
+		return existingGateTypes.length + addedGateTypes.length - connection.size()*2;
 	}
 
 	/**
@@ -247,8 +330,7 @@ public class Circuit {
 	 */
 	private int countSurvivingOutputs(Map<Integer, Integer> connection,
 			int[] existingOutputs, int[] addedOutputs) {
-		// TODO Auto-generated method stub
-		return 0;
+		return existingOutputs.length + addedOutputs.length - connection.size();
 	}
 
 	/**
@@ -262,34 +344,7 @@ public class Circuit {
 	 */
 	private int countSurvingInputs(Map<Integer, Integer> connection,
 			int[] existingInputs, int[] addedInputs) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/**
-	 * This extends a given circuit with another circuit.
-	 * The parameter circuit is added on top of the existing circuit. This means that
-	 * some inputs of the parameter input are fed by outputs of the current algorithm.
-	 * Which inputs are fed by what output exactly is determined by the connection mapping.
-	 * If connection.get(i) = j, then the output number i of the current algorithm
-	 * feeds input number j of the parameter circuit.
-	 * The extension is on the right, that means, additional inputs of the parameter 
-	 * circuit which are not mentioned by the connection mapping are added after
-	 * the inputs of the existing algorithm, while any outputs of the existing algorithm
-	 * which are not mentioned by the mapping are added to the overall outputs before
-	 * any output of the parameter algorithms.
-	 * 
-	 * Note that extendBottomLeft can be implemented by swapping the current
-	 * and the added circuit.
-	 * @param addedCircuit a circuit to add to the existing circuit
-	 * @param connection a specification to connect the outputs of the current
-	 * circuit to the inputs of the parameter circuit.
-	 * @return
-	 */
-	public Circuit extendTopRight(Circuit addedCircuit,
-								  Map<Integer, Integer> connection) {
-		// TODO extendTopRight -- check if we ever ever use this
-		return null;
+		return existingInputs.length + addedInputs.length - connection.size();
 	}
 	
 	/**
@@ -309,9 +364,9 @@ public class Circuit {
 	 * @return
 	 */
 	public Circuit extendLeft(Circuit addedCircuit) {
-		// TODO extendLeft
-		return null;
+		return extendTopLeft(addedCircuit, new HashMap<Integer, Integer>());
 	}
+	
 	/**
 	 * garbles the boolean circuit into a garbled circuit, with the
 	 * given input mapping.
