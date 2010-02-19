@@ -56,11 +56,21 @@ public class ReadFolders extends SymmetricPhase {
 	}
 
 	@Override
-	protected void execute(Connection connection) {
+	protected void execute(Connection connection) throws IOException {
 		logger.info("readFolders: starting computation...");
 		Mails mails = new Mails();
 
-		//TODO
+		File[] files = localSpamFolder.get().listFiles();
+		
+		for(File file : files){
+			mails.addSpamMail(readMail(file));
+		}
+		
+		files = localNonSpamFolder.get().listFiles();
+		
+		for(File file : files){
+			mails.addNonSpamMail(readMail(file));
+		}
 		
 		localMails.put(mails);
 	}
@@ -81,6 +91,6 @@ public class ReadFolders extends SymmetricPhase {
         reader.read(tempChars);        
         tmpString = new String(tempChars);
 		
-        return new Mail();
+        return new Mail(tmpString);
 	}
 }

@@ -15,6 +15,10 @@ public class Mail {
 	 */
 	private String content;
 	
+	public Mail(String content) {
+		this.content = content;
+	}
+
 	/**
 	 * This parses the words contained in content. A word is a sequence of
 	 * alphanumeric characters, non-alphanumeric characters between words
