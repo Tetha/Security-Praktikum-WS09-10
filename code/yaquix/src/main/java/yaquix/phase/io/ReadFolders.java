@@ -60,12 +60,14 @@ public class ReadFolders extends SymmetricPhase {
 		logger.info("readFolders: starting computation...");
 		Mails mails = new Mails();
 
+		logger.info("readFolders: reading SpamMails...");
 		File[] files = localSpamFolder.get().listFiles();
 		
 		for(File file : files){
 			mails.addSpamMail(readMail(file));
 		}
 		
+		logger.info("readFolders: reading nonSpamMails...");
 		files = localNonSpamFolder.get().listFiles();
 		
 		for(File file : files){
