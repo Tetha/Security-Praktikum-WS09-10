@@ -124,7 +124,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	}
 
 	@Override
-	public void clientExecute(Connection connection) throws IOException {
+	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: 1-2 OT");
 		Key publicKey = connection.receiveKey();
 		int x0 = connection.receiveInteger();
