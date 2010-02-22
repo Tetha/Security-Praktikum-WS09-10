@@ -1,9 +1,11 @@
 package yaquix.circuit;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Implements a boolean circuit, the bane of our existence.
@@ -16,7 +18,7 @@ public class Circuit {
 	 * @author hk
 	 *
 	 */
-	protected enum GateType {
+	public enum GateType {
 		/**
 		 * describes the gate as an input gate
 		 */
@@ -80,6 +82,12 @@ public class Circuit {
 	 */
 	protected int[] outputs; 
 
+	private Random random;
+	
+	public void setRandom(Random r) {
+		this.random = r;
+	}
+	
 	/**
 	 * This extends a given circuit with another circuit.
 	 * The parameter circuit is added on top of the existing circuit. That means, the
@@ -367,6 +375,8 @@ public class Circuit {
 		return extendTopLeft(addedCircuit, new HashMap<Integer, Integer>());
 	}
 	
+	
+	
 	/**
 	 * garbles the boolean circuit into a garbled circuit, with the
 	 * given input mapping.
@@ -377,7 +387,220 @@ public class Circuit {
 	 * but is garbled for yaos protocol
 	 */
 	public GarbledCircuit garble(Map<Integer, int[]> inputMapping) {
-		// TODO garble
+		GarbledCircuit result = new GarbledCircuit(gateType.length, inputs.length, outputs.length);
+		int[][] preds; // predecessors[gate][0..1]
+		int[][] wireGarblings; // wireGarblings[source][0/1]
+		
+		int[] outputWireMapping;
+		int[] inputWireMapping;
+		int onlyPredIndex;
+		
+		preds = computePredecessors();
+		wireGarblings = garbleAllWires(inputMapping);
+		for (int i = 0; i < gateType.length; i++) {
+			switch(gateType[i]) {
+			case IN:
+				outputWireMapping = wireGarblings[i];
+				garbleInput(result, i, outputWireMapping);
+			break;
+			
+			case OUT:
+				onlyPredIndex = preds[i][0];
+				inputWireMapping = wireGarblings[onlyPredIndex];
+				garbleOutput(result, i, inputWireMapping);
+			break;
+			case CONSTANT:
+				outputWireMapping = wireGarblings[i];
+				garbleConstantGate(result, i, outputWireMapping);
+			break;
+			
+			case UNARYGATE:
+				outputWireMapping = wireGarblings[i];
+				onlyPredIndex = preds[i][0];
+				inputWireMapping = wireGarblings[onlyPredIndex];
+				garbleUnaryGate(result, i, outputWireMapping, inputWireMapping);
+			break;
+			
+			case BINARYGATE:
+				outputWireMapping = wireGarblings[i];
+				int leftPredIndex = preds[i][0];
+				int rightPredIndex = preds[i][1];
+				int[] leftInputWireMapping = wireGarblings[leftPredIndex];
+				int[] rightInputWireMapping = wireGarblings[rightPredIndex];
+				
+				garbleBinaryGate(result, i, outputWireMapping, leftInputWireMapping, rightInputWireMapping);
+			break;
+			}
+		}
 		return null;
+	}
+
+
+	private void garbleOutput(GarbledCircuit result, int i,
+			int[] inputWireMapping) {
+		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
+			if (outputs[outputIndex] == i) {
+				result.addOutput(i, outputIndex, inputWireMapping);
+			}
+		}
+		
+	}
+
+	private void garbleInput(GarbledCircuit result, int i,
+			int[] outputWireMapping) {
+		for (int inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+			if (inputs[inputIndex] == i) {
+				result.addInput(i, inputIndex, adjacencyList[i], outputWireMapping);
+			}
+		}
+	}
+
+	private int[][] garbleAllWires(Map<Integer, int[]> inputMapping) {
+		int trueValue;
+		int falseValue;
+		int[][] result = new int[gateType.length][2];
+		for(int i = 0; i < gateType.length; i++) {
+			if (gateType[i] == GateType.IN) {
+				result[i] = inputMapping.get(i);
+			} else {
+				trueValue = random.nextInt();
+				do {
+					falseValue = random.nextInt();
+				} while (trueValue == falseValue);
+
+				int[] localGarbledMapping = result[i];
+				localGarbledMapping[0] = falseValue;
+				localGarbledMapping[1] = trueValue;
+				result[i] = localGarbledMapping;
+			}
+		}
+		return result;
+	}
+
+	private int[][] computePredecessors() {
+		int[][] result = new int[gateType.length][2];
+		int[] successorCount = new int[gateType.length];
+		for (int gateIndex = 0; gateIndex < gateType.length; gateIndex++) {
+			for(Integer follower : adjacencyList[gateIndex]) {
+				int successorsOfFollower = successorCount[follower];
+				result[follower][successorsOfFollower] = gateIndex;
+				successorCount[follower] += 1;
+			}
+		}
+		return result;
+	}
+
+	private void garbleBinaryGate(GarbledCircuit result, int i, 
+			int[] outputWireMapping, int[] leftInputWireMapping, 
+			int[] rightInputWireMapping) {
+		// the input decision table maps 0 x 1 to 0, 1 (it is 
+		// in some square-shaped format). In order to use the
+		// function garbleRow, we turn this into a row-like
+		// format which maps 0..3 to the output value. Then, we apply
+		// garbleRow 4 times, permute the table and we are done.
+		// note that we have to recompute the input mapping, because
+		// each input mapping individually is too short. staring at
+		// the specification for quite some time reveals, that each
+		// entry of the new input mapping is the xor of the values of
+		// the two shorter separate input mapping.
+		
+		int[] largeInputMapping = new int[4];		
+		largeInputMapping[0*2+0] = leftInputWireMapping[0] ^ rightInputWireMapping[0];
+		largeInputMapping[0*2+1] = leftInputWireMapping[0] ^ rightInputWireMapping[1];
+		largeInputMapping[1*2+0] = leftInputWireMapping[1] ^ rightInputWireMapping[0];
+		largeInputMapping[1*2+1] = leftInputWireMapping[1] ^ rightInputWireMapping[1];
+		
+		boolean[][] squareTruthTable = tables[i];
+		boolean[] longTruthTable = new boolean[4];
+		longTruthTable[0*2+0] = squareTruthTable[0][0];
+		longTruthTable[0*2+1] = squareTruthTable[0][1];
+		longTruthTable[1*2+0] = squareTruthTable[1][0];
+		longTruthTable[1*2+1] = squareTruthTable[1][1];
+		
+		int[][] directlyGarbled = new int[2][4];
+		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 0, directlyGarbled);
+		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 1, directlyGarbled);
+		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 2, directlyGarbled);
+		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 3, directlyGarbled);
+		
+		List<Integer> destinationIndexes = new LinkedList<Integer>();
+		for (int ii = 0; ii < 4; ii++) destinationIndexes.add(ii);
+		Collections.shuffle(destinationIndexes);
+		int[][] completelyGarbled = new int[2][4];
+		for (int ii = 0; ii < 4; ii++) {
+			int destinationIndex = destinationIndexes.get(i);
+			completelyGarbled[0][destinationIndex] = directlyGarbled[0][ii];
+			completelyGarbled[1][destinationIndex] = directlyGarbled[1][ii];
+		}
+		result.addBinaryGate(i, adjacencyList[i], completelyGarbled);
+	}
+
+	private void garbleUnaryGate(GarbledCircuit result, int i, 
+			int[] outputWireMapping, int[] inputWireMapping) {		
+		boolean[] truthTable = tables[i][0];
+
+		
+		int[][] directlyGarbled = new int[2][2];		
+		garbleRow(outputWireMapping, inputWireMapping, truthTable,
+				0, directlyGarbled);
+
+		garbleRow(outputWireMapping, inputWireMapping, truthTable,
+				1, directlyGarbled);
+		
+
+		int[][] completelyGarbled = new int[2][2];
+		if (random.nextBoolean()) {
+			// straight
+			completelyGarbled[0][0] = directlyGarbled[0][0];
+			completelyGarbled[1][0] = directlyGarbled[1][0];
+			
+			completelyGarbled[0][1] = directlyGarbled[0][1];			
+			completelyGarbled[1][1] = directlyGarbled[1][1];
+		} else {
+			// cross
+			completelyGarbled[0][0] = directlyGarbled[0][1];
+			completelyGarbled[1][0] = directlyGarbled[1][1];
+			
+			completelyGarbled[0][1] = directlyGarbled[0][0];			
+			completelyGarbled[1][1] = directlyGarbled[1][0];
+		}
+		
+		result.addUnaryGate(i, adjacencyList[i], completelyGarbled);
+	}
+
+	/**
+	 * @param outputWireMapping
+	 * @param inputWireMapping
+	 * @param truthTable
+	 * @param rowIndex
+	 * @param directlyGarbled
+	 */
+	private void garbleRow(int[] outputWireMapping, int[] inputWireMapping,
+			boolean[] truthTable, int rowIndex, int[][] directlyGarbled) {
+		int garbledInputForFalse = inputWireMapping[rowIndex];
+		int outputForFalse = (truthTable[rowIndex] ? outputWireMapping[1] : outputWireMapping[0]);		
+		int tagEntryForFalse = 0 ^ garbledInputForFalse;
+		int valueEntryForFalse = outputForFalse ^ garbledInputForFalse;		
+		directlyGarbled[0][rowIndex] = tagEntryForFalse;
+		directlyGarbled[1][rowIndex] = valueEntryForFalse;
+	}
+
+	private void garbleConstantGate(GarbledCircuit result, int i, 
+			int[] outputWireMapping) {
+		int[][] garbledTable;
+		boolean outputValue = tables[i][0][0];
+		
+		int garbledValue;
+		if (outputValue) {
+			garbledValue = outputWireMapping[1];
+		} else {
+			garbledValue = outputWireMapping[0];
+		}
+		
+		garbledTable = new int[2][4];
+		garbledTable[0][0] = 0;
+		garbledTable[1][0] = garbledValue;
+		
+		result.addConstantGate(i, adjacencyList[i], garbledTable);
 	}
 }

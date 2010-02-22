@@ -24,12 +24,21 @@ public class BiVariantPolynomial {
 	 * @param coefficients
 	 */
 	public BiVariantPolynomial(int[][] coefficients) {
-
 		this.coefficients = new int[coefficients.length][coefficients[0].length];
-
-		for(int i = 0; i < coefficients.length; i++){
-			this.coefficients[i] = coefficients[i].clone();
+		for (int i = 0; i < coefficients.length; i++) {
+			for (int ii = 0; ii < coefficients[i].length; ii++) {
+				this.coefficients[i][ii] = coefficients[i][ii];
+			}
 		}
+	}
+	
+	private int intPow(int base, int exponent) {
+		int multiplicationsStillNecessary = exponent;
+		int result = 1;
+		while (multiplicationsStillNecessary > 0) {
+			result = result*base;
+		}
+		return result;
 	}
 
 	/**
@@ -39,15 +48,12 @@ public class BiVariantPolynomial {
 	 * @return the value of the polynomial in the given coordinate
 	 */
 	public int evaluate(int x, int y) {
-
 		int result = 0;
-
-		for(int i = 0; i<2; i++){
-			for(int j =0; j<3; j++){
-				result += coefficients[i][j] * Math.pow(x, i) * Math.pow(y, j);
+		for (int xCoeffIndex = 0; xCoeffIndex < coefficients.length; xCoeffIndex++) {
+			for (int yCoeffIndex = 0; yCoeffIndex < coefficients[xCoeffIndex].length; yCoeffIndex++) {
+				result += coefficients[xCoeffIndex][yCoeffIndex] * intPow(x, xCoeffIndex) * intPow(y, yCoeffIndex);
 			}
 		}
-
 		return result;
 	}
 }
