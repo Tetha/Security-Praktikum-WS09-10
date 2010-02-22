@@ -6,13 +6,14 @@ import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
+import yaquix.polynomial.CoefficientDefinedPolynomial;
 import yaquix.polynomial.UnivariantPolynomial;
 
 /**
  * This class takes one factor from each of the two users and
  * computes one random term for each user such that the sum of the
  * terms is identical to the product of the factors.
- * 
+ *
  * This is implemented by selecting a simple univariant linear
  * polynomial which uses the term of the server user as the
  * factor of the variable and adds a random value to it. Then
@@ -20,7 +21,7 @@ import yaquix.polynomial.UnivariantPolynomial;
  * of the evaluation for the client user and the random value
  * we added to the polynomial (negated) as the term for the
  * server user.
- * 
+ *
  * @author hk
  *
  */
@@ -28,8 +29,8 @@ class PrivateMultiplication extends Phase {
 	private Random randomSource;
 	private InputKnowledge<Integer> localFactor;
 	private OutputKnowledge<Integer> localTerm;
-	
-	
+
+
 	/**
 	 * Constructs a new private multiplication phase
 	 * @param randomSource the random number generator in progress at the moment
@@ -46,13 +47,23 @@ class PrivateMultiplication extends Phase {
 
 	@Override
 	public void clientExecute(Connection connection) {
-		// TODO clientExecute
-
+		PolynomialEvaluation poleval = new PolynomialEvaluation(localFactor, localTerm);
+		poleval.clientExecute(connection);
 	}
 
 	@Override
 	public void serverExecute(Connection connection) {
-		// TODO serverExecute
+		// ???
+		InputKnowledge<CoefficientDefinedPolynomial> serverPol =
+			new InputKnowledge<CoefficientDefinedPolynomial>() {
+				@Override
+				public CoefficientDefinedPolynomial get() {
+				return (CoefficientDefinedPolynomial)
+					createPolynomial(localFactor.get(),randomSource.nextInt());
+				}
+			};
+		PolynomialEvaluation poleval = new PolynomialEvaluation(serverPol);
+		poleval.serverExecute(connection);
 	}
 
 	/**
@@ -62,7 +73,6 @@ class PrivateMultiplication extends Phase {
 	 * @return  the linear polynomial to evaluate
 	 */
 	private UnivariantPolynomial createPolynomial(int factor, int randomValue) {
-		// TODO createPolynomial
-		return null;
+		return new CoefficientDefinedPolynomial(new int[] {factor, randomValue});
 	}
 }
