@@ -745,15 +745,99 @@ public class CircuitBuilder {
 	 * The input has to be structured as follows:
 	 *  - every even and odd bit encode a mail label. The encoding is defined in the specification
 	 * The output has to be structured as follows:
-	 *  - if the labels agree "Spam", then the first bit of the output must be 1 and the second
-	 *    bit of the output must be 0
-	 *  - if the labels agree "Non Spam", then the first bit of the output must be 1 and the second
+	 *  - if the labels agree "Spam", then the first bit of the output must be 0 and the second
 	 *    bit of the output must be 1
-	 *  - if the labels disagree, the first bit must be 0 and the second bit is undefined. 
+	 *  - if the labels agree "Non Spam", then the first bit of the output must be 1 and the second
+	 *    bit of the output must be 0
+	 *  - if the labels disagree, the first bit must be 1 and the second bit must be 1. 
 	 * @param mailCount the overall amount of e-mails used
 	 * @return a circuit computing this.
 	 */
 	public static Circuit createAgreeingLabelComputation(int mailCount) {
-		return null;
+		Circuit transition = createAgreeingLabelTransition();
+		Circuit result = new Constant(false);
+		result = result.extendLeft(new Constant(false));
+		
+		for (int i = 0; i < mailCount; i++) {
+			result = result.extendTopLeft(transition, createIdentityMapping(2));
+		}
+		return result;
+	}
+
+	/**
+	 * @return
+	 */
+	private static Circuit createAgreeingLabelTransition() {
+		// Inputs
+		// Outputs
+		
+		Circuit result = new Split(2);
+		
+		// Inputs: e1
+		// Outputs e1 e1
+		
+		result = result.extendLeft(new Split(2));
+		
+		// Inputs: e0 e1
+		// Outputs: e0 e0 e1 e1
+		
+		result = result.extendLeft(new Split(3));
+		
+		// Inputs: s1 e0 e1
+		// Outputs s1 s1 s1 e0 e0 e1 e1
+		
+		result = result.extendLeft(new Split(2));
+		
+		// Inputs: s0 s1 e0 e1
+		// Outputs: s0 s0 s1 s1 s1 e0 e0 e1 e1
+		
+		Circuit layer1 = new Negation();
+		layer1.extendLeft(new Negation());
+		layer1.extendLeft(new And());
+		layer1.extendLeft(new Or());
+		
+		// layer 1: or and neg neg
+		
+		Map<Integer, Integer> inputToLayer1 = new HashMap<Integer, Integer>();
+		inputToLayer1.put(0, 0); // s0 -> left of first or
+		inputToLayer1.put(2, 1); // s1 -> right of first or
+		inputToLayer1.put(1, 2); // s0 -> left of first and
+		inputToLayer1.put(3, 3); // s1 -> right of first and
+		inputToLayer1.put(5, 4); // e0 -> negation
+		inputToLayer1.put(7, 5); // e1 -> negation
+		
+		result = result.extendTopLeft(layer1, inputToLayer1);
+		
+		// Outputs: s0+s1 s0*s1 -e0 -e1 s1 e0 e1
+		
+		Circuit layer2 = new And();
+		layer2.extendLeft(new Or());
+		layer2.extendLeft(new And());
+		
+		// layer 2: And Or And
+		
+		Map<Integer, Integer> layer1ToLayer2 = new HashMap<Integer, Integer>();
+		layer1ToLayer2.put(5, 0); // e0 -> left of and
+		layer1ToLayer2.put(0, 1); // s0+s1 -> right of and
+		layer1ToLayer2.put(1, 2); // s0*s1 -> left of or
+		layer1ToLayer2.put(3, 3); // -e1 -> right of or
+		layer1ToLayer2.put(2, 4); // -e0 -> left of and
+		layer1ToLayer2.put(6, 5); // e1 -> right of and
+		
+		result = result.extendTopLeft(layer2, layer1ToLayer2);
+		
+		// e0*(s0+s1) (s0*s1)+(-e1) (-e0)*e1 s1
+		
+		Circuit layer3 = new Or();
+		layer3.extendLeft(new Or());
+		
+		Map<Integer, Integer> layer2ToLayer3 = new HashMap<Integer, Integer>();
+		layer2ToLayer3.put(0, 0); // e0*(s0+s1) -> left or
+		layer2ToLayer3.put(1, 1); // (s0*s1)+(-e1) -> right or
+		layer2ToLayer3.put(2, 2); // (-e0)*e1 -> left or
+		layer2ToLayer3.put(3, 3); // s1 -> right or
+		
+		result = result.extendTopLeft(layer3, layer2ToLayer3);
+		return result;
 	}
 }
