@@ -64,11 +64,11 @@ public class LimitComputation extends SymmetricPhase {
 		
 		logger.info("limitComputation: going into localLimitComputation");
 		LocalLimitComputation localLimitcomputation = new LocalLimitComputation(concertedWordlist, localMails, tmpKnowledge);
-		localLimitcomputation.execute(connection);
+		executePhase(connection, localLimitcomputation);
 		
 		logger.info("limitComputation: going into LimitMerging");
 		LimitMerging limitMerging = new LimitMerging(tmpKnowledge, concertedAttributes);
-		limitMerging.execute(connection);
+		executePhase(connection, limitMerging);
 	}
 
 }

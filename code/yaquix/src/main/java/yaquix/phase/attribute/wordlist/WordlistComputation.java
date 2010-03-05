@@ -51,15 +51,13 @@ public class WordlistComputation extends SymmetricPhase {
 		logger.info("wordlistComputation: going into localWordlistcomputation");
 		
 		LocalWordlistComputation localWordlistComputation = 
-						new LocalWordlistComputation(localMails, tmpKnowledge);
-		
-		localWordlistComputation.execute(connection);
+						new LocalWordlistComputation(localMails, tmpKnowledge);		
+		executePhase(connection, localWordlistComputation);
 		
 		logger.info("wordlistComputation: going into wordlistMerging");
 		
 		WordlistMerging wordlistMerging = 
 							new WordlistMerging(tmpKnowledge, concertedWordlist);
-		
-		wordlistMerging.execute(connection);
+		executePhase(connection, wordlistMerging);
 	}
 }

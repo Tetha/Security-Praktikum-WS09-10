@@ -511,7 +511,6 @@ public class CircuitBuilder {
 	 * @return a ripple carry adder
 	 */
 	private static Circuit createAdder(int bitwidth) {
-		// TODO
 		Map<Integer, Integer> connection= new HashMap<Integer, Integer>();
 		connection.put(0, 0);
 		if (bitwidth < 1) {
@@ -615,14 +614,14 @@ public class CircuitBuilder {
 		// Inputs middle: [valueWidth X] [valueWidth Y] [valueWidth B] [valueWidth A] 
 		// Outputs middle: [valueWidth X*Y] [valueWidth B*-A]
 		
-		Circuit fComputation = result.extendTopLeft(new Times(valueWidth, new Or()), createIdentityMapping(2*valueWidth));
+		Circuit fComputation = middle.extendTopLeft(new Times(valueWidth, new Or()), createIdentityMapping(2*valueWidth));
 		
 		// Inputs fComputation: [valueWidth X] [valueWidth Y] [valueWidth B] [valueWidth A]
 		// Outputs fComputation: [valueWidth (X*Y)+(B*-A)]
 		//--------------------------------------------------------------
 		
 		connection.clear();
-		// Idenfity: X <- V; Y <- C=; B <- F; A <- C=
+		// Identity: X <- V; Y <- C=; B <- F; A <- C=
 		for(int i = 0; i < 2*valueWidth+keyWidth; i++) {
 			if (0 <= i && i < valueWidth) {
 				// first block C=
@@ -838,6 +837,171 @@ public class CircuitBuilder {
 		layer2ToLayer3.put(3, 3); // s1 -> right or
 		
 		result = result.extendTopLeft(layer3, layer2ToLayer3);
+		return result;
+	}
+	
+	/**
+	 * This constructs the state transition net for the 
+	 * max gain circuit.
+	 * The first sumWidth inputs must be the current
+	 * maximum sum.
+	 * The second indexWidth inputs must be the current
+	 * maximum index.
+	 * The third sumWidth inputs must be the current
+	 * input sum.
+	 * The fourth indexWidth inputs must be the current
+	 * sum index.
+	 * 
+	 * 
+	 * Then,
+	 * the first sumWidth outputs will be the
+	 * new maximum sum, 
+	 * the second indexWidth outputs will be the
+	 * new maximum index.
+	 * @param sumWidth the width of the sums
+	 * @param indexWidth the index of the maximum
+	 * @return a circuit to do a single compare
+	 * and copy.
+	 */
+	private static Circuit createMaxGainStatetransition(int sumWidth, int indexWidth) {
+		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		Circuit result = null;
+		
+		Circuit condAssign = new Or();
+		// Inputs condAssign: X Y
+		// Outputs condAssign: X+Y
+		
+		Circuit filterAnds = new And();
+		filterAnds = filterAnds.extendLeft(new And());
+		// Inputs filterAnds: A B C D
+		// Outputs filterAnds: A*B C*D
+		
+		condAssign = filterAnds.extendTopLeft(condAssign, createIdentityMapping(2));
+		
+		// Inputs condAssign: A B C D
+		// Outputs condAssign: (A*B)+(C*D)
+		
+		connection.clear();
+		connection.put(0, 3);
+		condAssign = new Negation().extendTopLeft(condAssign, connection);
+		
+		// Inputs: A B D C
+		// Outputs condAssign: (A*B)+(-C*D)
+		
+		connection.clear();
+		connection.put(0, 0);
+		connection.put(1, 3);
+		condAssign = new Split(2).extendTopLeft(condAssign, connection);
+		
+		// Inputs: B D C
+		// Outputs condAssign: (C*B)+(-C*D)
+		
+		// RENAME: C -> B, B -> T, D -> F
+		// Inputs condAssign: T F B
+		// Outputs condAssign: (B*T)+(-B*F)
+		
+		Circuit condIndexAssign = new Times(indexWidth, condAssign);
+		
+		// Inputs: [indexWidth x T] [indexWidth x F] [indexWidth x B]
+		// Outputs [indexWidth x (B*T)+(-B*F)]
+		
+		connection.clear();
+		for (int i  = 0; i < indexWidth; i++) {
+			connection.put(i, i+2*indexWidth);
+		}
+		condIndexAssign = new Split(indexWidth).extendTopLeft(condIndexAssign, connection);
+		
+		// Inputs condIndexAssign: [indexWidth x T] [indexWidth x F] B
+		// Outputs condIndexAssign: [indexWidth x (B*T)+(-B*F)]
+		
+		Circuit condSumAssign = new Times(sumWidth, condAssign);
+		
+		// Inputs condSumAssign: [sumWidth x T] [sumWidth x F] [sumWidth x B]
+		// Outputs condSumAssign: [sumWidth * (B*T)+(-B*F)]
+		
+		connection.clear();
+		for (int i = 0; i < indexWidth; i++) {
+			connection.put(i, i+2*sumWidth);
+		}
+		condSumAssign = new Split(sumWidth).extendTopLeft(condSumAssign,  connection);
+		
+		// Inputs condsumAssign: [sumWidth x T] [sumWidth x F] B
+		// Outputs condSumAssign: [sumWidth x (B*T)+(-B*F)]
+		
+		Circuit selectLayer = condIndexAssign.extendLeft(condSumAssign);
+		
+		// Inputs selectLayer: [sumWidth x T] [sumWidth x F] B [indexWidth x T] [indexWidth x F] A
+		// Ouputs selectLayer: [sumWidth x (B*T)+(-B*F)] [indexWidth x (A*T)+(-A*F)]
+		
+		connection.clear();
+		connection.put(0, 2*sumWidth);
+		connection.put(1, 2*sumWidth+1+2*indexWidth);
+		selectLayer = new Split(2).extendTopLeft(selectLayer, connection);
+		
+		// Inputs selectLayer: [sumWidth x T] [sumwidth x F] [indexWidth x T] [indexWidth x F] B
+		// Outputs selectLayer [sumWidth x (B*T)+(-B*F)] [indexWidth x (B*T)+(-A*F)] 
+		// Abstraction: Outputs selectLayer: [sumWidth x if B then T else F] [indexWidth x if B then T else F]
+		
+		Circuit rawComparer = createComparer(sumWidth);
+		// Inputs rawComparer: [sumWidth : A] [sumWidth : B]
+		// Outputs rawComparer: (A=B: 0, A>B||A<B 1) (A=B: ?, A>B:0, A<B: 1)
+		
+		Circuit strictLessThan = rawComparer.extendTopLeft(new And(), createIdentityMapping(2));
+		
+		// Inputs strictLessThan: [sumWidth: A] [sumWidth: B]
+		// Outputs strictLessThan: (A=B||A>B: 0, A<B: 1)
+		
+		connection.clear();
+		connection.put(0, 2*sumWidth + 2*indexWidth + 1);
+		result = strictLessThan.extendTopLeft(selectLayer, connection);
+		
+		// Inputs result: [sumWidth x T] [sumWidth x F] [indexWidth x T] [indexWidth x F] [sumWidth: A] [sumWidth: B]
+		// Outputs: [sumWidth x if (A < B) then T else F] [indexWidth x if (A < B) then T else F]
+		// RENAME: 1.T -> M, 1.F -> C 2.T -> I 2.F -> J, A -> X, B -> Y
+		// Inputs result: [sumWidth x M] [sumWidth x C] [indexWidth x I] [indexWidth x J] [sumWidth: X] [sumWidth: Y]
+		// Oututs: [sumWidth x if (X < Y) then M else C] [indexWidth x if (X < Y) then I else J]
+		
+		// make x and c the same
+		connection.clear();
+		for (int i = 0; i < 2*sumWidth; i++) {
+			if (0 <= i && i < sumWidth) {
+				connection.put(i, i+sumWidth);
+			} else if (sumWidth <= i && i < 2*sumWidth) {
+				connection.put(i, i+sumWidth+2*indexWidth);
+			}
+		}
+		result = new Times(sumWidth, new Split(2)).extendTopLeft(result, connection);
+		
+		// Inputs result: [sumWidth x M] [indexWidth x I] [indexWidth x J] [sumWidth: Y] [sumWidth: C]
+		// Outputs result: [sumWidth x if (C < Y) then M else C] [indexWIdth x if (C < Y) then I else J]
+		
+		// make m and y the same
+		connection.clear();
+		for (int i = 0; i < 2*sumWidth; i++) {
+			if (0 <=  i && i < sumWidth) {
+				connection.put(i, i);
+			} else if (sumWidth <= i && i < 2*sumWidth) {
+				connection.put(i, i+2*indexWidth);
+			}
+		}
+		result = new Times(sumWidth, new Split(2)).extendTopLeft(result, connection);
+		
+		// Inputs result: [indexWidth x I] [indexWidth x J] [sumWidth: C] [sumWidth: M]
+		// Outputs result: [sumWidth x if (C < M) then M else C] [indexWidth x if (C < M) then I else J]
+		Map<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
+		for (int i = 0; i < 2*indexWidth + 2*sumWidth; i++) {
+			if (0 <= i && i < sumWidth) {
+				connection.put(i, i+2*indexWidth+sumWidth);
+			} else if (sumWidth <= i && i < sumWidth + indexWidth) {
+				connection.put(i, i - sumWidth);
+			} else if (sumWidth + indexWidth < i && i < 2*sumWidth + indexWidth) {
+				connection.put(i, i-sumWidth+indexWidth);
+			} else if (2*sumWidth + indexWidth <= i && i < 2*sumWidth + 2*indexWidth) {
+				connection.put(i, i - 2*sumWidth);
+			}
+		}
+		result = new Shuffle(2*sumWidth+2*indexWidth, shuffleMap).extendTopLeft(result,
+							 createIdentityMapping(2*sumWidth + 2*indexWidth));
 		return result;
 	}
 }

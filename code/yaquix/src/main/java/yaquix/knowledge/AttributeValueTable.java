@@ -90,7 +90,6 @@ public class AttributeValueTable {
 	 }
 
 	public int countAllMails() {
-		// TODO Auto-generated method stub
-		return -1;
+		return countSpamMails() + countNonSpamMails();
 	}
 }

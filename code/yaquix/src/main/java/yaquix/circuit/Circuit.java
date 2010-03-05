@@ -375,7 +375,14 @@ public class Circuit {
 		return extendTopLeft(addedCircuit, new HashMap<Integer, Integer>());
 	}
 	
-	
+
+	/**
+	 * returns the number of inputs
+	 * @return how many inputs the circuit has
+	 */
+	public int getInputCount() {
+		return inputs.length;
+	}	
 	
 	/**
 	 * garbles the boolean circuit into a garbled circuit, with the

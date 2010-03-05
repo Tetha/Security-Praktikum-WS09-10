@@ -1,5 +1,6 @@
 package yaquix.phase.classifier.entropy;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 import yaquix.Connection;
@@ -26,7 +27,7 @@ import yaquix.polynomial.UnivariantPolynomial;
  *
  */
 class PrivateMultiplication extends Phase {
-	private Random randomSource;
+	private SecureRandom randomSource;
 	private InputKnowledge<Integer> localFactor;
 	private OutputKnowledge<Integer> localTerm;
 
@@ -37,7 +38,7 @@ class PrivateMultiplication extends Phase {
 	 * @param localFactor the factor of the current user
 	 * @param localTerm a place to store the computed term.
 	 */
-	public PrivateMultiplication(Random randomSource,
+	public PrivateMultiplication(SecureRandom randomSource,
 			InputKnowledge<Integer> localFactor,
 			OutputKnowledge<Integer> localTerm) {
 		this.randomSource = randomSource;
@@ -53,7 +54,7 @@ class PrivateMultiplication extends Phase {
 
 	@Override
 	public void serverExecute(Connection connection) {
-		// ???
+		// XXX 
 		InputKnowledge<CoefficientDefinedPolynomial> serverPol =
 			new InputKnowledge<CoefficientDefinedPolynomial>() {
 				@Override
@@ -73,6 +74,6 @@ class PrivateMultiplication extends Phase {
 	 * @return  the linear polynomial to evaluate
 	 */
 	private UnivariantPolynomial createPolynomial(int factor, int randomValue) {
-		return new CoefficientDefinedPolynomial(new int[] {factor, randomValue});
+		return new CoefficientDefinedPolynomial(new int[] {randomValue, factor});
 	}
 }

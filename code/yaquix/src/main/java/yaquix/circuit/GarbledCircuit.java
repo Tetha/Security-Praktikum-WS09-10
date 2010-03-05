@@ -3,7 +3,6 @@ package yaquix.circuit;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import yaquix.circuit.Circuit.GateType;
 
@@ -50,6 +49,7 @@ public class GarbledCircuit implements Serializable {
 		
 	protected int[] inputValues;
 	
+	@SuppressWarnings("unchecked")
 	public GarbledCircuit(int gateCount, int inputCount, int outputCount) {
 		gateType = new GateType[gateCount];
 		adjacencyList = new LinkedList[gateCount];
@@ -147,7 +147,7 @@ public class GarbledCircuit implements Serializable {
 		return decodeOutput(outputValues);
 	}
 
-
+	
 	private boolean[] decodeOutput(int[] outputValues) {
 		boolean[] result = new boolean[outputs.length];
 		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
