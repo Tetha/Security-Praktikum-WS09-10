@@ -123,7 +123,7 @@ public class ID3Step extends SymmetricPhase {
 		Knowledge<Attribute> bestAttribute = new Knowledge<Attribute>();
 		Phase maxGainPhase = new MaxGainComputation(entropyShares,
 									concertedRemainingAttributes,
-									bestAttribute);
+									bestAttribute, randomSource);
 		executePhase(connection, maxGainPhase);
 
 
