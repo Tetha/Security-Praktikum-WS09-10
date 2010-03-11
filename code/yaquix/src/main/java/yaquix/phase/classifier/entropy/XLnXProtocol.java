@@ -2,17 +2,23 @@ package yaquix.phase.classifier.entropy;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
+import yaquix.phase.SymmetricPhase;
 
-public class XLnXProtocol extends Phase {
+public class XLnXProtocol extends SymmetricPhase {
 	/**
 	 * contains the local input share
 	 */
 	private InputKnowledge<Integer> localInput;
 	private OutputKnowledge<Integer> localShare;
+	
+	private static final Logger LOG = LoggerFactory.getLogger(XLnXProtocol.class);
 	
 	/**
 	 * constructs new execution of the XLnX-Protocol.
@@ -27,17 +33,21 @@ public class XLnXProtocol extends Phase {
 	}
 
 	@Override
-	public void clientExecute(Connection connection) throws IOException,
+	protected void execute(Connection connection) throws IOException,
 			ClassNotFoundException {
-		// TODO Auto-generated method stub
-
+		// XXX: cheated
+		LOG.info("Starting Phase: XLnXProtocol (Faked)");
+		int localNumber = localInput.get();
+		int remoteNumber = connection.exchangeInteger(localNumber);
+		
+		int x = (localNumber + remoteNumber);
+		double xlnx = x * Math.log(x);
+		double share = xlnx / 2;
+		int roundedShare = (int) Math.ceil(share);
+		
+		localShare.put(roundedShare);
+		LOG.info("Ending Phase: XLnXProtocol");
 	}
 
-	@Override
-	public void serverExecute(Connection connection) throws IOException,
-			ClassNotFoundException {
-		// TODO Auto-generated method stub
-
-	}
 
 }
