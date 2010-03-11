@@ -1,6 +1,11 @@
 package yaquix.phase.classifier;
 
+import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.List;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import yaquix.Connection;
 import yaquix.circuit.Circuit;
@@ -41,8 +46,14 @@ public class AgreedLabelComputation extends Phase {
 	 */
 	private OutputKnowledge<MailType> concertedUniqueLabel;
 	
-	
-	
+	/**
+	 * contains the logger instance for this class.
+	 */
+	private static final Logger LOG = LoggerFactory.getLogger(AgreedLabelComputation.class);
+	/**
+	 * contains the source of random bits.
+	 */
+	private SecureRandom randomSource;
 	
 	/**
 	 * Constructs a new AgreedLabelComputation
@@ -50,19 +61,22 @@ public class AgreedLabelComputation extends Phase {
 	 * @param concertedUniqueLabel a place to store the common label or null on error.
 	 */
 	public AgreedLabelComputation(InputKnowledge<List<MailType>> localLabels,
-			OutputKnowledge<MailType> concertedUniqueLabel) {
+			OutputKnowledge<MailType> concertedUniqueLabel,
+			SecureRandom randomSource) {
 		this.localLabels = localLabels;
 		this.concertedUniqueLabel = concertedUniqueLabel;
+		this.randomSource = randomSource;
 	}
 
 	@Override
-	public void clientExecute(Connection connection) {
+	public void clientExecute(Connection connection) throws ClassNotFoundException, IOException {
 		List<MailType> localMailLabels = localLabels.get();
 		Knowledge<boolean[]> inputLabels = new Knowledge<boolean[]>();
 		inputLabels.put(encodeLabels(localMailLabels));
 		
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
-		CircuitEvaluation subphase = new CircuitEvaluation(inputLabels, concertedOutput);
+		CircuitEvaluation subphase = new CircuitEvaluation(inputLabels, concertedOutput,
+														   randomSource);
 		subphase.clientExecute(connection);
 		MailType result = decodeOutput(concertedOutput);
 		concertedUniqueLabel.put(result);
@@ -70,7 +84,7 @@ public class AgreedLabelComputation extends Phase {
 	}
 
 	@Override
-	public void serverExecute(Connection connection) {
+	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("entering Agreed Label computation..");
 		List<MailType> localMailLabels = localLabels.get();
 		int mailCount = remoteMailCount.get() + localMailLabels.size();
@@ -83,7 +97,8 @@ public class AgreedLabelComputation extends Phase {
 		
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 		
-		CircuitEvaluation subphase = new CircuitEvaluation(inputCircuit, inputLabels, concertedOutput);
+		CircuitEvaluation subphase = new CircuitEvaluation(inputCircuit, inputLabels, concertedOutput,
+														   randomSource);
 		subphase.serverExecute(connection);
 		MailType result=decodeOutput(concertedOutput);
 		concertedUniqueLabel.put(result);

@@ -1004,4 +1004,150 @@ public class CircuitBuilder {
 							 createIdentityMapping(2*sumWidth + 2*indexWidth));
 		return result;
 	}
+	
+	/**
+	 * Constructs the circuit which finds the maximum gain. In order to do this, the
+	 * circuit gets two vectors of entropy-shares and outputs the index in the
+	 * vector with maximum sum. This index is then identical to the index of the
+	 * attribute with the maximum information gain.
+	 * 
+	 * The input of the circuit consists of VECTORLENGTH SHAREWIDTH bit numbers
+	 * which are the shares of alice, followed by VECTORLENGTH SHAREWIDTH bit numbers
+	 * which are the shares of bob. The output of the circuit is a log_2(VECTORLENGTH) 
+	 * long binary encoded integer which is the index of the attribute with maximum
+	 * information gain.
+	 * 
+	 * @param vectorlength the number of shares to search
+	 * @param shareWidth the bitwidth of each share
+	 * @return a circuit to perform this computation.
+	 */
+	 public static Circuit createMaximumGainCircuit(int vectorLength, int shareWidth) {
+		 /*
+		  * We construct this circuit in several layers from output to input.
+		  * 
+		  * (1) we construct a properly sized linear search network using the
+		  * automaton implemented in createMaxGainStateTransition. Note that 
+		  * every but the first state transition adds a single new sum that 
+		  * can be handled, while the first state transition adds 2. This means,
+		  * we need vectorlength -1 transition networks, which add 2 + 1 + .. 
+		  * (vectorlength-2 many 1s) = vectorlength sums we can handle.
+		  * Let indexWidth be the smallest integer larger than log_2(VECTORLENGTH)
+		  * This presents us with the following required inputs:
+		  * [ shareWidth+1: A0+B0 ] [ indexWidth: idx0 ] [ shareWidth+1: A1+B1 ] [ indexWidth: idx1 ]
+		  * 
+		  * (2) we add the indexes with constant gates such that idx 0 becomes 0,
+		  * idx1 becomes 1, and so on. 
+		  * Index #k is preceded by k+1 sums and k indexes. Thus, the bits of index 
+		  * #k must go from (k+1)*sumWidth  + k*indexWidth. 
+		  * This leaves us with the inputs:
+		  * [ shareWidth+1: A0+B0 ] [ shareWidth+1: A1 + B1 ] ..
+		  * 
+		  * (3) we add the summation of the shares. Since the adder circuit assumes
+		  * that the bitwidth is large enough to handle overflows, this requires the inputs:
+		  * [ shareWidth+1: A0 ] [ shareWidth+1 B0 ] [ shareWidth+1 A1 ] [ shareWidth+1 B1 ] ...
+		  * 
+		  * (4) Since the input is shareWidth bits only, however, we need to precede
+		  * each chunk with a constant 0 gate. In other words, we need 2*vectorlength many
+		  * constant 0-gates, and need to connect 0-gate #i with input (shareWidth+1) * i of the
+		  * created circuit
+		  * Thus the inputs after (4) are:
+		  * [ shareWidth: A0 ] [ shareWidth B0 ] [ shareWidth A1 ] [ shareWidth B1 ]
+		  * 
+		  * (5) in order to comply with the input specification, we need to reorder this.
+		  * [ shareWidth: A0 ] [ shareWidth A1 ] ... [ shareWidth B0 ] [ shareWidth B1 ]
+		  * 
+		  * Thus, the Ai needs to be moved i * shareWidth to the right (as there will be
+		  * i many Bx before it), and the Bi needs to be moved to index 
+		  * shareWidth + 2*i*shareWidth (as there is always one Ai in front of it, and
+		  * 2*i pairs of A0 and B0).
+		  *  
+		  * (6) Finally, we need to prevent the value for the maximum sum to be output. 
+		  * This is done by putting the first sumWidth outputs into stop-circuits.
+		  */
+		 
+		 Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+		 int sumWidth = shareWidth +1;
+		 int indexWidth = -1; // TODO
+		 
+		 // (1)
+		 Circuit stateTransition = createMaxGainStatetransition(sumWidth, indexWidth);
+		 Circuit result = stateTransition;
+		 for (int i = 0; i < vectorLength-2; i++) {
+			 result = result.extendTopLeft(stateTransition, createIdentityMapping(sumWidth+indexWidth));
+		 }
+		 
+		 // (2)
+		 for (int indexIndex = 0; indexIndex < vectorLength; indexIndex++) {
+			 connection.clear();
+			 Circuit indexConstantGates = encodeInteger(indexIndex, indexWidth);
+			 for (int indexBitIndex = 0; indexBitIndex < indexWidth; indexBitIndex++) {
+				 int indexOffset = (indexIndex+1)*sumWidth + indexIndex * indexWidth;
+				 connection.put(indexBitIndex, indexOffset+indexBitIndex);
+			 }
+			 result = indexConstantGates.extendTopLeft(result, connection);
+		 }
+		 
+		 // (3)
+		 connection.clear();
+		 Circuit adder = createAdder(sumWidth);
+		 Circuit adders = null;
+		 for (int i = 0; i < vectorLength; i++) {
+			 if (adders == null) {
+				 adders = adder;
+			 } else {
+				 adders = adders.extendLeft(adder);
+			 }
+		 }
+		 result = adders.extendTopLeft(adders, createIdentityMapping(vectorLength*sumWidth));
+		 
+		 // (4)
+		 connection.clear();
+		 Circuit zero = new Constant(false);
+		 Circuit zeros = null;
+		 for(int i = 0; i < 2*vectorLength; i++) {
+			 if (zeros == null) {
+				 zeros = zero;
+			 } else {
+				 zeros = zeros.extendLeft(zero);
+			 }
+			 connection.put(i, sumWidth*i);
+		 }
+		 result = zeros.extendTopLeft(adders, connection);
+		 
+		 // (5)
+		 Map<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
+		 for (int aIndex = 0; aIndex < vectorLength; aIndex++) { // Ai s
+			 int inputOffset = aIndex * shareWidth;
+			 for (int bitIndex = inputOffset; bitIndex < inputOffset + shareWidth; bitIndex++) {
+				 shuffleMap.put(bitIndex, bitIndex + aIndex*shareWidth);
+			 }
+		 }
+		 		 
+		 for (int bIndex = 0; bIndex < vectorLength; bIndex++) { // Bi's
+			 int inputOffset = bIndex * shareWidth;
+			 for (int bitIndex = inputOffset; bitIndex < inputOffset + shareWidth; bitIndex++) {
+				 shuffleMap.put(bitIndex, bitIndex + shareWidth + 2*bIndex*shareWidth);
+			 }
+		 }
+		 Circuit inputReorderer = new Shuffle(2*vectorLength*shareWidth, shuffleMap);
+		 result = inputReorderer.extendTopLeft(result, createIdentityMapping(2*vectorLength*shareWidth));
+		 
+		 // (6)
+		 Circuit stop = new Stop();
+		 Circuit stops = null;
+		 for (int i = 0; i < sumWidth; i++) {
+			 if (stops == null) {
+				 stops = stop;
+			 } else {
+				 stops = stops.extendLeft(stop);
+			 }
+		 }
+		 result = result.extendTopLeft(stops, createIdentityMapping(sumWidth));
+		 return result;
+	 }
+
+	private static Circuit encodeInteger(int indexIndex, int indexWidth) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

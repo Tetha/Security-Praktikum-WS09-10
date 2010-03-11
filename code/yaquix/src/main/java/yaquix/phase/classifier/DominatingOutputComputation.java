@@ -1,5 +1,7 @@
 package yaquix.phase.classifier;
 
+import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -50,6 +52,11 @@ public class DominatingOutputComputation extends Phase {
 	private Logger logger;
 	
 	/**
+	 * contains the random source.
+	 */
+	private SecureRandom randomSource;
+	
+	/**
 	 * Creates a new DominatingOutputPhase.
 	 * @param localLabels the local mail labels.
 	 * @param concertedDominatingLabel a place to store the dominating class 
@@ -62,7 +69,7 @@ public class DominatingOutputComputation extends Phase {
 		this.localLabels = localLabels;
 		this.remoteMailCountLimit = remoteMailCountLimit;
 		this.concertedDominatingLabel = concertedDominatingLabel;
-		logger = LoggerFactory.getLogger("yaquix.phase.classifier.DominatingOutputComputation");
+		logger = LoggerFactory.getLogger(DominatingOutputComputation.class);
 	}
 
 	private int intLog2(int x) {
@@ -76,14 +83,14 @@ public class DominatingOutputComputation extends Phase {
 	}
 
 	@Override
-	public void clientExecute(Connection connection) {
+	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
 		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
 		localInput.put(encodeLabels(localLabels.get(), 
 					   intLog2(remoteMailCountLimit.get())*2));
 		
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
-		CircuitEvaluation subPhase = new CircuitEvaluation(localInput, concertedOutput);
+		CircuitEvaluation subPhase = new CircuitEvaluation(localInput, concertedOutput, randomSource);
 		subPhase.clientExecute(connection);
 		
 		decodeOutput(concertedOutput);
@@ -91,7 +98,7 @@ public class DominatingOutputComputation extends Phase {
 	}
 	
 	@Override
-	public void serverExecute(Connection connection) {
+	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
 		List<MailType> labels = localLabels.get();
 		int maximumMailBound = Math.max(labels.size(), remoteMailCountLimit.get());
@@ -107,7 +114,8 @@ public class DominatingOutputComputation extends Phase {
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 		
 		CircuitEvaluation subPhase = new CircuitEvaluation(circuitInput, 
-										localInputKnowledge, concertedOutput);
+										localInputKnowledge, concertedOutput,
+										randomSource);
 		subPhase.serverExecute(connection);
 		
 		decodeOutput(concertedOutput);

@@ -1,6 +1,7 @@
 package yaquix.phase.classifier;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class ID3Step extends SymmetricPhase {
 	/**
 	 * contains a source of randomness.
 	 */
-	private Random randomSource;
+	private SecureRandom randomSource;
 
 	/**
 	 * constructs a new ID3 step computation phase.
@@ -74,7 +75,7 @@ public class ID3Step extends SymmetricPhase {
 			InputKnowledge<AttributeValueTable> localValues,
 			InputKnowledge<Integer> remoteMailCountLimit,
 			OutputKnowledge<Classifier> concertedClassifier,
-			Random randomSource) {
+			SecureRandom randomSource) {
 		this.concertedRemainingAttributes = concertedRemainingAttributes;
 		this.localValues = localValues;
 		this.remoteMailCountLimit = remoteMailCountLimit;
@@ -93,7 +94,7 @@ public class ID3Step extends SymmetricPhase {
 		Knowledge<MailType> uniqueLabel = new Knowledge<MailType>();
 
 		Phase uniqueDecider =
-			new AgreedLabelComputation(emailLabels, uniqueLabel);
+			new AgreedLabelComputation(emailLabels, uniqueLabel, randomSource);
 		executePhase(connection, uniqueDecider);
 		if (uniqueLabel.get() != null) {
 			Classifier result = new Leaf(uniqueLabel.get());

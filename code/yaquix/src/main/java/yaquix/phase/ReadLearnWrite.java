@@ -3,6 +3,7 @@ package yaquix.phase;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -44,7 +45,7 @@ public class ReadLearnWrite extends SymmetricPhase {
 	/**
 	 * the randomsource for the id3-algorithm
 	 */
-	private Random randomSource;
+	private SecureRandom randomSource;
 	
 	/**
 	 * This constructs a new phase to read files and learn the classifier
@@ -54,11 +55,13 @@ public class ReadLearnWrite extends SymmetricPhase {
 	 */
 	public ReadLearnWrite(InputKnowledge<File> localSpamFolder,
 			InputKnowledge<File> localNonSpamFolder,
-			InputKnowledge<Writer> localClassifierOutput) {
+			InputKnowledge<Writer> localClassifierOutput,
+			SecureRandom randomSource) {
 		super();
 		this.localSpamFolder = localSpamFolder;
 		this.localNonSpamFolder = localNonSpamFolder;
 		this.localClassifierOutput = localClassifierOutput;
+		this.randomSource = randomSource;
 	}
 
 
