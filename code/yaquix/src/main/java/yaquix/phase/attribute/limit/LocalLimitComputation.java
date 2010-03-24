@@ -34,9 +34,7 @@ class LocalLimitComputation extends SymmetricPhase {
 	 * requires the mapping from words to own local limit.
 	 */
 	private OutputKnowledge<Map<String, Double>> localLimits;
-	
-	Logger logger;
-	
+
 	/**
 	 * This constructs a new LocalLimitComputation.
 	 * @param concertedWordlist the list of words to compute the limits for
@@ -45,10 +43,7 @@ class LocalLimitComputation extends SymmetricPhase {
 	 */
 	public LocalLimitComputation(InputKnowledge<List<String>> concertedWordlist,
 			InputKnowledge<Mails> localMails,
-			OutputKnowledge<Map<String, Double>> localLimits) {
-		
-		logger.info("localLimitComputation");
-		
+			OutputKnowledge<Map<String, Double>> localLimits) {			
 		this.concertedWordlist = concertedWordlist;
 		this.localMails = localMails;
 		this.localLimits = localLimits;
@@ -57,23 +52,29 @@ class LocalLimitComputation extends SymmetricPhase {
 	@Override
 	protected void execute(Connection connection) {
 		
-		double tmpValue;
-		Map<String, Double>  map;
 		
-		logger.info("localLimitComputation: starting computation...");
 		
+		logger.info("entering phase");
+		HashMap<String, Double> map = new HashMap<String, Double>();
 		for(String word : concertedWordlist.get()){
-		
-			tmpValue = 0;
-			map = new HashMap<String, Double>();
 			
-			for(Mail mail : localMails.get().getAllMails()){
-			
-				tmpValue += mail.countWords()/mail.countWord(word);
-				map.put(word, tmpValue);
+			double summedAverages = 0;
+			double averageInOneMail;
+						
+			List<Mail> mails = localMails.get().getAllMails();
+			for(Mail mail : mails){
+				if (mail.countWords() == 0) {
+					averageInOneMail = 0;
+				} else {
+					averageInOneMail = mail.countWord(word)/(double)mail.countWords();
+				}
+				summedAverages += averageInOneMail;
 			}
-			
-			localLimits.put(map);			
+			assert mails.size() != 0 : "No mails -> Average goes haywire";
+			map.put(word, summedAverages/(double)mails.size());
 		}
+		localLimits.put(map);
+		logger.trace("Local limits: " + map);
+		logger.info("leaving phase");
 	}
 }

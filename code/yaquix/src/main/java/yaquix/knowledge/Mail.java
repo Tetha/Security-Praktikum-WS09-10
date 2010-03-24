@@ -32,19 +32,22 @@ public class Mail {
 		StringBuilder currentWord = new StringBuilder();
 		boolean inWord = false;
 		for (int i = 0; i < content.length(); i++) {
+			char currentChar = content.charAt(i);
+			boolean isLetter = 'a' <= currentChar && currentChar <= 'z';
 			if (inWord) {
-				if ('a' <= content.charAt(i) && content.charAt(i) <= 'z') {
+				if (isLetter) {
 					// still in word
-					currentWord.append(content.charAt(i));
+					currentWord.append(currentChar);
 				} else {
 					// word ended
 					words.add(currentWord.toString());			
 					inWord = false;
 				}
 			} else {
-				if ('a' <= content.charAt(i) && content.charAt(i) <= 'z') {
+				if (isLetter) {
 					// now in word
 					currentWord = new StringBuilder();
+					currentWord.append(currentChar);
 					inWord = true;
 				} else {
 					// still not in word

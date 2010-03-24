@@ -3,6 +3,7 @@ package yaquix.phase;
 import java.io.IOException;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import yaquix.Connection;
 
@@ -29,6 +30,10 @@ public abstract class Phase {
 	 */
 	protected Logger logger;
 
+	public Phase() {
+		logger = LoggerFactory.getLogger(getClass());
+	}
+	
 	/**
 	 * This implements the actions the server side has to perform
 	 * in order to complete the desired goal of the phase.

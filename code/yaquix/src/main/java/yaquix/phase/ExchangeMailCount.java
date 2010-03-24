@@ -27,8 +27,9 @@ public class ExchangeMailCount extends SymmetricPhase {
 	@Override
 	protected void execute(Connection connection) throws IOException,
 			ClassNotFoundException {
+		logger.info("entering phase");
 		remoteMailCount.put(connection.exchangeInteger(localMailCount.get()));
-
+		logger.info("leaving phase");
 	}
 
 }

@@ -23,9 +23,7 @@ import yaquix.phase.SymmetricPhase;
 public class WordlistComputation extends SymmetricPhase {
 	private InputKnowledge<Mails> localMails;
 	private OutputKnowledge<List<String>> concertedWordlist;
-	
-	private Logger logger;
-	
+		
 	/**
 	 * Creates a new WordListComputation phase with the given
 	 * inputs and outputs.
@@ -34,8 +32,7 @@ public class WordlistComputation extends SymmetricPhase {
 	 */
 	public WordlistComputation(InputKnowledge<Mails> localMails,
 							OutputKnowledge<List<String>> concertedWordlist) {
-		logger.info("wordlistComputation");
-		
+		super();
 		this.localMails = localMails;
 		this.concertedWordlist = concertedWordlist;
 	}
@@ -44,20 +41,17 @@ public class WordlistComputation extends SymmetricPhase {
 	protected void execute(Connection connection) 
 									throws IOException, ClassNotFoundException {
 		
-		logger.info("wordlistComputation: starting computation...");
+		logger.info("entering phase");
 		
 		Knowledge<List<String>> tmpKnowledge = new Knowledge<List<String>>();
-		
-		logger.info("wordlistComputation: going into localWordlistcomputation");
-		
+				
 		LocalWordlistComputation localWordlistComputation = 
 						new LocalWordlistComputation(localMails, tmpKnowledge);		
 		executePhase(connection, localWordlistComputation);
-		
-		logger.info("wordlistComputation: going into wordlistMerging");
-		
+				
 		WordlistMerging wordlistMerging = 
 							new WordlistMerging(tmpKnowledge, concertedWordlist);
 		executePhase(connection, wordlistMerging);
+		logger.info("leaving phase");
 	}
 }

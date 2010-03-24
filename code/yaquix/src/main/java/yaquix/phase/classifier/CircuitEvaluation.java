@@ -66,7 +66,7 @@ public class CircuitEvaluation extends Phase {
 		this.serverCircuit = serverCircuit;
 		this.localInput = localInput;
 		this.concertedOutput = concertedOutput;
-		random = randomSource;
+		this.random = randomSource;
 	}
 
 	
@@ -91,7 +91,7 @@ public class CircuitEvaluation extends Phase {
 		Circuit inputCircuit = serverCircuit.get();
 		Map<Integer, int[]> inputMapping = buildInputMapping(inputCircuit.getInputCount());
 		
-		GarbledCircuit transmittedCircuit = inputCircuit.garble(inputMapping);
+		GarbledCircuit transmittedCircuit = inputCircuit.garble(inputMapping, random);
 		connection.sendGarbledCircuit(transmittedCircuit); // (1)
 		
 

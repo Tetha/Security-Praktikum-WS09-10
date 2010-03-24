@@ -30,9 +30,7 @@ class LimitMerging extends SymmetricPhase {
 	 * requires the computed attributes.
 	 */
 	private OutputKnowledge<List<Attribute>> concertedAttributes;
-	
-	Logger logger;
-	
+		
 	/**
 	 * This constructs a new ListMergingPhase
 	 * @param localLimits the source of the limits to merge
@@ -40,7 +38,6 @@ class LimitMerging extends SymmetricPhase {
 	 */
 	public LimitMerging(InputKnowledge<Map<String, Double>> localLimits,
 			OutputKnowledge<List<Attribute>> concertedAttributes) {
-		logger.info("limitMerging");
 		this.localLimits = localLimits;
 		this.concertedAttributes = concertedAttributes;
 	}
@@ -48,21 +45,19 @@ class LimitMerging extends SymmetricPhase {
 	@Override
 	protected void execute(Connection connection) 
 									throws IOException, ClassNotFoundException {
-		logger.info("limitMerging: starting computation");
+		logger.info("entering phase");
 
 		List<Attribute> list = new Vector<Attribute>();
 
-		logger.info("limitMerging: exchanging limits...");
 		Map<String, Double> remoteMap = 
 								connection.exchangeLimits(localLimits.get());
 
-		logger.info("limitMerging: concerting attributes...");
 		for(String word : localLimits.get().keySet())
 			list.add(new Attribute(word, localLimits.get().get(word),
 														remoteMap.get(word)));
 
 		concertedAttributes.put(list);
-		
+		logger.info("leaving phase");
 	}
 
 }

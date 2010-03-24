@@ -61,17 +61,21 @@ public class AgreedLabelComputation extends Phase {
 	 * @param concertedUniqueLabel a place to store the common label or null on error.
 	 */
 	public AgreedLabelComputation(InputKnowledge<List<MailType>> localLabels,
+			InputKnowledge<Integer> remoteMailCount,
 			OutputKnowledge<MailType> concertedUniqueLabel,
 			SecureRandom randomSource) {
 		this.localLabels = localLabels;
+		this.remoteMailCount = remoteMailCount;
 		this.concertedUniqueLabel = concertedUniqueLabel;
 		this.randomSource = randomSource;
 	}
 
 	@Override
 	public void clientExecute(Connection connection) throws ClassNotFoundException, IOException {
+		logger.info("entering phase");
 		List<MailType> localMailLabels = localLabels.get();
 		Knowledge<boolean[]> inputLabels = new Knowledge<boolean[]>();
+		LOG.trace(String.format("%d", localMailLabels.size()));
 		inputLabels.put(encodeLabels(localMailLabels));
 		
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
@@ -80,12 +84,12 @@ public class AgreedLabelComputation extends Phase {
 		subphase.clientExecute(connection);
 		MailType result = decodeOutput(concertedOutput);
 		concertedUniqueLabel.put(result);
-		
+		logger.info("entering phase");
 	}
 
 	@Override
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
-		logger.info("entering Agreed Label computation..");
+		logger.info("entering phase");
 		List<MailType> localMailLabels = localLabels.get();
 		int mailCount = remoteMailCount.get() + localMailLabels.size();
 		Circuit agreedLabel = CircuitBuilder.createAgreeingLabelComputation(mailCount);
@@ -102,7 +106,7 @@ public class AgreedLabelComputation extends Phase {
 		subphase.serverExecute(connection);
 		MailType result=decodeOutput(concertedOutput);
 		concertedUniqueLabel.put(result);
-		logger.info("leaving Agreed Label computation...");
+		logger.info("leaving phase");
 	}
 
 	/**

@@ -3,6 +3,9 @@ package yaquix.circuit;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import yaquix.circuit.base.And;
 import yaquix.circuit.base.Constant;
 import yaquix.circuit.base.Input;
@@ -26,6 +29,7 @@ import yaquix.circuit.base.Xor;
  *
  */
 public class CircuitBuilder {
+	private static final Logger LOG = LoggerFactory.getLogger(CircuitBuilder.class);
 	/**
 	 * This applies the extension to separate the outputs for each user
 	 * to an existing circuit. The extension adds a layer of xor-gates
@@ -754,12 +758,21 @@ public class CircuitBuilder {
 	 */
 	public static Circuit createAgreeingLabelComputation(int mailCount) {
 		Circuit transition = createAgreeingLabelTransition();
+		String LOGName = LOG.getName();
+		String myName = LOGName + ".AgreeingLabelComputationTransition";
+		Logger myLogger = LoggerFactory.getLogger(myName);
+		myLogger.trace(transition.dumpAsDot());
 		Circuit result = new Constant(false);
 		result = result.extendLeft(new Constant(false));
 		
 		for (int i = 0; i < mailCount; i++) {
 			result = result.extendTopLeft(transition, createIdentityMapping(2));
 		}
+		
+		myName = LOGName + ".AgreeingLabelComputation";
+		myLogger = LoggerFactory.getLogger(myName);
+		myLogger.trace(result.dumpAsDot());
+
 		return result;
 	}
 
@@ -791,9 +804,9 @@ public class CircuitBuilder {
 		// Outputs: s0 s0 s1 s1 s1 e0 e0 e1 e1
 		
 		Circuit layer1 = new Negation();
-		layer1.extendLeft(new Negation());
-		layer1.extendLeft(new And());
-		layer1.extendLeft(new Or());
+		layer1 = layer1.extendLeft(new Negation());
+		layer1 = layer1.extendLeft(new And());
+		layer1 = layer1.extendLeft(new Or());
 		
 		// layer 1: or and neg neg
 		
@@ -810,8 +823,8 @@ public class CircuitBuilder {
 		// Outputs: s0+s1 s0*s1 -e0 -e1 s1 e0 e1
 		
 		Circuit layer2 = new And();
-		layer2.extendLeft(new Or());
-		layer2.extendLeft(new And());
+		layer2 = layer2.extendLeft(new Or());
+		layer2 = layer2.extendLeft(new And());
 		
 		// layer 2: And Or And
 		
@@ -828,7 +841,7 @@ public class CircuitBuilder {
 		// e0*(s0+s1) (s0*s1)+(-e1) (-e0)*e1 s1
 		
 		Circuit layer3 = new Or();
-		layer3.extendLeft(new Or());
+		layer3 = layer3.extendLeft(new Or());
 		
 		Map<Integer, Integer> layer2ToLayer3 = new HashMap<Integer, Integer>();
 		layer2ToLayer3.put(0, 0); // e0*(s0+s1) -> left or

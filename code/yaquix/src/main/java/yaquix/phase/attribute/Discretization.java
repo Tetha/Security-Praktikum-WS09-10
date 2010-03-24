@@ -54,7 +54,7 @@ public class Discretization extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
-		logger.info("Entering discretization phase...");
+		logger.info("entering phase");
 		
 		Knowledge<List<String>> concertedWordlist = new Knowledge<List<String>>();
 		WordlistComputation p1 = new WordlistComputation(localMails, concertedWordlist);
@@ -69,7 +69,7 @@ public class Discretization extends SymmetricPhase {
 		concertedAttributes.put(commonAttributes.get());
 		executePhase(connection, p3);
 		
-		logger.info("Finishing discretization phase");
+		logger.info("leaving phase");
 	}
 
 }

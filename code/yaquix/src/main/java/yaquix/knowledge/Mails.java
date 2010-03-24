@@ -59,7 +59,10 @@ public class Mails {
 	 * @return an independent view on all mails
 	 */
 	public List<Mail> getAllMails() {
-		return spamMails;
+		List<Mail> allMails = new LinkedList<Mail>();
+		allMails.addAll(spamMails);
+		allMails.addAll(nonSpamMails);
+		return allMails;
 	}
 	
 	/**

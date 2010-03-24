@@ -41,7 +41,6 @@ class LocalDiscretization extends SymmetricPhase {
 	 * This requires the resulting attribute value table.
 	 */
 	private OutputKnowledge<AttributeValueTable> localAttributeValues;
-	Logger logger;
 	
 	/**
 	 * Constructs a new Local Discretization phase.
@@ -52,7 +51,6 @@ class LocalDiscretization extends SymmetricPhase {
 	public LocalDiscretization(InputKnowledge<List<Attribute>> commonAttributes,
 			InputKnowledge<Mails> localEmails,
 			OutputKnowledge<AttributeValueTable> localAttributeValues) {
-		logger.info("localDiscretization:");
 		this.commonAttributes = commonAttributes;
 		this.localEmails = localEmails;
 		this.localAttributeValues = localAttributeValues;
@@ -60,6 +58,7 @@ class LocalDiscretization extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) {
+		logger.info("entering phase");
 		List<Attribute> attributeList = new Vector<Attribute>();	
 		AttributeValueTable valueTable = new AttributeValueTable();
 		Map<Attribute,Occurrences> map;
@@ -91,5 +90,6 @@ class LocalDiscretization extends SymmetricPhase {
 		}
 		
 		localAttributeValues.put(valueTable);
+		logger.info("leaving phase");
 	}
 }

@@ -80,8 +80,7 @@ public class ID3Step extends SymmetricPhase {
 		this.localValues = localValues;
 		this.remoteMailCountLimit = remoteMailCountLimit;
 		this.concertedClassifier = concertedClassifier;
-
-		logger = LoggerFactory.getLogger("yaquix.phase.classifier.ID3Step");
+		this.randomSource = randomSource;
 	}
 
 	@Override
@@ -94,7 +93,7 @@ public class ID3Step extends SymmetricPhase {
 		Knowledge<MailType> uniqueLabel = new Knowledge<MailType>();
 
 		Phase uniqueDecider =
-			new AgreedLabelComputation(emailLabels, uniqueLabel, randomSource);
+			new AgreedLabelComputation(emailLabels, remoteMailCountLimit, uniqueLabel, randomSource);
 		executePhase(connection, uniqueDecider);
 		if (uniqueLabel.get() != null) {
 			Classifier result = new Leaf(uniqueLabel.get());

@@ -9,7 +9,9 @@ import java.util.Iterator;
 import java.security.Key;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+
+import org.slf4j.LoggerFactory;
 
 import yaquix.circuit.GarbledCircuit;
 
@@ -23,7 +25,7 @@ public class Connection {
 	/**
 	 * contains true if this is the server side of the connection.
 	 */
-	private Boolean isServer;
+	private boolean isServer;
 
 	/**
 	 * Stuff written here (and flushed afterwards) goes to the
@@ -41,7 +43,7 @@ public class Connection {
 	 */
 	private Socket connection;
 	private ServerSocket serverSocket;
-	private Logger logger;
+	private Logger logger = LoggerFactory.getLogger(Connection.class);
 
 	/**
 	 * constructs the server side of the connection.
@@ -55,14 +57,15 @@ public class Connection {
 	 * @throws Exception
 	 */
 	public Connection(ServerSocket socket) throws IOException {
-		logger.info("initializing serverside connection");
+		isServer = true;
+		logger.trace("initializing serverside connection");
 		serverSocket = socket;
 
-		logger.info("connection: connecting client");
+		logger.trace("connection: connecting client");
 		connection = socket.accept();
-		logger.info("client connected");
+		logger.trace("client connected");
 
-		logger.info("setting streams");
+		logger.trace("setting streams");
 		toRemote= new ObjectOutputStream(connection.getOutputStream());
 		fromRemote = new ObjectInputStream(connection.getInputStream());
 	}
@@ -75,7 +78,7 @@ public class Connection {
 	 * @throws Exception
 	 */
 	public Connection(Socket socket) throws IOException {
-			logger.info("initializing clientside connection");
+			logger.trace("initializing clientside connection");
 
 			connection = socket;
 
@@ -91,7 +94,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public void sendInteger(int localInteger) throws IOException {
-		logger.info("connection: sending integer ");
+		logger.trace("connection: sending integer " + localInteger);
 		toRemote.writeInt(localInteger);
 		toRemote.flush();
 	}
@@ -102,8 +105,10 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public int receiveInteger() throws IOException {
-		logger.info("connection: receiving integer");
-		return fromRemote.readInt();
+		logger.trace("connection: receiving integer");
+		int result = fromRemote.readInt();
+		logger.trace("received " + result);
+		return result;
 	}
 
 	/**
@@ -112,7 +117,7 @@ public class Connection {
 	 * @param localBitstrings the bitstrings to send
 	 */
 	public void sendListOfBitStrings(List<boolean[]> localBitstrings) throws IOException{
-		logger.info("connection: sending list of bitstrings ");
+		logger.trace("connection: sending list of bitstrings ");
 		toRemote.writeObject(localBitstrings);
 		toRemote.flush();
 	}
@@ -125,7 +130,7 @@ public class Connection {
 	 * @throws ClassNotFoundException
 	 */
 	public List<boolean[]> receiveListOfBitStrings() throws IOException, ClassNotFoundException {
-		logger.info("connection: receiving list of bitstrings ");
+		logger.trace("connection: receiving list of bitstrings ");
 
 		return (List<boolean[]>) fromRemote.readObject();
 	}
@@ -137,7 +142,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public void sendIntegers(int[] localIntegers) throws IOException {
-		logger.info("connection: sending list of integers ");
+		logger.trace("connection: sending list of integers ");
 		toRemote.writeObject(localIntegers);
 		toRemote.flush();
 	}
@@ -150,7 +155,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public int[] receiveIntegers() throws IOException, ClassNotFoundException {
-		logger.info("connection: receiving list of integers ");
+		logger.trace("connection: receiving list of integers ");
 		return (int[]) fromRemote.readObject();
 	}
 
@@ -168,20 +173,22 @@ public class Connection {
 	 */
 	public List<String> exchangeWordlist(List<String> localWordlist)
 										throws IOException, ClassNotFoundException {
-		logger.info("connection: exchanging wordlists " + localWordlist.toString());
+		logger.trace("connection: exchanging wordlists " + localWordlist);
 		if(isServer){
-			logger.info("connection: sending wordlist");
+			logger.trace("connection: sending wordlist");
 			toRemote.writeObject(localWordlist);
 			toRemote.flush();
-			logger.info("connection: receiving wordlist");
-			return (List<String>) fromRemote.readObject();
+			logger.trace("connection: receiving wordlist");
+			List<String> remoteWords = (List<String>) fromRemote.readObject();
+			logger.trace("Received word list: " + remoteWords);
+			return remoteWords;
 		} else {
-			logger.info("connection: receiving wordlist");
+			logger.trace("connection: receiving wordlist");
 			List<String> receivedWordlist = (List<String>) fromRemote.readObject();
-			logger.info("connection: sending wordlist");
+			logger.trace("connection: sending wordlist");
 			toRemote.writeObject(localWordlist);
 			toRemote.flush();
-
+			logger.trace("Received word list: " + receivedWordlist);
 			return receivedWordlist;
 		}
 	}
@@ -200,19 +207,19 @@ public class Connection {
 	 */
 	public Map<String, Double> exchangeLimits(Map<String, Double> localLimits)
 										throws IOException, ClassNotFoundException {
-		logger.info("connection: exchanging limits");
+		logger.trace("connection: exchanging limits");
 		if(isServer){
-			logger.info("connection: sending limit");
+			logger.trace("connection: sending limit");
 			toRemote.writeObject(localLimits);
 			toRemote.flush();
 
-			logger.info("connection: receiving limit");
+			logger.trace("connection: receiving limit");
 			return (Map<String, Double>) fromRemote.readObject();
 		} else {
-			logger.info("connection: receiving limit");
+			logger.trace("connection: receiving limit");
 			Map<String, Double> receivedLimits = (Map<String, Double>) fromRemote.readObject();
 
-			logger.info("connection: sending limit");
+			logger.trace("connection: sending limit");
 			toRemote.writeObject(localLimits);
 			toRemote.flush();
 
@@ -227,7 +234,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public void sendGarbledCircuit(GarbledCircuit localCircuit) throws IOException {
-		logger.info("connection: sending garbled circuit");
+		logger.trace("connection: sending garbled circuit");
 
 		toRemote.writeObject(localCircuit);
 		toRemote.flush();
@@ -240,7 +247,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public GarbledCircuit receiveGarbledCircuit() throws IOException, ClassNotFoundException {
-		logger.info("connection: receiving garbled circuit");
+		logger.trace("connection: receiving garbled circuit");
 		return (GarbledCircuit) fromRemote.readObject();
 	}
 
@@ -251,7 +258,7 @@ public class Connection {
 	 * @throws Exception
 	 */
 	public void sendBitstring(boolean[] localBitstring) throws IOException {
-		logger.info("connection: sending bitstring");
+		logger.trace("connection: sending bitstring");
 		toRemote.writeObject(localBitstring);
 		toRemote.flush();
 	}
@@ -263,7 +270,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public boolean[] receiveBitstring() throws IOException, ClassNotFoundException {
-		logger.info("connection: receiving bitstring");
+		logger.trace("connection: receiving bitstring");
 		return (boolean[]) fromRemote.readObject();
 	}
 
@@ -284,7 +291,7 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public void sendKey(Key publicKey) throws IOException {
-		logger.info("connection: sending key");
+		logger.trace("connection: sending key");
 		toRemote.writeObject(publicKey);
 		toRemote.flush();
 	}
@@ -297,11 +304,30 @@ public class Connection {
 	 * @throws IOException
 	 */
 	public Key receiveKey() throws IOException, ClassNotFoundException {
-		logger.info("connection: receiving key");
+		logger.trace("receiving key");
 		return (Key) fromRemote.readObject();
 	}
 
-	public Integer exchangeInteger(Integer localKey) {
-		return null;
+	public Integer exchangeInteger(Integer localValue) throws IOException, ClassNotFoundException {
+		logger.trace("exchanging integers");
+		if(isServer){
+			logger.trace("sending " + localValue);
+			toRemote.writeObject(localValue);
+			toRemote.flush();
+
+			logger.trace("receiving limit");
+			Integer receivedValue = (Integer) fromRemote.readObject();
+			logger.trace("received " + receivedValue);
+			return receivedValue;
+		} else {
+			logger.trace("connection: receiving limit");
+			Integer receivedValue = (Integer) fromRemote.readObject();
+
+			logger.trace("connection: sending limit");
+			toRemote.writeObject(localValue);
+			toRemote.flush();
+			logger.trace("received " + receivedValue);
+			return receivedValue;
+		}
 	}
 }

@@ -36,9 +36,7 @@ public class ReadFolders extends SymmetricPhase {
 	 * contains a place to store the read mails.
 	 */
 	private OutputKnowledge<Mails> localMails;
-	
-	Logger logger;
-	
+		
 	/**
 	 * Constructs a new phase to read the input folders
 	 * @param localSpamFolder the folder containing spam mails
@@ -48,8 +46,7 @@ public class ReadFolders extends SymmetricPhase {
 	public ReadFolders(InputKnowledge<File> localSpamFolder,
 			InputKnowledge<File> localNonSpamFolder,
 			OutputKnowledge<Mails> localMails) {
-		
-		logger.info("readFolders");
+		super();
 		this.localSpamFolder = localSpamFolder;
 		this.localNonSpamFolder = localNonSpamFolder;
 		this.localMails = localMails;
@@ -57,24 +54,27 @@ public class ReadFolders extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) throws IOException {
-		logger.info("readFolders: starting computation...");
+		logger.info("entering phase");
 		Mails mails = new Mails();
 
-		logger.info("readFolders: reading SpamMails...");
+		logger.info("reading spam mails");
 		File[] files = localSpamFolder.get().listFiles();
 		
-		for(File file : files){
+		assert files != null : localSpamFolder.get() + " is no directory";
+		for(File file : files) {
 			mails.addSpamMail(readMail(file));
 		}
 		
-		logger.info("readFolders: reading nonSpamMails...");
+		logger.info("reading non spam mails");
 		files = localNonSpamFolder.get().listFiles();
 		
+		assert files != null : localSpamFolder.get() + " is no directory";
 		for(File file : files){
 			mails.addNonSpamMail(readMail(file));
 		}
 		
 		localMails.put(mails);
+		logger.info("leaving phase");
 	}
 	
 	/**

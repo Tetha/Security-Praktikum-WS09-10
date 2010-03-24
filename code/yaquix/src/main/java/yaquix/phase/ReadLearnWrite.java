@@ -57,7 +57,6 @@ public class ReadLearnWrite extends SymmetricPhase {
 			InputKnowledge<File> localNonSpamFolder,
 			InputKnowledge<Writer> localClassifierOutput,
 			SecureRandom randomSource) {
-		super();
 		this.localSpamFolder = localSpamFolder;
 		this.localNonSpamFolder = localNonSpamFolder;
 		this.localClassifierOutput = localClassifierOutput;
@@ -68,31 +67,26 @@ public class ReadLearnWrite extends SymmetricPhase {
 	@Override
 	protected void execute(Connection connection) throws IOException,
 			ClassNotFoundException {
-		logger.info("Entering ReadLeardWrite phase");
+		logger.info("entering phase");
 		
-		List<Phase> phases = new LinkedList<Phase>();
 		Knowledge<Mails> localMails = new Knowledge<Mails>();
-		phases.add(new ReadFolders(localSpamFolder, localNonSpamFolder, localMails));
+		executePhase(connection, new ReadFolders(localSpamFolder, localNonSpamFolder, localMails));
 		
 		Knowledge<AttributeValueTable> localAttributeValues = new Knowledge<AttributeValueTable>();
 		Knowledge<List<Attribute>> concertedAttributes = new Knowledge<List<Attribute>>();
-		phases.add(new Discretization(localMails, localAttributeValues, concertedAttributes));
+		executePhase(connection, new Discretization(localMails, localAttributeValues, concertedAttributes));
 		
 		Knowledge<Integer> localMailCount = new Knowledge<Integer>();
 		localMailCount.put(localMails.get().getAllMails().size());
 		Knowledge<Integer> remoteMailCount = new Knowledge<Integer>();
-		phases.add(new ExchangeMailCount(localMailCount, remoteMailCount));
+		executePhase(connection, new ExchangeMailCount(localMailCount, remoteMailCount));
 		
 		Knowledge<Classifier> concertedClassifier = new Knowledge<Classifier>();
-		phases.add(new ID3Step(concertedAttributes, localAttributeValues, remoteMailCount, concertedClassifier, randomSource));
+		executePhase(connection, new ID3Step(concertedAttributes, localAttributeValues, remoteMailCount, concertedClassifier, randomSource));
 
-		phases.add(new OutputPhase(concertedClassifier, localClassifierOutput));
+		executePhase(connection, new OutputPhase(concertedClassifier, localClassifierOutput));		
 		
-		for (Phase p : phases) {
-			executePhase(connection, p);
-		}
-		
-		logger.info("Leaving ReadLearnWrite");
+		logger.info("leaving phase");
 	}
 
 

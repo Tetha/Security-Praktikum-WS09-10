@@ -60,11 +60,6 @@ class OneOfTwoObliviousTransfer extends Phase {
 	private SecureRandom randomSource;
 
 	/**
-	 * contains the logger for this phase
-	 */
-	private Logger logger;
-
-	/**
 	 * This is the server side constructor. It sets the two messages to
 	 * have the client select from. Note that if you use this constructor,
 	 * you MUST call serverExecute or undefined behavior happens.
@@ -98,7 +93,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	private Cipher getCipher() {
 		Cipher cipher;
 		try {
-			cipher = Cipher.getInstance("RSA");
+			cipher = Cipher.getInstance("RSA/ECB/NoPadding");
 		} catch(NoSuchPaddingException e) {
 			throw new RuntimeException(e); // TODO exception
 		} catch(NoSuchAlgorithmException e) {
@@ -125,7 +120,9 @@ class OneOfTwoObliviousTransfer extends Phase {
 
 	@Override
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
-		logger.info("Entering Phase: 1-2 OT");
+		logger.info("entering phase");
+		logger.debug(String.format("Selecting %s", clientBit.get() ? "1" : "0"));
+		
 		Key publicKey = connection.receiveKey();
 		int x0 = connection.receiveInteger();
 		int x1 = connection.receiveInteger();
@@ -171,12 +168,14 @@ class OneOfTwoObliviousTransfer extends Phase {
 			result = l1 - kPrime;
 		}
 		clientReceivedMessage.put(result);
-		logger.info("Leaving Phase: 1-2 OT");
+		logger.debug(String.format("received %d", result));
+		logger.info("leaving phase");
 	}
 
 	@Override
 	public void serverExecute(Connection connection) throws IOException {
-		logger.info("Entering Phase: 1-2 OT");
+		logger.info("entering phase");
+		
 		KeyPairGenerator keyGenerator;
 		try {
 			keyGenerator = KeyPairGenerator.getInstance("RSA");
@@ -188,13 +187,14 @@ class OneOfTwoObliviousTransfer extends Phase {
 
 		int m0 = serverMessages.get()[0];
 		int m1 = serverMessages.get()[1];
+		logger.debug(String.format("server messages: %d %d", m0, m1));
+		
 		Key privateKey = keys.getPrivate();
 		Key publicKey = keys.getPublic();
 		int x0 = randomSource.nextInt();
 		int x1 = randomSource.nextInt();
 
 		Cipher cipher = getCipher();
-		Key key;
 		try {
 			cipher.init(Cipher.DECRYPT_MODE, privateKey);
 		} catch (InvalidKeyException exc) {
@@ -209,8 +209,11 @@ class OneOfTwoObliviousTransfer extends Phase {
 		int k0;
 		int k1;
 		try {
-			k0 = byteArrayToInt(cipher.doFinal(intToByteArray(v - x0)));
-			k1 = byteArrayToInt(cipher.doFinal(intToByteArray(v - x1)));
+			byte[] k0Bytes = intToByteArray(v - x0);
+			byte[] k1Bytes = intToByteArray(v - x1);
+
+			k0 = byteArrayToInt(cipher.doFinal(k0Bytes));
+			k1 = byteArrayToInt(cipher.doFinal(k1Bytes));			
 		} catch (IllegalBlockSizeException exc) {
 			throw new RuntimeException(exc);
 		} catch (BadPaddingException exc) {
@@ -219,7 +222,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 
 		connection.sendInteger(m0+k0);
 		connection.sendInteger(m1+k1);
-		logger.info("Leaving Phase: 1-2 OT");
+		logger.info("leaving phase");
 	}
 
 }

@@ -16,12 +16,16 @@ public class Constant extends Circuit {
 	 */
 	@SuppressWarnings("unchecked")
 	public Constant(boolean isTrue) {
-		gateType = new GateType[1];
+		gateType = new GateType[2];
 		gateType[0] = GateType.CONSTANT;
+		gateType[1] = GateType.OUT;
 		
-		adjacencyList = new LinkedList[1];
+		adjacencyList = new LinkedList[2];
 		adjacencyList[0] = new LinkedList<Integer>();
-		tables = new boolean[1][4][4];
+		adjacencyList[0].add(1);
+		adjacencyList[1] = new LinkedList<Integer>();
+		
+		tables = new boolean[2][4][4];
 		tables[0][0][0] = isTrue;
 		
 		inputs = new int[0];

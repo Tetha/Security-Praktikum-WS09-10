@@ -12,11 +12,13 @@ public class Knowledge<C> implements InputKnowledge<C>, OutputKnowledge<C> {
 	
 	@Override
 	public C get() {
+		assert value != null;
 		return value;
 	}
 
 	@Override
 	public void put(C knowledge) {
+		assert knowledge != null;
 		value = knowledge;
 	}
 }

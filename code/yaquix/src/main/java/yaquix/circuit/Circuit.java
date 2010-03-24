@@ -1,11 +1,17 @@
 package yaquix.circuit;
 
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.util.OutputUtil;
 
 /**
  * Implements a boolean circuit, the bane of our existence.
@@ -45,6 +51,7 @@ public class Circuit {
 		BINARYGATE 
 	};
 	
+	private static final Logger LOG = LoggerFactory.getLogger(Circuit.class);
 	/**
 	 * stores the type of all gates.
 	 */
@@ -82,9 +89,9 @@ public class Circuit {
 	 */
 	protected int[] outputs; 
 
-	private Random random;
+	private SecureRandom random;
 	
-	public void setRandom(Random r) {
+	public void setRandom(SecureRandom r) {
 		this.random = r;
 	}
 	
@@ -112,15 +119,27 @@ public class Circuit {
 	@SuppressWarnings("unchecked")
 	public Circuit extendTopLeft(Circuit addedCircuit, 
 								 Map<Integer, Integer> connection) {
+		LOG.trace("extendTopLeft");
+		assert connection.size() <= addedCircuit.inputs.length : "Connection too large";
+		assert connection.size() <= outputs.length : "Connection too large";
 		Circuit result = new Circuit();
 		result.inputs = new int[countSurvingInputs(connection, inputs, addedCircuit.inputs)];
-		result.outputs = new int[countSurvivingOutputs(connection, outputs, addedCircuit.outputs)];
+		assert inputs.length <= result.inputs.length && result.inputs.length <= inputs.length + addedCircuit.inputs.length;
+		
+		int survivingOutputCount = countSurvivingOutputs(connection, outputs, addedCircuit.outputs);
+		result.outputs = new int[survivingOutputCount];
+		assert addedCircuit.outputs.length <= result.outputs.length && result.outputs.length <= addedCircuit.outputs.length + outputs.length;
 		int survivingGatesCount = countSurvivingGates(connection, gateType, addedCircuit.gateType);
+		LOG.trace(String.format("surviving gates: %d, existing gates: %d, added gates: %d, connection: %s",
+					survivingGatesCount, gateType.length, addedCircuit.gateType.length, connection));
+		
 		result.adjacencyList = new LinkedList[survivingGatesCount];
+		for (int i = 0; i < survivingGatesCount; i++) {
+			result.adjacencyList[i] = new LinkedList<Integer>();
+		}
 		result.gateType = new GateType[survivingGatesCount];
 		result.tables = new boolean[survivingGatesCount][4][4];
 
-		int survivingAddedInputs = 0;
 		int existingInputs = inputs.length;
 		int addedGates = addedCircuit.countInnerGates();
 		int existingGates = countInnerGates();
@@ -133,6 +152,7 @@ public class Circuit {
 		// or added circuit with gate indexes in the result circuit
 		// the destination of output associates output indexes with 
 		// gate indexes in the result circuit.
+		int survivingAddedInputs = 0;
 		List<Integer> destinationOfAddedInput = new LinkedList<Integer>();
 		int[] destinationOfAddedGate = new int[addedCircuit.gateType.length];
 		int[] destinationOfExistingGate = new int[gateType.length];
@@ -142,7 +162,11 @@ public class Circuit {
 				destinationOfAddedGate[addedCircuit.inputs[i]] = -1;
 			} else {
 				destinationOfAddedInput.add(survivingAddedInputs);
+				assert 0 <= survivingAddedInputs && survivingAddedInputs < result.gateType.length;
+
 				destinationOfAddedGate[addedCircuit.inputs[i]] = survivingAddedInputs;
+				LOG.trace(String.format("mapping added input %d with gateIndex %d to new gate index %d",
+							i, addedCircuit.inputs[i], destinationOfAddedGate[addedCircuit.inputs[i]]));
 				survivingAddedInputs++;
 			}
 		}
@@ -152,26 +176,41 @@ public class Circuit {
 			int destinationIndex = i+survivingAddedInputs;
 			destinationOfExistingInput.add(destinationIndex);
 			destinationOfExistingGate[inputs[i]] = destinationIndex;
+			LOG.trace(String.format("mapping existing input %d with gateIndex %d to new gate index %d",
+					i, inputs[i], destinationIndex));
 		}
 		
+		int copiedAddedGates = 0;
 		for(int i = 0; i < addedCircuit.gateType.length; i++) {
 			if (addedCircuit.gateType[i] == GateType.IN
 					|| addedCircuit.gateType[i] == GateType.OUT) continue;
 			
-			destinationOfAddedGate[i] = i+existingInputs+survivingAddedInputs;
+			int destinationIndex = copiedAddedGates+existingInputs+survivingAddedInputs;
+			assert 0 <= destinationIndex && destinationIndex < result.gateType.length;
+			destinationOfAddedGate[i] = destinationIndex;
+			LOG.trace(String.format("mapping added gate with gateIndex %d to new gate index %d",
+					i,  destinationIndex));
+			copiedAddedGates++;
 		}
 		
-		
+		int copiedExistingGates = 0;
 		for(int i = 0; i < gateType.length; i++) {
 			if (gateType[i] == GateType.IN
 					|| gateType[i] == GateType.OUT) continue;
-			destinationOfExistingGate[i] = i+existingInputs+survivingAddedInputs+addedGates;
+			int destinationIndex = survivingAddedInputs+existingInputs+addedGates+copiedExistingGates;
+			assert 0 <= destinationIndex && destinationIndex < result.gateType.length;
+			destinationOfExistingGate[i] = destinationIndex;
+			LOG.trace(String.format("mapping existing gate with gateIndex %d to new gate index %d",
+					i,  destinationIndex));
+			copiedExistingGates++;
 		}
 		
 		List<Integer> destinationOfAddedOutput =  new LinkedList<Integer>();
 		for(int i = 0 ; i < addedCircuit.outputs.length; i++) {
 			int destinationIndex = survivingAddedInputs + existingInputs + addedGates + existingGates + i;
 			destinationOfAddedOutput.add(destinationIndex);
+			LOG.trace(String.format("i=%d,output=%d", i, addedCircuit.outputs[i]));
+			LOG.trace(String.format("destAddGate.length=%d", destinationOfAddedGate.length));
 			destinationOfAddedGate[addedCircuit.outputs[i]] = destinationIndex; 
 		}
 		
@@ -185,12 +224,15 @@ public class Circuit {
 				int destinationIndex = survivingAddedInputs + existingInputs 
 												+ addedGates + existingGates 
 												+ addedOutputs + survivingAddedOutputs;
+				assert 0 <= destinationIndex && destinationIndex < result.gateType.length;
 				destinationOfExistingOutput.add(destinationIndex);
 				destinationOfExistingGate[outputs[i]] = destinationIndex;
 				survivingAddedOutputs++;
 				
 			}
 		}
+		
+		// Index mapping is correct.
 		
 		// copy the gates in a meaningful fashion.
 		int newInputsAdded = 0;
@@ -205,7 +247,6 @@ public class Circuit {
 				result.inputs[newInputsAdded] = newGateIndex;
 				newInputsAdded++;
 				
-				result.adjacencyList[newGateIndex] = new LinkedList<Integer>();
 				int inputGateIndex = addedCircuit.inputs[i];
 				for(Integer follower : addedCircuit.adjacencyList[inputGateIndex]) {
 					int followerDestination = destinationOfAddedGate[follower];
@@ -220,11 +261,16 @@ public class Circuit {
 			result.inputs[newInputsAdded] = newGateIndex;
 			newInputsAdded++;
 		
-			result.adjacencyList[newGateIndex] = new LinkedList<Integer>();
 			int inputGateIndex = inputs[i];
 			for(Integer follower : adjacencyList[inputGateIndex]) {
-				int followerDestination = destinationOfExistingGate[follower];
-				result.adjacencyList[newGateIndex].add(followerDestination);
+				if (gateType[follower] == GateType.OUT) {
+					skipConnectedOutput(addedCircuit, connection, result,
+							destinationOfAddedGate, destinationOfExistingOutput,
+							newGateIndex, follower);
+				} else {
+					int followerDestination = destinationOfExistingGate[follower];
+					result.adjacencyList[newGateIndex].add(followerDestination);
+				}
 			}
 		
 		}
@@ -237,7 +283,6 @@ public class Circuit {
 			int gateDestinationIndex = destinationOfAddedGate[i];
 			result.gateType[gateDestinationIndex] = addedCircuit.gateType[i];
 			result.tables[gateDestinationIndex] = addedCircuit.tables[i];
-			result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
 			for (Integer follower : addedCircuit.adjacencyList[i]) {
 				int followerDestinationIndex = destinationOfAddedGate[follower];
 				result.adjacencyList[gateDestinationIndex].add(followerDestinationIndex);
@@ -247,33 +292,19 @@ public class Circuit {
 		for (int i = 0; i < gateType.length; i++) {
 			if(gateType[i] == GateType.IN || gateType[i] == GateType.OUT) continue;
 			int gateDestinationIndex = destinationOfExistingGate[i];
+			LOG.trace(String.format("gateDestination=%d, i=%d, gatetype-length=%d", 
+									gateDestinationIndex, i,result.gateType.length));
 			result.gateType[gateDestinationIndex] = gateType[i];
 			result.tables[gateDestinationIndex] = tables[i];
-			result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
 			for (Integer follower : adjacencyList[i]) {
 				if (gateType[follower] == GateType.OUT) {
-					int outputIndex = -1;
-					for (int j = 0; j < outputs.length; j++) {
-						if (outputs[j] == follower) {
-							outputIndex = j;
-							break;
-						}
-					}
-					assert (outputIndex != -1);
-					if (connection.containsKey(outputIndex)) {
-						int associatedAddedInput = connection.get(outputIndex);
-						int assoiciatedAddedGate = addedCircuit.inputs[associatedAddedInput];
-						for (Integer inputFollower : addedCircuit.adjacencyList[assoiciatedAddedGate]) {
-							int inputFollowerDestination = destinationOfAddedGate[inputFollower];
-							adjacencyList[gateDestinationIndex].add(inputFollowerDestination);
-						}
-					} else {
-						int outputDestination = destinationOfExistingOutput.get(follower);
-						adjacencyList[gateDestinationIndex].add(outputDestination);
-					}
+					skipConnectedOutput(addedCircuit, connection, result,
+							destinationOfAddedGate,
+							destinationOfExistingOutput, gateDestinationIndex,
+							follower);
 				} else {
 					int followerDestination = destinationOfExistingGate[follower];
-					adjacencyList[gateDestinationIndex].add(followerDestination);
+					result.adjacencyList[gateDestinationIndex].add(followerDestination);
 				}
 			}
 		}
@@ -299,7 +330,37 @@ public class Circuit {
 				outputsAdded++;
 			}
 		}
+		
+		for (int i = 0; i < result.adjacencyList.length; i++) {
+			assert result.adjacencyList[i] != null : "Uninitialized adjacency list " + i;
+		}
 		return result;
+	}
+
+	private void skipConnectedOutput(Circuit addedCircuit,
+			Map<Integer, Integer> connection, Circuit result,
+			int[] destinationOfAddedGate,
+			List<Integer> destinationOfExistingOutput,
+			int gateDestinationIndex, Integer follower) {
+		int outputIndex = -1;
+		for (int j = 0; j < outputs.length; j++) {
+			if (outputs[j] == follower) {
+				outputIndex = j;
+				break;
+			}
+		}
+		assert (outputIndex != -1);
+		if (connection.containsKey(outputIndex)) {
+			int associatedAddedInput = connection.get(outputIndex);
+			int assoiciatedAddedGate = addedCircuit.inputs[associatedAddedInput];
+			for (Integer inputFollower : addedCircuit.adjacencyList[assoiciatedAddedGate]) {
+				int inputFollowerDestination = destinationOfAddedGate[inputFollower];
+				result.adjacencyList[gateDestinationIndex].add(inputFollowerDestination);
+			}
+		} else {
+			int outputDestination = destinationOfExistingOutput.get(outputIndex);
+			result.adjacencyList[gateDestinationIndex].add(outputDestination);
+		}
 	}
 	
 	/**
@@ -352,6 +413,8 @@ public class Circuit {
 	 */
 	private int countSurvingInputs(Map<Integer, Integer> connection,
 			int[] existingInputs, int[] addedInputs) {
+		LOG.trace(String.format("ex in: %d, added in: %d, connection.size(): %d, connectio %s",
+								existingInputs.length, addedInputs.length, connection.size(), connection));
 		return existingInputs.length + addedInputs.length - connection.size();
 	}
 	
@@ -393,7 +456,8 @@ public class Circuit {
 	 * @return a garbled circuit which does the same as this circuit 
 	 * but is garbled for yaos protocol
 	 */
-	public GarbledCircuit garble(Map<Integer, int[]> inputMapping) {
+	public GarbledCircuit garble(Map<Integer, int[]> inputMapping, SecureRandom random) {
+		setRandom(random);
 		GarbledCircuit result = new GarbledCircuit(gateType.length, inputs.length, outputs.length);
 		int[][] preds; // predecessors[gate][0..1]
 		int[][] wireGarblings; // wireGarblings[source][0/1]
@@ -439,7 +503,7 @@ public class Circuit {
 			break;
 			}
 		}
-		return null;
+		return result;
 	}
 
 
@@ -497,7 +561,7 @@ public class Circuit {
 		return result;
 	}
 
-	private void garbleBinaryGate(GarbledCircuit result, int i, 
+	private void garbleBinaryGate(GarbledCircuit result, int gateIndex, 
 			int[] outputWireMapping, int[] leftInputWireMapping, 
 			int[] rightInputWireMapping) {
 		// the input decision table maps 0 x 1 to 0, 1 (it is 
@@ -517,7 +581,7 @@ public class Circuit {
 		largeInputMapping[1*2+0] = leftInputWireMapping[1] ^ rightInputWireMapping[0];
 		largeInputMapping[1*2+1] = leftInputWireMapping[1] ^ rightInputWireMapping[1];
 		
-		boolean[][] squareTruthTable = tables[i];
+		boolean[][] squareTruthTable = tables[gateIndex];
 		boolean[] longTruthTable = new boolean[4];
 		longTruthTable[0*2+0] = squareTruthTable[0][0];
 		longTruthTable[0*2+1] = squareTruthTable[0][1];
@@ -535,11 +599,11 @@ public class Circuit {
 		Collections.shuffle(destinationIndexes);
 		int[][] completelyGarbled = new int[2][4];
 		for (int ii = 0; ii < 4; ii++) {
-			int destinationIndex = destinationIndexes.get(i);
+			int destinationIndex = destinationIndexes.get(ii);
 			completelyGarbled[0][destinationIndex] = directlyGarbled[0][ii];
 			completelyGarbled[1][destinationIndex] = directlyGarbled[1][ii];
 		}
-		result.addBinaryGate(i, adjacencyList[i], completelyGarbled);
+		result.addBinaryGate(gateIndex, adjacencyList[gateIndex], completelyGarbled);
 	}
 
 	private void garbleUnaryGate(GarbledCircuit result, int i, 
@@ -609,5 +673,198 @@ public class Circuit {
 		garbledTable[1][0] = garbledValue;
 		
 		result.addConstantGate(i, adjacencyList[i], garbledTable);
+	}
+	
+	/**
+	 * Turns the circuit into a dot-graph.
+	 */
+	public String dumpAsDot() {
+		StringBuilder result = new StringBuilder();
+		result.append("digraph {");
+		result = addGates(result);
+		result = addEdges(result);
+		result.append("}");
+		return result.toString();
+	}
+
+	/**
+	 * Adds all gates to the dot representation.
+	 * @param result where to append the gates to.
+	 */
+	private StringBuilder addEdges(StringBuilder result) {
+		for (int startIndex = 0; startIndex < adjacencyList.length; startIndex++) {
+			result = addEdgesFrom(result, startIndex);
+		}
+		return result;
+	}
+
+	/**
+	 * adds all edges coming from startindex to the graphviz code in result.
+	 * @param startIndex the index of the gate where the nodes start
+	 * @param result a place to append to
+	 * @return result to document the state change
+	 */ 
+	private StringBuilder addEdgesFrom(StringBuilder result, int startIndex) {
+		String startName = buildNodeName(startIndex);
+		for (Integer follower : adjacencyList[startIndex]) {
+			String followerName = buildNodeName(follower);
+			String edgeStatement = String.format("%s -> %s;", startName, followerName);
+			result.append(edgeStatement);
+		}
+		return result;
+	}
+
+	/**
+	 * adds all edges to the graph.
+	 * @param result where to append the edges to.
+	 */ 
+	private StringBuilder addGates(StringBuilder result) {
+		for (int gateIndex = 0; gateIndex < gateType.length; gateIndex++) {
+			result = addGate(result, gateIndex);
+		}
+		return result;
+	}
+
+	/**
+	 * adds a single gate to the dot representation.
+	 * @param result where to add the gate to.
+	 * @param gateIndex the  index of the gate to add
+	 */
+	private StringBuilder addGate(StringBuilder result, int gateIndex) {
+		switch (gateType[gateIndex]) {
+		case IN:
+			int inputIndex = findInArray(gateIndex, inputs);
+			result = addBoundaryGate(result, inputIndex, gateIndex, "Input");
+			break;
+			
+		case OUT:
+			int outputIndex = findInArray(gateIndex, outputs);
+			result = addBoundaryGate(result, outputIndex, gateIndex, "Output");
+			break;
+			
+		case CONSTANT:
+			result = addConstantGate(result, gateIndex);
+			break;
+			
+		case UNARYGATE:
+			result = addUnaryGate(result, gateIndex);
+			break;
+			
+		case BINARYGATE:
+			result = addBinaryGate(result, gateIndex);
+			break;
+			
+		default:
+			assert false : "gateType not exhausted";
+		}
+		return result;
+	}
+	
+	/**
+	 * returns the index of NEEDLE in HAYSTACK
+	 * @param needle the value to find
+	 * @param hayStack the array to search
+	 * @return the index
+	 */
+	private int findInArray(int needle, int[] hayStack) {
+		int result = 0;
+		while (hayStack[result] != needle) {
+			result++;
+		}
+		assert hayStack[result] == needle;
+		return result;
+	}
+
+	/**
+	 * This adds a boundary (input/output)-gate to the graph representation.
+	 * @param result where to append to
+	 * @param boundaryIndex the index in the boundary array
+	 * @param gateIndex the index of the inner gate
+	 * @param label the label to add to the boundary index
+	 * @return result to document state change
+	 */
+	private StringBuilder addBoundaryGate(StringBuilder result,
+			int boundaryIndex, int gateIndex, String label) {		
+		String nodeDescription = String.format("%s %d", label, boundaryIndex);
+		return addNode(result, gateIndex, nodeDescription, "invhouse");
+	}
+
+	
+	
+
+	/**
+	 * adds a constant gate to the graph representation
+	 * @param result the stringbuilder to append to.
+	 * @param gateIndex the index of the gate to add
+	 */
+	private StringBuilder addConstantGate(StringBuilder result, int gateIndex) {
+		int gateValue = tables[gateIndex][0][0] ? 1 : 0;
+		String label = String.format("%d", gateValue);
+		return addNode(result, gateIndex, label, "record");
+	}
+	
+	/**
+	 * Adds a unary gate to the graph representation
+	 * @param result the stringbuilder to append to
+	 * @param gateIndex the index of the gate to add
+	 */
+	private StringBuilder addUnaryGate(StringBuilder result, int gateIndex) {
+		int falseValue = boolToInt(tables[gateIndex][0][0]);
+		int trueValue = boolToInt(tables[gateIndex][0][1]);
+		String label = String.format("{I|0|1} | {I|%d|%d}",
+							falseValue, trueValue);
+		return addNode(result, gateIndex, label, "record");
+	}
+
+	
+	
+	/**
+	 * Adds a binary gate to the graph representation.
+	 * @param result the stringbuilder to append to
+	 * @param gateindex the index of the gate to add
+	 */
+	private StringBuilder addBinaryGate(StringBuilder result, int gateIndex) {
+		int falseFalseValue = boolToInt(tables[gateIndex][0][0]);
+		int falseTrueValue = boolToInt(tables[gateIndex][0][1]);
+		int trueFalseValue = boolToInt(tables[gateIndex][1][0]);
+		int trueTrueValue = boolToInt(tables[gateIndex][1][1]);
+		String label = String.format("{L|0|0|1|1}|{R|0|1|0|1}|{O|%d|%d|%d|%d}",
+				falseFalseValue, falseTrueValue, trueFalseValue, trueTrueValue);
+		return addNode(result, gateIndex, label, "record");
+	}
+	
+	/**
+	 * Constructs the node name for a gate with index GATE_INDEX
+	 * @param gateIndex the index of the gate
+	 * @return the name in the graphviz output for the gate
+	 */
+	private String buildNodeName(int gateIndex) {
+		return String.format("v%d", gateIndex);
+	}
+
+	/**
+	 * This adds a shaped, labeled node to the graph representation.
+	 * @param result the stringbuilder to append to
+	 * @param gateIndex the index of the gate added
+	 * @param nodeDescription the description of the node
+	 * @param shape the shape of the node
+	 * @return result to document the state change
+	 */
+	private StringBuilder addNode(StringBuilder result, int gateIndex,
+			String nodeDescription, String shape) {
+		String nodeName = buildNodeName(gateIndex);
+		String nodeStatement = String.format("%s [shape=%s, label=\"%s\"];",
+											 nodeName, shape, nodeDescription); 
+		result.append(nodeStatement);
+		return result;
+	}
+	
+	/**
+	 * reuturns 0 for false and 1 for true
+	 * @param encodedBool the bool to turn into an int
+	 * @return 0 or 1 for false or true
+	 */
+	private int boolToInt(boolean encodedBool) {
+		return encodedBool ? 1 : 0;
 	}
 }

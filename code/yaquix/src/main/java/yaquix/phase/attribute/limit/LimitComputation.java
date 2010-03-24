@@ -39,9 +39,7 @@ public class LimitComputation extends SymmetricPhase {
 	 * requires the list of attributes to be put.
 	 */
 	private OutputKnowledge<List<Attribute>> concertedAttributes;
-	
-	Logger logger;
-	
+		
 	/**
 	 * This constructs a new limit computation class
 	 * @param concertedWordlist the list of words to compute attributes for
@@ -51,7 +49,6 @@ public class LimitComputation extends SymmetricPhase {
 	public LimitComputation(InputKnowledge<List<String>> concertedWordlist,
 			InputKnowledge<Mails> localMails,
 			OutputKnowledge<List<Attribute>> concertedAttributes) {
-		logger.info("limitComputation");
 		this.concertedWordlist = concertedWordlist;
 		this.localMails = localMails;
 		this.concertedAttributes = concertedAttributes;
@@ -59,16 +56,15 @@ public class LimitComputation extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
-		logger.info("limitComputation: starting computation...");
+		logger.info("entering phase");
 		Knowledge<Map<String, Double>>  tmpKnowledge = new Knowledge<Map<String, Double>>();
 		
-		logger.info("limitComputation: going into localLimitComputation");
 		LocalLimitComputation localLimitcomputation = new LocalLimitComputation(concertedWordlist, localMails, tmpKnowledge);
 		executePhase(connection, localLimitcomputation);
 		
-		logger.info("limitComputation: going into LimitMerging");
 		LimitMerging limitMerging = new LimitMerging(tmpKnowledge, concertedAttributes);
 		executePhase(connection, limitMerging);
+		logger.info("leaving phase");
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import yaquix.Connection;
 import yaquix.knowledge.Mails;
@@ -38,63 +37,65 @@ class LocalWordlistComputation extends SymmetricPhase {
 	 * This requires the computed local wordlist to be stored.
 	 */
 	private OutputKnowledge<List<String>> localWordlist;
-	
-	private Logger logger;
-	
+		
 	/**
 	 * This creates a new local discretization phase
 	 * @param localMails the mails to compute a word list for
 	 * @param localWordlist the selected word list
 	 */
 	public LocalWordlistComputation(InputKnowledge<Mails> localMails,
-			OutputKnowledge<List<String>> localWordlist) {
-		logger.info("localWordlistcomputation");
-		
+			OutputKnowledge<List<String>> localWordlist) {		
 		this.localMails = localMails;
 		this.localWordlist = localWordlist;
 	}
 
 	@Override
 	protected void execute(Connection connection) {
-		logger.info("localWordlistcomputation: starting computation...");
+		logger.info("entering phase");
 		
 		Mails mails = localMails.get();
 		List<String> words = new Vector<String>();
 		List<Double> spamPercentage = new Vector<Double>();
 		List<Double> nonSpamPercentage = new Vector<Double>();
-		
-		logger.info("localWordlistComputation: computing words in our emails" +
-							" and corresponding spam-/nonSpam-percentages...");
-		
+				
 		Set<String> wordset = mails.getAllWords();
 		
-		for(String word : wordset){
+		for(String word : wordset) {
 			words.add(word);
 			spamPercentage.add((double) mails.countWordInSpamMails(word)*100/mails.countWordInAllEmails(word));
 			nonSpamPercentage.add((double) mails.countWordInNonSpamMails(word)*100/mails.countWordInAllEmails(word));
 		}
+				 
+		List<String> chosenWordlist = chooseWords(words, spamPercentage,  nonSpamPercentage);
+		logger.debug("chosen wordlist: " + chosenWordlist);
+		localWordlist.put(chosenWordlist);
 		
-		localWordlist.put(chooseWords(words, spamPercentage,  nonSpamPercentage));
+		logger.info("leaving phase");
 	}
 	
 	private List<String> chooseWords(List<String> words, 
 									 List<Double> spamPercentage, 
 									 List<Double> nonSpamPercentage) {
+		logger.trace(String.format("chooseWords(words=%s,spamPercentage=%s,nonSpamPercentage=%s), NUM_WORDS = %d",
+						words, spamPercentage, nonSpamPercentage, NUMBER_OF_WORDS));
 		
-		logger.info("localWordlistComputation: choosing the best  words (max: " + NUMBER_OF_WORDS  + "...");
-		
-		double key;
 		List<String> goodWords = new Vector<String>();
-		SortedMap<Double, String> map = new TreeMap<Double, String>();
 		
-		for(int i = 0; i < words.size(); i++){			
-			map.put((Math.abs(spamPercentage.get(i) - nonSpamPercentage.get(i))), words.get(i));
-		}
-		
-		for(int i = 0; i < NUMBER_OF_WORDS; i++){
-			key = map.lastKey();
-			goodWords.add(map.get(key));
-			map.remove(key);
+		for(int i = 0; i < Math.min(words.size(), NUMBER_OF_WORDS); i++){
+			int bestCandidateIndex = -1;
+			double bestDifference = 0;
+			for (int candidateIndex = 0; candidateIndex < words.size(); candidateIndex++) {
+				if (goodWords.contains(words.get(candidateIndex))) {
+					continue;
+				}
+				double currentDifference = Math.abs(spamPercentage.get(candidateIndex) - nonSpamPercentage.get(candidateIndex));
+				if (currentDifference >= bestDifference) {
+					bestCandidateIndex = candidateIndex;
+					bestDifference = currentDifference;
+				}
+			}
+			assert bestCandidateIndex != -1 : "No canidate found.";
+			goodWords.add(words.get(bestCandidateIndex));
 		}
 		
 		return goodWords;
