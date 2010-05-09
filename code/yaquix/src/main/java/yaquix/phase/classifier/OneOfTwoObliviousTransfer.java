@@ -123,49 +123,60 @@ class OneOfTwoObliviousTransfer extends Phase {
 		logger.info("entering phase");
 		logger.debug(String.format("Selecting %s", clientBit.get() ? "1" : "0"));
 		
-		Key publicKey = connection.receiveKey();
-		int x0 = connection.receiveInteger();
-		int x1 = connection.receiveInteger();
-		int k = randomSource.nextInt();
-		int kPrime;
-
-		Cipher cipher = getCipher();
-		try {
-			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		} catch (InvalidKeyException e) {
-			throw new RuntimeException(e); // TODO exception
-		}
-
-		try {
-			kPrime = byteArrayToInt(cipher.doFinal(intToByteArray(k)));
-		} catch(BadPaddingException e) {
-			throw new RuntimeException(e); // TODO exception
-		} catch (IllegalBlockSizeException e) {
-			throw new RuntimeException(e); // TODO exception
-		}
-
-		int v;
-		if (clientBit.get()) {
-			v = x1;
-		} else {
-			v = x0;
-		}
-		// if I understand the whole keygen initialization right,
-		// N has 1024 bits now, which means that N is around 2^1000,
-		// which is more than java integers can ever handle, so the modulo
-		// should not matter.
-		v = (v + kPrime);
-
-		connection.sendInteger(v);
-
-		int l0 = connection.receiveInteger();
-		int l1 = connection.receiveInteger();
-
+//		Key publicKey = connection.receiveKey();
+//		int x0 = connection.receiveInteger();
+//		int x1 = connection.receiveInteger();
+//		int k = randomSource.nextInt();
+//		int kPrime;
+//
+//		Cipher cipher = getCipher();
+//		try {
+//			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+//		} catch (InvalidKeyException e) {
+//			throw new RuntimeException(e); // TODO exception
+//		}
+//
+//		try {
+//			kPrime = byteArrayToInt(cipher.doFinal(intToByteArray(k)));
+//		} catch(BadPaddingException e) {
+//			throw new RuntimeException(e); // TODO exception
+//		} catch (IllegalBlockSizeException e) {
+//			throw new RuntimeException(e); // TODO exception
+//		}
+//
+//		int v;
+//		if (clientBit.get()) {
+//			v = x1;
+//		} else {
+//			v = x0;
+//		}
+//		// if I understand the whole keygen initialization right,
+//		// N has 1024 bits now, which means that N is around 2^1000,
+//		// which is more than java integers can ever handle, so the modulo
+//		// should not matter.
+//		v = (v + kPrime);
+//
+//		connection.sendInteger(v);
+//
+//		int l0 = connection.receiveInteger();
+//		int l1 = connection.receiveInteger();
+//
+//		int result;
+//		if (clientBit.get()) {
+//			result = l0 - kPrime;
+//		} else {
+//			result = l1 - kPrime;
+//		}
+//		clientReceivedMessage.put(result);
+		
+		int firstMessage = connection.receiveInteger(); // (1)
+		int secondMessage = connection.receiveInteger(); // (2)
+		
 		int result;
 		if (clientBit.get()) {
-			result = l0 - kPrime;
+			result = secondMessage;
 		} else {
-			result = l1 - kPrime;
+			result = firstMessage;
 		}
 		clientReceivedMessage.put(result);
 		logger.debug(String.format("received %d", result));
@@ -175,53 +186,55 @@ class OneOfTwoObliviousTransfer extends Phase {
 	@Override
 	public void serverExecute(Connection connection) throws IOException {
 		logger.info("entering phase");
-		
-		KeyPairGenerator keyGenerator;
-		try {
-			keyGenerator = KeyPairGenerator.getInstance("RSA");
-		} catch (NoSuchAlgorithmException exc) {
-			throw new RuntimeException(exc); // TODO exception
-		}
-		keyGenerator.initialize(1024, randomSource);
-		KeyPair keys = keyGenerator.generateKeyPair();
-
-		int m0 = serverMessages.get()[0];
-		int m1 = serverMessages.get()[1];
-		logger.debug(String.format("server messages: %d %d", m0, m1));
-		
-		Key privateKey = keys.getPrivate();
-		Key publicKey = keys.getPublic();
-		int x0 = randomSource.nextInt();
-		int x1 = randomSource.nextInt();
-
-		Cipher cipher = getCipher();
-		try {
-			cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		} catch (InvalidKeyException exc) {
-			throw new RuntimeException(exc); // TODO exception
-		}
-
-		connection.sendKey(publicKey);
-		connection.sendInteger(x0);
-		connection.sendInteger(x1);
-
-		int v = connection.receiveInteger();
-		int k0;
-		int k1;
-		try {
-			byte[] k0Bytes = intToByteArray(v - x0);
-			byte[] k1Bytes = intToByteArray(v - x1);
-
-			k0 = byteArrayToInt(cipher.doFinal(k0Bytes));
-			k1 = byteArrayToInt(cipher.doFinal(k1Bytes));			
-		} catch (IllegalBlockSizeException exc) {
-			throw new RuntimeException(exc);
-		} catch (BadPaddingException exc) {
-			throw new RuntimeException(exc);
-		}
-
-		connection.sendInteger(m0+k0);
-		connection.sendInteger(m1+k1);
+		logger.info(String.format("serverExecute(%s, %s)", serverMessages.get()[0], serverMessages.get()[1]));
+//		KeyPairGenerator keyGenerator;
+//		try {
+//			keyGenerator = KeyPairGenerator.getInstance("RSA");
+//		} catch (NoSuchAlgorithmException exc) {
+//			throw new RuntimeException(exc); // TODO exception
+//		}
+//		keyGenerator.initialize(1024, randomSource);
+//		KeyPair keys = keyGenerator.generateKeyPair();
+//
+//		int m0 = serverMessages.get()[0];
+//		int m1 = serverMessages.get()[1];
+//		logger.debug(String.format("server messages: %d %d", m0, m1));
+//		
+//		Key privateKey = keys.getPrivate();
+//		Key publicKey = keys.getPublic();
+//		int x0 = randomSource.nextInt();
+//		int x1 = randomSource.nextInt();
+//
+//		Cipher cipher = getCipher();
+//		try {
+//			cipher.init(Cipher.DECRYPT_MODE, privateKey);
+//		} catch (InvalidKeyException exc) {
+//			throw new RuntimeException(exc); // TODO exception
+//		}
+//
+//		connection.sendKey(publicKey);
+//		connection.sendInteger(x0);
+//		connection.sendInteger(x1);
+//
+//		int v = connection.receiveInteger();
+//		int k0;
+//		int k1;
+//		try {
+//			byte[] k0Bytes = intToByteArray(v - x0);
+//			byte[] k1Bytes = intToByteArray(v - x1);
+//
+//			k0 = byteArrayToInt(cipher.doFinal(k0Bytes));
+//			k1 = byteArrayToInt(cipher.doFinal(k1Bytes));			
+//		} catch (IllegalBlockSizeException exc) {
+//			throw new RuntimeException(exc);
+//		} catch (BadPaddingException exc) {
+//			throw new RuntimeException(exc);
+//		}
+//
+//		connection.sendInteger(m0+k0);
+//		connection.sendInteger(m1+k1);
+		connection.sendInteger(serverMessages.get()[0]); // (1)
+		connection.sendInteger(serverMessages.get()[1]); // (2)
 		logger.info("leaving phase");
 	}
 

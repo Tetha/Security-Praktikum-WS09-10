@@ -117,9 +117,9 @@ public class EntropySharesComputation extends SymmetricPhase {
 		int[] shares = new int[attributes.size()];
 		for (int a = 0; a < attributes.size(); a++) {
 			int share = 0;
-			for (int aj = 0; aj < attributeSetShares.length; aj++) {
+			for (int aj = 0; aj < attributeSetShares[a].length; aj++) {
 				share += attributeSetShares[a][aj];
-				for (int cj = 0; cj < attributeClassSetShares.length; cj++) {
+				for (int cj = 0; cj < attributeClassSetShares[a][aj].length; cj++) {
 					share += attributeClassSetShares[a][aj][cj];
 				}
 			}

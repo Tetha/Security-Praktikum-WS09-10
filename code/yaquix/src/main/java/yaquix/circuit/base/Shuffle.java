@@ -7,9 +7,9 @@ import yaquix.circuit.Circuit;
 
 /**
  * This shuffles inputs and outputs around according
- * to a certain wire mapping. Basically, you need 
+ * to a certain wire mapping. Basically, you need
  * to think of a bipartite graph of the same number
- * of inputs and outputs. 
+ * of inputs and outputs.
  * @author hk
  *
  */
@@ -24,11 +24,19 @@ public class Shuffle extends Circuit {
 	public Shuffle(int inputCount, Map<Integer, Integer> connections) {
 		int nodeCount = 2*inputCount;
 		gateType = new Circuit.GateType[nodeCount];
-		inputs = new int[nodeCount];
-		outputs = new int[nodeCount];
+		inputs = new int[inputCount];
+		outputs = new int[inputCount];
 		tables = new boolean[nodeCount][4][4];
 		adjacencyList = new LinkedList[nodeCount];
-		
+
+		for (Integer follower : connections.values()) {
+			assert follower < inputCount : String.format("Output %d out of bounds", follower);
+		}
+
+		for (Integer key : connections.keySet()) {
+			assert key < inputCount : String.format("Input %d out of bounds", key);
+		}
+
 		for (int i = 0; i < nodeCount; i++) {
 			adjacencyList[i] = new LinkedList<Integer>();
 			if (0 <= i && i < inputCount) {
@@ -37,7 +45,7 @@ public class Shuffle extends Circuit {
 				gateType[i] = GateType.IN;
 				Integer follower = connections.get(i);
 				if (follower != null) {
-					adjacencyList[i].add(follower);
+					addNewFollower(this, i, inputCount+follower);
 				}
 			} else if (inputCount <= i && i < 2*inputCount) {
 				// output

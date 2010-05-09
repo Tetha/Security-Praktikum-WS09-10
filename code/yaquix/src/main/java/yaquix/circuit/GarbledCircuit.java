@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import yaquix.circuit.Circuit.GateType;
 
 public class GarbledCircuit implements Serializable {
@@ -49,6 +52,9 @@ public class GarbledCircuit implements Serializable {
 		
 	protected int[] inputValues;
 	
+	private static final Logger LOG = LoggerFactory
+			.getLogger(GarbledCircuit.class);
+		
 	@SuppressWarnings("unchecked")
 	public GarbledCircuit(int gateCount, int inputCount, int outputCount) {
 		gateType = new GateType[gateCount];
@@ -125,6 +131,7 @@ public class GarbledCircuit implements Serializable {
 		gateType[gateIndex] = GateType.OUT;
 		outputs[outputIndex] = gateIndex;
 		tables[gateIndex][0] = inputWireMapping;
+		adjacencyList[gateIndex] = new LinkedList<Integer>();
 	}	
 	
 	/**
@@ -136,9 +143,12 @@ public class GarbledCircuit implements Serializable {
 		int[] outputValues = new int[gateType.length];
 		boolean[] hasOutput = new boolean[gateType.length];
 		
+		//setInputOutputs(hasOutput, outputValues);
+		
 		while(someOutputHasNoOutput(hasOutput)) {
 			for (int gateIndex = 0; gateIndex <  gateType.length; gateIndex++) {
-				if (!hasOutput[gateIndex] && allInputsDefined(hasOutput, gateIndex)) {
+				if (gateType[gateIndex] == GateType.IN  || 
+						!hasOutput[gateIndex] && allInputsDefined(hasOutput, gateIndex)) {
 					evaluateGate(gateIndex, outputValues, hasOutput);
 				}
 			}
@@ -147,7 +157,6 @@ public class GarbledCircuit implements Serializable {
 		return decodeOutput(outputValues);
 	}
 
-	
 	private boolean[] decodeOutput(int[] outputValues) {
 		boolean[] result = new boolean[outputs.length];
 		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
@@ -163,18 +172,20 @@ public class GarbledCircuit implements Serializable {
 	}
 
 	private void evaluateGate(int gateIndex, int[] outputValues, boolean[] hasOutput) {
+		LOG.trace(String.format("Evaluate gate %d", gateIndex));
 		int[] preds;
 		int predOutput;
 		hasOutput[gateIndex] = true;
 		switch (gateType[gateIndex]) {
 		case CONSTANT:
-			outputValues[gateIndex] = tables[gateIndex][0][0];
+			outputValues[gateIndex] = tables[gateIndex][1][0];
 			break;
 			
 		case UNARYGATE:
 			preds = computePredecessors(gateIndex);
 			int predIndex = preds[0];
 			predOutput = outputValues[predIndex];
+			assert tables[gateIndex][0][0] == predOutput || tables[gateIndex][0][1] == predOutput;
 			if (tables[gateIndex][0][0] == predOutput) {
 				outputValues[gateIndex] = tables[gateIndex][1][0] ^ predOutput;
 			} else {
@@ -190,12 +201,19 @@ public class GarbledCircuit implements Serializable {
 			int rightInput = outputValues[rightPredIndex];
 			int inputTag = leftInput ^ rightInput;
 			
+			assert tables[gateIndex][0][0] == inputTag
+					|| tables[gateIndex][0][1] == inputTag
+					|| tables[gateIndex][0][2] == inputTag
+					|| tables[gateIndex][0][3] == inputTag;
+			boolean outputWritten = false;
 			for (int i = 0; i < 4; i++) {
 				if (tables[gateIndex][0][i] == inputTag) {
+					outputWritten = true;
 					outputValues[gateIndex] = tables[gateIndex][1][i] ^ inputTag;
 					break;
 				}
 			}
+			assert outputWritten;
 		break;
 		
 		case IN:
@@ -224,7 +242,7 @@ public class GarbledCircuit implements Serializable {
 		int[] preds = new int[2];
 		int predCount = 0;
 		
-		for (int predIndex = 0; predIndex < gateType.length; predIndex++) {
+		for (int predIndex = 0; predIndex < gateType.length; predIndex++) {			
 			for (Integer follower : adjacencyList[predIndex]) {
 				if (follower == gateIndex) {
 					preds[predCount] = predIndex;
@@ -236,11 +254,17 @@ public class GarbledCircuit implements Serializable {
 	}
 
 	private boolean someOutputHasNoOutput(boolean[] hasOutput) {
-		for (int outputIndex = 0; outputIndex < hasOutput.length; outputIndex++) {
+		int newFinishedGates = 0;
+		boolean result = false;
+		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
 			int gateIndex = outputs[outputIndex];
-			if (!hasOutput[gateIndex]) return false;
+			if (hasOutput[gateIndex]) {
+				newFinishedGates++;
+			} else {
+				result = true;
+			}
 		}
-		return true;
+		return result;
 	}
 
 	/**

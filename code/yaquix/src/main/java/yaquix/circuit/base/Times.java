@@ -4,6 +4,12 @@ import yaquix.circuit.Circuit;
 
 /**
  * This class repeats the given given circuit n times.
+ * 
+ * If the initial circuit requires I input bits, then the
+ * repeated input circuit requires n*I input bits.
+ * If the initial circuit prdouces O output bits, then the
+ * repeated circuit produces n*O output bits.
+ * 
  * For each input of the circuit, the repeated circuit requires
  * an input word of n bits instead of a single bit input. The
  * 0th repetition of the circuit operates on the inputs with 
@@ -31,5 +37,21 @@ public class Times extends Circuit {
 	 * @param repeatedCircuit the circuit to enlarge
 	 */
 	public Times(int wordWidth, Circuit repeatedCircuit) {
+		/*
+		 * At first, we have a circuit with
+		 *  - inputs i1 i2 i3 ..
+		 *  - outputs o1 o2 o3
+		 *  
+		 * We then build wordWidth many circuits in parallel. This results
+		 * in
+		 *  - inputs: i11 i12 i13 ... i21 i22 i23 ...
+		 *  - outputs o11 o12 o13 ... o21 o22 o23 ...
+		 * 
+		 * We then shuffle the inputs and outputs accordingly, that is, 
+		 * input A of circuit B goes to input A*#Inputs + B and
+		 * output C of circuit D goes to output C*N+D.
+		 * 
+		 */
+		
 	}
 }

@@ -17,6 +17,10 @@ public class Split extends Circuit {
 	 */
 	@SuppressWarnings("unchecked")
 	public Split(int numberOfOutputs) {
+		if (numberOfOutputs < 0) {
+			throw new IllegalArgumentException("number of outputs < 0");
+		}
+		
 		int nodeCount = numberOfOutputs + 1;
 		
 		gateType = new GateType[nodeCount];

@@ -3,15 +3,14 @@ package yaquix.circuit;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.OutputUtil;
 
 /**
  * Implements a boolean circuit, the bane of our existence.
@@ -28,77 +27,77 @@ public class Circuit {
 		/**
 		 * describes the gate as an input gate
 		 */
-		IN, 
-		
+		IN,
+
 		/**
 		 * describes the gate as an output gate
 		 */
 		OUT,
-		
+
 		/**
 		 * describes the gate as a constant value gate
 		 */
-		CONSTANT, 
-		
+		CONSTANT,
+
 		/**
 		 * describes the gate as an unary gate
 		 */
-		UNARYGATE, 
-		
+		UNARYGATE,
+
 		/**
 		 * describes the gate as a binary gate
 		 */
-		BINARYGATE 
+		BINARYGATE
 	};
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(Circuit.class);
 	/**
 	 * stores the type of all gates.
 	 */
 	protected GateType[] gateType;
-	
+
 	/**
 	 * stores the structure of the circuit.
 	 * adjacencyList[i] contains the followers of gate with index i.
 	 */
 	protected List<Integer>[] adjacencyList;
-	
+
 	/**
 	 * stores the annotations of the gates.
 	 * if a gate with index i is constant, then tables[i][0][0] contains
-	 * the value of the gate. 
-	 * if a gate with index i is unary, then tables[i][0][[0] contains 
+	 * the value of the gate.
+	 * if a gate with index i is unary, then tables[i][0][[0] contains
 	 * the output of the gate for input 0 and tables[i][0][1] contains
 	 * the output of the gate for input 1.
-	 * if a gate with index i is binary, then tables[i] contains the 
+	 * if a gate with index i is binary, then tables[i] contains the
 	 * outputs (with [left][right]).
 	 */
 	protected boolean[][][] tables;
-	
+
 	/**
 	 * stores the gate indices of the inputs.
 	 * inputs[i] = j means: gate #j has type IN and the input i
 	 * goes into gate j
 	 */
 	protected int[] inputs;
-	
+
 	/**
 	 * stores the gate indices of the outputs;
 	 * outputs[i] = j means: the value of output i comes from
 	 * the output of gate j
 	 */
-	protected int[] outputs; 
+	protected int[] outputs;
 
 	private SecureRandom random;
-	
+
 	public void setRandom(SecureRandom r) {
 		this.random = r;
 	}
-	
+
 	/**
 	 * This extends a given circuit with another circuit.
 	 * The parameter circuit is added on top of the existing circuit. That means, the
-	 * outputs of the existing circuit are connected to the inputs of the 
+	 * outputs of the existing circuit are connected to the inputs of the
 	 * newly added circuit. These connections are controlled via the connection
 	 * parameter: if connection.get(i) = j, then output number i of the
 	 * existing circuit is connected to input number j of the parameter circuit.
@@ -106,9 +105,9 @@ public class Circuit {
 	 * the inputs of the parameter circuit which are not mentioned in the connection
 	 * relation are added as inputs to the resulting circuit before copying
 	 * all inputs of the current circuit to the resulting circuit and outputs
-	 * of the current algorithm which are not mentioned by the mapping are added 
+	 * of the current algorithm which are not mentioned by the mapping are added
 	 * after any outputs of the parameter circuit.
-	 * 
+	 *
 	 * Note that extendBottomRight can be implemented by swapping addedCircuit and
 	 * the current circuit.
 	 * @param addedCircuit a circuit to add to the existing circuit.
@@ -117,22 +116,37 @@ public class Circuit {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Circuit extendTopLeft(Circuit addedCircuit, 
+	public Circuit extendTopLeft(Circuit addedCircuit,
 								 Map<Integer, Integer> connection) {
-		LOG.trace("extendTopLeft");
+		checkCircuit(addedCircuit);
+		checkCircuit(this);
+		LOG.trace(String.format("extendTopLeft(%s, %s)", addedCircuit, connection));
+		Set<Integer> inputGates = new HashSet<Integer>();
+		for (int i = 0; i < inputs.length; i++) {
+			inputGates.add(inputs[i]);
+		}
+		assert inputGates.size() == inputs.length : "Inputs not unique";
+
+		if (connection == null) {
+			throw new NullPointerException("connection");
+		}
+		if (addedCircuit == null) {
+			throw new NullPointerException("added circuit");
+		}
+
 		assert connection.size() <= addedCircuit.inputs.length : "Connection too large";
-		assert connection.size() <= outputs.length : "Connection too large";
+		assert connection.size() <= outputs.length : String.format("Connection too large (conn-size = %d > %d = # outputs)", connection.size(), outputs.length);
 		Circuit result = new Circuit();
 		result.inputs = new int[countSurvingInputs(connection, inputs, addedCircuit.inputs)];
 		assert inputs.length <= result.inputs.length && result.inputs.length <= inputs.length + addedCircuit.inputs.length;
-		
+
 		int survivingOutputCount = countSurvivingOutputs(connection, outputs, addedCircuit.outputs);
 		result.outputs = new int[survivingOutputCount];
 		assert addedCircuit.outputs.length <= result.outputs.length && result.outputs.length <= addedCircuit.outputs.length + outputs.length;
 		int survivingGatesCount = countSurvivingGates(connection, gateType, addedCircuit.gateType);
 		LOG.trace(String.format("surviving gates: %d, existing gates: %d, added gates: %d, connection: %s",
 					survivingGatesCount, gateType.length, addedCircuit.gateType.length, connection));
-		
+
 		result.adjacencyList = new LinkedList[survivingGatesCount];
 		for (int i = 0; i < survivingGatesCount; i++) {
 			result.adjacencyList[i] = new LinkedList<Integer>();
@@ -145,12 +159,12 @@ public class Circuit {
 		int existingGates = countInnerGates();
 		int addedOutputs = addedCircuit.outputs.length;
 		int survivingAddedOutputs = 0;
-		
-		// the destination of X input lists associate the input index with 
+
+		// the destination of X input lists associate the input index with
 		// gate indexes in the result circuit
 		// the destination of X gate associates gate indexes in the existing
 		// or added circuit with gate indexes in the result circuit
-		// the destination of output associates output indexes with 
+		// the destination of output associates output indexes with
 		// gate indexes in the result circuit.
 		int survivingAddedInputs = 0;
 		List<Integer> destinationOfAddedInput = new LinkedList<Integer>();
@@ -170,8 +184,8 @@ public class Circuit {
 				survivingAddedInputs++;
 			}
 		}
-		
-		List<Integer> destinationOfExistingInput = new LinkedList<Integer>(); 
+
+		List<Integer> destinationOfExistingInput = new LinkedList<Integer>();
 		for(int i = 0; i < inputs.length; i++) {
 			int destinationIndex = i+survivingAddedInputs;
 			destinationOfExistingInput.add(destinationIndex);
@@ -179,20 +193,22 @@ public class Circuit {
 			LOG.trace(String.format("mapping existing input %d with gateIndex %d to new gate index %d",
 					i, inputs[i], destinationIndex));
 		}
-		
+
 		int copiedAddedGates = 0;
 		for(int i = 0; i < addedCircuit.gateType.length; i++) {
 			if (addedCircuit.gateType[i] == GateType.IN
 					|| addedCircuit.gateType[i] == GateType.OUT) continue;
-			
+
 			int destinationIndex = copiedAddedGates+existingInputs+survivingAddedInputs;
-			assert 0 <= destinationIndex && destinationIndex < result.gateType.length;
+			LOG.trace(String.format("result.gateType.lenght = %d, copiedAddedGates=%d, existingInputs=%d,survivingAddedInputs=%d",
+						result.gateType.length, copiedAddedGates, existingInputs, survivingAddedInputs));
+			assert 0 <= destinationIndex && destinationIndex < result.gateType.length : destinationIndex;
 			destinationOfAddedGate[i] = destinationIndex;
 			LOG.trace(String.format("mapping added gate with gateIndex %d to new gate index %d",
 					i,  destinationIndex));
 			copiedAddedGates++;
 		}
-		
+
 		int copiedExistingGates = 0;
 		for(int i = 0; i < gateType.length; i++) {
 			if (gateType[i] == GateType.IN
@@ -204,39 +220,44 @@ public class Circuit {
 					i,  destinationIndex));
 			copiedExistingGates++;
 		}
-		
+
 		List<Integer> destinationOfAddedOutput =  new LinkedList<Integer>();
 		for(int i = 0 ; i < addedCircuit.outputs.length; i++) {
 			int destinationIndex = survivingAddedInputs + existingInputs + addedGates + existingGates + i;
 			destinationOfAddedOutput.add(destinationIndex);
 			LOG.trace(String.format("i=%d,output=%d", i, addedCircuit.outputs[i]));
 			LOG.trace(String.format("destAddGate.length=%d", destinationOfAddedGate.length));
-			destinationOfAddedGate[addedCircuit.outputs[i]] = destinationIndex; 
+			destinationOfAddedGate[addedCircuit.outputs[i]] = destinationIndex;
 		}
-		
+
 		List<Integer> destinationOfExistingOutput = new LinkedList<Integer>();
 		for(int i = 0; i < outputs.length; i++) {
 			if(connection.containsKey(i)) {
 				destinationOfExistingOutput.add(-1);
 				destinationOfExistingGate[outputs[i]] = -1;
 			} else {
-				
-				int destinationIndex = survivingAddedInputs + existingInputs 
-												+ addedGates + existingGates 
+
+				int destinationIndex = survivingAddedInputs + existingInputs
+												+ addedGates + existingGates
 												+ addedOutputs + survivingAddedOutputs;
-				assert 0 <= destinationIndex && destinationIndex < result.gateType.length;
+				System.out.println(String.format("%d + %d + %d + %d + %d + %d",
+									survivingAddedInputs, existingInputs,
+									addedGates, existingGates,
+									addedOutputs, survivingAddedOutputs));
+				assert 0 <= destinationIndex && destinationIndex < result.gateType.length :
+							String.format("%d %d", destinationIndex, result.gateType.length);
 				destinationOfExistingOutput.add(destinationIndex);
 				destinationOfExistingGate[outputs[i]] = destinationIndex;
 				survivingAddedOutputs++;
-				
+
 			}
 		}
-		
+
 		// Index mapping is correct.
-		
+
 		// copy the gates in a meaningful fashion.
 		int newInputsAdded = 0;
-		
+
 		for(int i = 0; i < addedCircuit.inputs.length; i++) {
 			int newGateIndex = destinationOfAddedInput.get(i);
 			if (newGateIndex == -1) {
@@ -246,21 +267,23 @@ public class Circuit {
 				result.gateType[newGateIndex] = GateType.IN;
 				result.inputs[newInputsAdded] = newGateIndex;
 				newInputsAdded++;
-				
+
 				int inputGateIndex = addedCircuit.inputs[i];
 				for(Integer follower : addedCircuit.adjacencyList[inputGateIndex]) {
 					int followerDestination = destinationOfAddedGate[follower];
-					result.adjacencyList[newGateIndex].add(followerDestination);
+					assert 0 <= followerDestination && followerDestination < result.gateType.length;
+					addNewFollower(result, newGateIndex, followerDestination);
 				}
 			}
 		}
-		
+
+
 		for(int i = 0; i < inputs.length; i++) {
 			int newGateIndex = destinationOfExistingInput.get(i);
 			result.gateType[newGateIndex] = GateType.IN;
 			result.inputs[newInputsAdded] = newGateIndex;
 			newInputsAdded++;
-		
+
 			int inputGateIndex = inputs[i];
 			for(Integer follower : adjacencyList[inputGateIndex]) {
 				if (gateType[follower] == GateType.OUT) {
@@ -269,30 +292,35 @@ public class Circuit {
 							newGateIndex, follower);
 				} else {
 					int followerDestination = destinationOfExistingGate[follower];
-					result.adjacencyList[newGateIndex].add(followerDestination);
+					assert newGateIndex != followerDestination : "cycle";
+					assert 0 <= followerDestination && followerDestination < result.gateType.length;
+					addNewFollower(result, newGateIndex, followerDestination);
 				}
 			}
-		
+
 		}
-		
+
+
 		// inner gates
 		for(int i= 0; i < addedCircuit.gateType.length; i++) {
 			if (addedCircuit.gateType[i] == GateType.IN
 					|| addedCircuit.gateType[i] == GateType.OUT) continue;
-			
+
 			int gateDestinationIndex = destinationOfAddedGate[i];
 			result.gateType[gateDestinationIndex] = addedCircuit.gateType[i];
 			result.tables[gateDestinationIndex] = addedCircuit.tables[i];
 			for (Integer follower : addedCircuit.adjacencyList[i]) {
 				int followerDestinationIndex = destinationOfAddedGate[follower];
-				result.adjacencyList[gateDestinationIndex].add(followerDestinationIndex);
+				assert 0 <= gateDestinationIndex && gateDestinationIndex < result.gateType.length;
+				addNewFollower(result, gateDestinationIndex,
+						followerDestinationIndex);
 			}
 		}
-		
+
 		for (int i = 0; i < gateType.length; i++) {
 			if(gateType[i] == GateType.IN || gateType[i] == GateType.OUT) continue;
 			int gateDestinationIndex = destinationOfExistingGate[i];
-			LOG.trace(String.format("gateDestination=%d, i=%d, gatetype-length=%d", 
+			LOG.trace(String.format("gateDestination=%d, i=%d, gatetype-length=%d",
 									gateDestinationIndex, i,result.gateType.length));
 			result.gateType[gateDestinationIndex] = gateType[i];
 			result.tables[gateDestinationIndex] = tables[i];
@@ -304,11 +332,15 @@ public class Circuit {
 							follower);
 				} else {
 					int followerDestination = destinationOfExistingGate[follower];
-					result.adjacencyList[gateDestinationIndex].add(followerDestination);
+					assert 0 <= followerDestination && followerDestination < result.gateType.length;
+					addNewFollower(result, gateDestinationIndex,
+							followerDestination);
 				}
 			}
 		}
-		
+
+		checkCircuit(result);
+
 		// outputs
 		int outputsAdded = 0;
 		for (int i = 0; i < addedCircuit.outputs.length; i++) {
@@ -318,7 +350,7 @@ public class Circuit {
 			result.adjacencyList[gateDestinationIndex] = new LinkedList<Integer>();
 			outputsAdded++;
 		}
-		
+
 		for (int i = 0; i < outputs.length; i++) {
 			int gateDestinationIndex = destinationOfExistingOutput.get(i);
 			if (gateDestinationIndex == -1) {
@@ -330,11 +362,38 @@ public class Circuit {
 				outputsAdded++;
 			}
 		}
-		
-		for (int i = 0; i < result.adjacencyList.length; i++) {
-			assert result.adjacencyList[i] != null : "Uninitialized adjacency list " + i;
-		}
+
+		checkCircuit(result);
 		return result;
+	}
+
+	/**
+	 * @param result
+	 * @param gateDestinationIndex
+	 * @param followerDestination
+	 */
+	protected void addNewFollower(Circuit result, int gateDestinationIndex,
+			int followerDestination) {
+		assert 0 <= followerDestination && followerDestination < result.gateType.length;
+		result.adjacencyList[gateDestinationIndex].add(followerDestination);
+	}
+
+	/**
+	 * @param checkedCircuit
+	 */
+	private void checkCircuit(Circuit checkedCircuit) {
+		LOG.debug(String.format("Checking %s", checkedCircuit));
+		assert checkedCircuit.gateType.length == checkedCircuit.adjacencyList.length;
+		assert checkedCircuit.gateType.length == checkedCircuit.tables.length;
+		for (int i = 0; i < checkedCircuit.adjacencyList.length; i++) {
+			for (Integer follower : checkedCircuit.adjacencyList[i]) {
+				assert 0 <= follower && follower < checkedCircuit.gateType.length
+					: String.format("Follower %d of %d out of bounds (min: 0, max: %d)",
+								follower, i, checkedCircuit.gateType.length);
+			}
+			assert checkedCircuit.adjacencyList[i] != null : "Uninitialized adjacency list " + i;
+			assert !checkedCircuit.adjacencyList[i].contains(i) : "cycle";
+		}
 	}
 
 	private void skipConnectedOutput(Circuit addedCircuit,
@@ -342,27 +401,26 @@ public class Circuit {
 			int[] destinationOfAddedGate,
 			List<Integer> destinationOfExistingOutput,
 			int gateDestinationIndex, Integer follower) {
-		int outputIndex = -1;
-		for (int j = 0; j < outputs.length; j++) {
-			if (outputs[j] == follower) {
-				outputIndex = j;
-				break;
-			}
-		}
-		assert (outputIndex != -1);
+		int outputIndex = findInArray(follower, outputs);
+
 		if (connection.containsKey(outputIndex)) {
 			int associatedAddedInput = connection.get(outputIndex);
 			int assoiciatedAddedGate = addedCircuit.inputs[associatedAddedInput];
 			for (Integer inputFollower : addedCircuit.adjacencyList[assoiciatedAddedGate]) {
 				int inputFollowerDestination = destinationOfAddedGate[inputFollower];
-				result.adjacencyList[gateDestinationIndex].add(inputFollowerDestination);
+				assert 0 <= inputFollowerDestination && inputFollowerDestination < result.gateType.length;
+				assert inputFollowerDestination != gateDestinationIndex : "No Cycles";
+				addNewFollower(result, gateDestinationIndex,
+						inputFollowerDestination);
 			}
 		} else {
 			int outputDestination = destinationOfExistingOutput.get(outputIndex);
-			result.adjacencyList[gateDestinationIndex].add(outputDestination);
+			assert 0 <= outputDestination && outputDestination < result.gateType.length;
+			assert outputDestination != gateDestinationIndex : "No cycles";
+			addNewFollower(result, gateDestinationIndex, outputDestination);
 		}
 	}
-	
+
 	/**
 	 * counts the non-input-output-gates.
 	 * @return the number of the non-input-output-gates
@@ -417,17 +475,17 @@ public class Circuit {
 								existingInputs.length, addedInputs.length, connection.size(), connection));
 		return existingInputs.length + addedInputs.length - connection.size();
 	}
-	
+
 	/**
 	 * This adds the parameter circuit to the left of the current circuit.
-	 * The addition is done on the same level, that means, the two 
-	 * circuits to not communicate with each other. 
+	 * The addition is done on the same level, that means, the two
+	 * circuits to not communicate with each other.
 	 * The addition is done to the left, that means, the inputs of the
-	 * parameter circuit are added before any inputs of the current 
+	 * parameter circuit are added before any inputs of the current
 	 * circuit to the resulting circuits inputs and any outputs
 	 * of the parameter circuit are added to the resulting circuit
 	 * before any outputs of the current circuit.
-	 * 
+	 *
 	 * Note that extendRight can be implemented by swapping the
 	 * current circuit and the added circuit.
 	 * @param addedCircuit
@@ -437,7 +495,7 @@ public class Circuit {
 	public Circuit extendLeft(Circuit addedCircuit) {
 		return extendTopLeft(addedCircuit, new HashMap<Integer, Integer>());
 	}
-	
+
 
 	/**
 	 * returns the number of inputs
@@ -445,15 +503,15 @@ public class Circuit {
 	 */
 	public int getInputCount() {
 		return inputs.length;
-	}	
-	
+	}
+
 	/**
 	 * garbles the boolean circuit into a garbled circuit, with the
 	 * given input mapping.
 	 * @param inputMapping For each input index, the entry[0] defines the
 	 * garbled input value for an input 0, while the entry[1] defines the
 	 * garbled input value for an input 1
-	 * @return a garbled circuit which does the same as this circuit 
+	 * @return a garbled circuit which does the same as this circuit
 	 * but is garbled for yaos protocol
 	 */
 	public GarbledCircuit garble(Map<Integer, int[]> inputMapping, SecureRandom random) {
@@ -461,11 +519,11 @@ public class Circuit {
 		GarbledCircuit result = new GarbledCircuit(gateType.length, inputs.length, outputs.length);
 		int[][] preds; // predecessors[gate][0..1]
 		int[][] wireGarblings; // wireGarblings[source][0/1]
-		
+
 		int[] outputWireMapping;
 		int[] inputWireMapping;
 		int onlyPredIndex;
-		
+
 		preds = computePredecessors();
 		wireGarblings = garbleAllWires(inputMapping);
 		for (int i = 0; i < gateType.length; i++) {
@@ -474,7 +532,7 @@ public class Circuit {
 				outputWireMapping = wireGarblings[i];
 				garbleInput(result, i, outputWireMapping);
 			break;
-			
+
 			case OUT:
 				onlyPredIndex = preds[i][0];
 				inputWireMapping = wireGarblings[onlyPredIndex];
@@ -484,25 +542,26 @@ public class Circuit {
 				outputWireMapping = wireGarblings[i];
 				garbleConstantGate(result, i, outputWireMapping);
 			break;
-			
+
 			case UNARYGATE:
 				outputWireMapping = wireGarblings[i];
 				onlyPredIndex = preds[i][0];
 				inputWireMapping = wireGarblings[onlyPredIndex];
 				garbleUnaryGate(result, i, outputWireMapping, inputWireMapping);
 			break;
-			
+
 			case BINARYGATE:
 				outputWireMapping = wireGarblings[i];
 				int leftPredIndex = preds[i][0];
 				int rightPredIndex = preds[i][1];
 				int[] leftInputWireMapping = wireGarblings[leftPredIndex];
 				int[] rightInputWireMapping = wireGarblings[rightPredIndex];
-				
+
 				garbleBinaryGate(result, i, outputWireMapping, leftInputWireMapping, rightInputWireMapping);
 			break;
 			}
 		}
+
 		return result;
 	}
 
@@ -514,7 +573,7 @@ public class Circuit {
 				result.addOutput(i, outputIndex, inputWireMapping);
 			}
 		}
-		
+
 	}
 
 	private void garbleInput(GarbledCircuit result, int i,
@@ -561,10 +620,10 @@ public class Circuit {
 		return result;
 	}
 
-	private void garbleBinaryGate(GarbledCircuit result, int gateIndex, 
-			int[] outputWireMapping, int[] leftInputWireMapping, 
+	private void garbleBinaryGate(GarbledCircuit result, int gateIndex,
+			int[] outputWireMapping, int[] leftInputWireMapping,
 			int[] rightInputWireMapping) {
-		// the input decision table maps 0 x 1 to 0, 1 (it is 
+		// the input decision table maps 0 x 1 to 0, 1 (it is
 		// in some square-shaped format). In order to use the
 		// function garbleRow, we turn this into a row-like
 		// format which maps 0..3 to the output value. Then, we apply
@@ -574,26 +633,26 @@ public class Circuit {
 		// the specification for quite some time reveals, that each
 		// entry of the new input mapping is the xor of the values of
 		// the two shorter separate input mapping.
-		
-		int[] largeInputMapping = new int[4];		
+
+		int[] largeInputMapping = new int[4];
 		largeInputMapping[0*2+0] = leftInputWireMapping[0] ^ rightInputWireMapping[0];
 		largeInputMapping[0*2+1] = leftInputWireMapping[0] ^ rightInputWireMapping[1];
 		largeInputMapping[1*2+0] = leftInputWireMapping[1] ^ rightInputWireMapping[0];
 		largeInputMapping[1*2+1] = leftInputWireMapping[1] ^ rightInputWireMapping[1];
-		
+
 		boolean[][] squareTruthTable = tables[gateIndex];
 		boolean[] longTruthTable = new boolean[4];
 		longTruthTable[0*2+0] = squareTruthTable[0][0];
 		longTruthTable[0*2+1] = squareTruthTable[0][1];
 		longTruthTable[1*2+0] = squareTruthTable[1][0];
 		longTruthTable[1*2+1] = squareTruthTable[1][1];
-		
+
 		int[][] directlyGarbled = new int[2][4];
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 0, directlyGarbled);
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 1, directlyGarbled);
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 2, directlyGarbled);
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 3, directlyGarbled);
-		
+
 		List<Integer> destinationIndexes = new LinkedList<Integer>();
 		for (int ii = 0; ii < 4; ii++) destinationIndexes.add(ii);
 		Collections.shuffle(destinationIndexes);
@@ -606,36 +665,36 @@ public class Circuit {
 		result.addBinaryGate(gateIndex, adjacencyList[gateIndex], completelyGarbled);
 	}
 
-	private void garbleUnaryGate(GarbledCircuit result, int i, 
-			int[] outputWireMapping, int[] inputWireMapping) {		
+	private void garbleUnaryGate(GarbledCircuit result, int i,
+			int[] outputWireMapping, int[] inputWireMapping) {
 		boolean[] truthTable = tables[i][0];
 
-		
-		int[][] directlyGarbled = new int[2][2];		
+
+		int[][] directlyGarbled = new int[2][2];
 		garbleRow(outputWireMapping, inputWireMapping, truthTable,
 				0, directlyGarbled);
 
 		garbleRow(outputWireMapping, inputWireMapping, truthTable,
 				1, directlyGarbled);
-		
+
 
 		int[][] completelyGarbled = new int[2][2];
 		if (random.nextBoolean()) {
 			// straight
 			completelyGarbled[0][0] = directlyGarbled[0][0];
 			completelyGarbled[1][0] = directlyGarbled[1][0];
-			
-			completelyGarbled[0][1] = directlyGarbled[0][1];			
+
+			completelyGarbled[0][1] = directlyGarbled[0][1];
 			completelyGarbled[1][1] = directlyGarbled[1][1];
 		} else {
 			// cross
 			completelyGarbled[0][0] = directlyGarbled[0][1];
 			completelyGarbled[1][0] = directlyGarbled[1][1];
-			
-			completelyGarbled[0][1] = directlyGarbled[0][0];			
+
+			completelyGarbled[0][1] = directlyGarbled[0][0];
 			completelyGarbled[1][1] = directlyGarbled[1][0];
 		}
-		
+
 		result.addUnaryGate(i, adjacencyList[i], completelyGarbled);
 	}
 
@@ -649,32 +708,32 @@ public class Circuit {
 	private void garbleRow(int[] outputWireMapping, int[] inputWireMapping,
 			boolean[] truthTable, int rowIndex, int[][] directlyGarbled) {
 		int garbledInputForFalse = inputWireMapping[rowIndex];
-		int outputForFalse = (truthTable[rowIndex] ? outputWireMapping[1] : outputWireMapping[0]);		
+		int outputForFalse = (truthTable[rowIndex] ? outputWireMapping[1] : outputWireMapping[0]);
 		int tagEntryForFalse = 0 ^ garbledInputForFalse;
-		int valueEntryForFalse = outputForFalse ^ garbledInputForFalse;		
+		int valueEntryForFalse = outputForFalse ^ garbledInputForFalse;
 		directlyGarbled[0][rowIndex] = tagEntryForFalse;
 		directlyGarbled[1][rowIndex] = valueEntryForFalse;
 	}
 
-	private void garbleConstantGate(GarbledCircuit result, int i, 
+	private void garbleConstantGate(GarbledCircuit result, int i,
 			int[] outputWireMapping) {
 		int[][] garbledTable;
 		boolean outputValue = tables[i][0][0];
-		
+
 		int garbledValue;
 		if (outputValue) {
 			garbledValue = outputWireMapping[1];
 		} else {
 			garbledValue = outputWireMapping[0];
 		}
-		
+
 		garbledTable = new int[2][4];
 		garbledTable[0][0] = 0;
 		garbledTable[1][0] = garbledValue;
-		
+
 		result.addConstantGate(i, adjacencyList[i], garbledTable);
 	}
-	
+
 	/**
 	 * Turns the circuit into a dot-graph.
 	 */
@@ -703,7 +762,7 @@ public class Circuit {
 	 * @param startIndex the index of the gate where the nodes start
 	 * @param result a place to append to
 	 * @return result to document the state change
-	 */ 
+	 */
 	private StringBuilder addEdgesFrom(StringBuilder result, int startIndex) {
 		String startName = buildNodeName(startIndex);
 		for (Integer follower : adjacencyList[startIndex]) {
@@ -717,7 +776,7 @@ public class Circuit {
 	/**
 	 * adds all edges to the graph.
 	 * @param result where to append the edges to.
-	 */ 
+	 */
 	private StringBuilder addGates(StringBuilder result) {
 		for (int gateIndex = 0; gateIndex < gateType.length; gateIndex++) {
 			result = addGate(result, gateIndex);
@@ -736,30 +795,30 @@ public class Circuit {
 			int inputIndex = findInArray(gateIndex, inputs);
 			result = addBoundaryGate(result, inputIndex, gateIndex, "Input");
 			break;
-			
+
 		case OUT:
 			int outputIndex = findInArray(gateIndex, outputs);
 			result = addBoundaryGate(result, outputIndex, gateIndex, "Output");
 			break;
-			
+
 		case CONSTANT:
 			result = addConstantGate(result, gateIndex);
 			break;
-			
+
 		case UNARYGATE:
 			result = addUnaryGate(result, gateIndex);
 			break;
-			
+
 		case BINARYGATE:
 			result = addBinaryGate(result, gateIndex);
 			break;
-			
+
 		default:
 			assert false : "gateType not exhausted";
 		}
 		return result;
 	}
-	
+
 	/**
 	 * returns the index of NEEDLE in HAYSTACK
 	 * @param needle the value to find
@@ -784,13 +843,13 @@ public class Circuit {
 	 * @return result to document state change
 	 */
 	private StringBuilder addBoundaryGate(StringBuilder result,
-			int boundaryIndex, int gateIndex, String label) {		
+			int boundaryIndex, int gateIndex, String label) {
 		String nodeDescription = String.format("%s %d", label, boundaryIndex);
 		return addNode(result, gateIndex, nodeDescription, "invhouse");
 	}
 
-	
-	
+
+
 
 	/**
 	 * adds a constant gate to the graph representation
@@ -802,7 +861,7 @@ public class Circuit {
 		String label = String.format("%d", gateValue);
 		return addNode(result, gateIndex, label, "record");
 	}
-	
+
 	/**
 	 * Adds a unary gate to the graph representation
 	 * @param result the stringbuilder to append to
@@ -816,8 +875,8 @@ public class Circuit {
 		return addNode(result, gateIndex, label, "record");
 	}
 
-	
-	
+
+
 	/**
 	 * Adds a binary gate to the graph representation.
 	 * @param result the stringbuilder to append to
@@ -832,7 +891,7 @@ public class Circuit {
 				falseFalseValue, falseTrueValue, trueFalseValue, trueTrueValue);
 		return addNode(result, gateIndex, label, "record");
 	}
-	
+
 	/**
 	 * Constructs the node name for a gate with index GATE_INDEX
 	 * @param gateIndex the index of the gate
@@ -854,11 +913,11 @@ public class Circuit {
 			String nodeDescription, String shape) {
 		String nodeName = buildNodeName(gateIndex);
 		String nodeStatement = String.format("%s [shape=%s, label=\"%s\"];",
-											 nodeName, shape, nodeDescription); 
+											 nodeName, shape, nodeDescription);
 		result.append(nodeStatement);
 		return result;
 	}
-	
+
 	/**
 	 * reuturns 0 for false and 1 for true
 	 * @param encodedBool the bool to turn into an int
@@ -866,5 +925,9 @@ public class Circuit {
 	 */
 	private int boolToInt(boolean encodedBool) {
 		return encodedBool ? 1 : 0;
+	}
+
+	public int getOutputCount() {
+		return outputs.length;
 	}
 }

@@ -19,12 +19,12 @@ import yaquix.phase.Phase;
 /**
  * This phase computes the attribute, which provides the
  * greates information gain if we split the set of data
- * according to this attribute. 
+ * according to this attribute.
  * This computation is based on a sequence of shares such
  * that the sum of these shares is the information gained
  * if we split the data according to the attribute with the
  * same index.
- * 
+ *
  *  In order to compute this, we construct the maximum gain
  *  circuit and execute it by using yaos protocol.
  * @author hk
@@ -35,30 +35,30 @@ public class MaxGainComputation extends Phase {
 	 * This contains the local entropy shares of the user.
 	 */
 	private InputKnowledge<int[]> localEntropyShares;
-	
+
 	/**
 	 * This contains the attributes ordered exactly the same
-	 * as the local entropy shares. 
+	 * as the local entropy shares.
 	 */
 	private InputKnowledge<List<Attribute>> concertedAttributes;
-	
+
 	/**
-	 * This requires the best attribute to be stored. 
+	 * This requires the best attribute to be stored.
 	 */
 	private OutputKnowledge<Attribute> concertedBestAttribute;
-	
+
 	/**
 	 * contains the logger.
 	 */
 	private static final Logger LOG = LoggerFactory.getLogger(MaxGainComputation.class);
-	
+
 	/**
 	 * Contains the random source of the application.
 	 */
 	private SecureRandom randomSource;
 
 	private final int shareWidth;
-	
+
 	/**
 	 * Constructs a new maximum gain computation phase.
 	 * @param localEntropyShares the local entropy shares
@@ -80,11 +80,11 @@ public class MaxGainComputation extends Phase {
 	public void clientExecute(Connection connection) throws ClassNotFoundException, IOException {
 		LOG.info("Starting Phase: Max Gain Computation");
 		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
-		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();		
+		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 		Phase usedPhase = new CircuitEvaluation(localInput, concertedOutput, randomSource);
-		
+
 		evaluateCircuit(connection, localInput, concertedOutput, usedPhase, false);
-		
+
 		LOG.info("Ending Phase: Max Gain Computation");
 	}
 
@@ -101,28 +101,28 @@ public class MaxGainComputation extends Phase {
 		}
 		List<Attribute> attributes = concertedAttributes.get();
 		boolean[] circuitOutput = concertedOutput.get();
-		Attribute outputAttribute = decodeOutput(attributes, circuitOutput);		
+		Attribute outputAttribute = decodeOutput(attributes, circuitOutput);
 		concertedBestAttribute.put(outputAttribute);
 	}
-	
+
 	@Override
 	public void serverExecute(Connection connection) throws ClassNotFoundException, IOException {
 		LOG.info("Starting Phase: Max Gain Computation");
 		int[] shares = localEntropyShares.get();
 		int shareCount = shares.length;
 		Circuit maxGain = CircuitBuilder.createMaximumGainCircuit(shareCount, shareWidth);
-		
+		LOG.trace("circuit created");
 		Knowledge<Circuit> evaluatedCircuit = new Knowledge<Circuit>();
 		evaluatedCircuit.put(maxGain);
-		
+
 		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 		Phase evaluationPhase = new CircuitEvaluation(evaluatedCircuit, localInput, concertedOutput, randomSource);
-		
-		evaluateCircuit(connection, localInput, concertedOutput, evaluationPhase, true);		
+
+		evaluateCircuit(connection, localInput, concertedOutput, evaluationPhase, true);
 		LOG.info("Ending Phase: Max Gain Computation");
 	}
-	
+
 	private Attribute decodeOutput(List<Attribute> attributes, boolean[] output) {
 		int attributeIndex = 0;
 		for (int bitIndex = 0; bitIndex < output.length; bitIndex++) {
@@ -131,16 +131,16 @@ public class MaxGainComputation extends Phase {
 				attributeIndex = attributeIndex+1;
 			}
 		}
-		
+
 		Attribute result = attributes.get(attributeIndex);
-		
+
 		return result;
 	}
 
 	private boolean[] encodeInput() {
-		int[] localShares = localEntropyShares.get();		
+		int[] localShares = localEntropyShares.get();
 		int shareCount = localShares.length;
-		
+
 		boolean[] input = new boolean[shareCount * shareWidth];
 		for (int shareIndex = 0; shareIndex < shareCount; shareIndex ++) {
 			encodeShare(input, localShares[shareIndex], shareIndex * shareWidth, shareWidth);

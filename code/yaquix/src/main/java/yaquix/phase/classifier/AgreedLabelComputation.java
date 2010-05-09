@@ -118,6 +118,7 @@ public class AgreedLabelComputation extends Phase {
 		MailType result=null;
 		boolean[] circuitOutput = concertedOutput.get();
 
+		assert circuitOutput[0] || circuitOutput[1] : "Agreeing Label circuit output broken";
 		if (circuitOutput[0] && circuitOutput[1]) {
 			//no common label
 			result=null;
@@ -127,10 +128,7 @@ public class AgreedLabelComputation extends Phase {
 		} else if (!circuitOutput[0] && circuitOutput[1]) {
 			//spam
 			result=MailType.SPAM;
-		} else if (!circuitOutput[0] && !circuitOutput[1]) {
-			//no mail: shouldn't happen
-			throw new IllegalStateException(); 
-		}
+		} 
 		return result;
 	}
 	

@@ -104,8 +104,9 @@ public class CircuitEvaluation extends Phase {
 		
 		Knowledge<int[]> aliceMessages = new Knowledge<int[]>();
 		Phase ot = new OneOfTwoObliviousTransfer(aliceMessages, random);
+		final int bobInputOffset = aliceInput.length;
 		for (int bobInIndex = 0; bobInIndex < bobInputLength; bobInIndex++) {
-			aliceMessages.put(inputMapping.get(bobInIndex));
+			aliceMessages.put(inputMapping.get(bobInIndex+bobInputOffset));
 			ot.serverExecute(connection); // (4)
 		}
 		
