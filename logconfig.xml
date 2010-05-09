@@ -1,0 +1,41 @@
+<configuration>
+    <appender name="STDOUT"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="FIRST-DOTFILE"
+              class="ch.qos.logback.core.FileAppender">
+        <file>/tmp/circuit.dot</file>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern> %msg </Pattern>
+        </layout>
+    </appender>
+
+    <appender name="SECOND-DOTFILE"
+              class="ch.qos.logback.core.FileAppender">
+        <file>/tmp/second_circuit.dot</file>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern> %msg </Pattern>
+        </layout>
+    </appender>
+
+    <root level="trace">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="yaquix.circuit.Circuit"
+            level="trace"/>
+    <logger name="yaquix.Connection"
+            level="debug"/>
+
+    <logger name="yaquix.circuit.CircuitBuilder.AgreeingLabelComputation">
+        <appender-ref ref="FIRST-DOTFILE"/>
+    </logger>
+
+    <logger name="yaquix.circuit.CircuitBuilder.AgreeingLabelComputationTransition">
+        <appender-ref ref="SECOND-DOTFILE"/>
+    </logger>
+</configuration>
