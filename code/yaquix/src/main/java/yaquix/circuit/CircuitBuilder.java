@@ -1100,12 +1100,8 @@ public class CircuitBuilder {
 		 System.err.println(String.format("state transition output count: %d", stateTransition.getOutputCount()));
 		 Circuit result = stateTransition;
 		 for (int i = 0; i < vectorLength-2; i++) {
-			 System.err.println(String.format("Current result output: %d", result.getOutputCount()));
 			 result = result.extendTopLeft(stateTransition, createIdentityMapping(sumWidth+indexWidth));
 		 }
-		 System.err.println(String.format("sumwidth = %d + indexWidth = %d, vectorLength=%d",
-				 			sumWidth, indexWidth, vectorLength));
-		 System.err.println(String.format("result inputs: %d outputs: %d", result.getInputCount(), result.getOutputCount()));
 		 LOG.trace("Step 2");
 		 // (2)
 		 for (int indexIndex = 0; indexIndex < vectorLength; indexIndex++) {
@@ -1122,7 +1118,6 @@ public class CircuitBuilder {
 		 // (3)
 		 connection.clear();
 		 Circuit adder = createAdder(sumWidth);
-		 System.err.println(String.format("single adder inputs: %d, outputs: %d", adder.getInputCount(), adder.getOutputCount()));
 		 Circuit adders = null;
 		 for (int i = 0; i < vectorLength; i++) {
 			 if (adders == null) {
@@ -1146,7 +1141,7 @@ public class CircuitBuilder {
 			 }
 			 connection.put(i, sumWidth*i);
 		 }
-		 result = zeros.extendTopLeft(adders, connection);
+		 result = zeros.extendTopLeft(result, connection);
 		 
 		 LOG.trace("Step 5");
 		 // (5)
@@ -1175,7 +1170,6 @@ public class CircuitBuilder {
 			 }
 		 }
 		 Circuit inputReorderer = new Shuffle(2*vectorLength*shareWidth, shuffleMap);
-		 System.err.println(String.format("inputReorderer, inputs: %d > outputs %d", inputReorderer.getInputCount(), inputReorderer.getOutputCount()));
 		 result = inputReorderer.extendTopLeft(result, createIdentityMapping(2*vectorLength*shareWidth));
 
 		 LOG.trace("Step 6");
@@ -1190,11 +1184,9 @@ public class CircuitBuilder {
 			 }
 		 }
 		 
-		 
 		 result = result.extendTopLeft(stops, createIdentityMapping(sumWidth));
-		 System.err.println(String.format("result, inputs: %d > outputs %d", result.getInputCount(), result.getOutputCount()));
 		 return result;
-	 }
+	}
 
 	private static Circuit encodeInteger(int indexIndex, int indexWidth) {
 		Circuit result = null;
@@ -1214,7 +1206,7 @@ public class CircuitBuilder {
 				result = result.extendLeft(newBit);
 			}
 		}
-		LOG.trace(String.format("%d -> %s", indexIndex, tortureChamber));
+		System.out.println(String.format("%d -> %s", indexIndex, tortureChamber));
 
 		return result;
 	}

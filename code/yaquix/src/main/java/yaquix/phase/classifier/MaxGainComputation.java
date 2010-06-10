@@ -73,7 +73,7 @@ public class MaxGainComputation extends Phase {
 		this.concertedAttributes = concertedAttributes;
 		this.concertedBestAttribute = concertedBestAttribute;
 		this.randomSource = randomSource;
-		shareWidth = 32;
+		shareWidth = 1;
 	}
 
 	@Override
@@ -108,7 +108,9 @@ public class MaxGainComputation extends Phase {
 	@Override
 	public void serverExecute(Connection connection) throws ClassNotFoundException, IOException {
 		LOG.info("Starting Phase: Max Gain Computation");
-		int[] shares = localEntropyShares.get();
+		
+		//int[] shares = localEntropyShares.get();
+		int[] shares = {0};
 		int shareCount = shares.length;
 		Circuit maxGain = CircuitBuilder.createMaximumGainCircuit(shareCount, shareWidth);
 		LOG.trace("circuit created");
@@ -135,6 +137,7 @@ public class MaxGainComputation extends Phase {
 				outputContents.append("0");
 			}
 		}
+		System.err.println(outputContents);
 		for (int bitIndex = 0; bitIndex < output.length; bitIndex++) {
 			attributeIndex = attributeIndex * 2;
 			if (output[bitIndex]) {
@@ -148,7 +151,8 @@ public class MaxGainComputation extends Phase {
 	}
 
 	private boolean[] encodeInput() {
-		int[] localShares = localEntropyShares.get();
+		//int[] localShares = localEntropyShares.get();
+		int[] localShares = {0};
 		int shareCount = localShares.length;
 
 		boolean[] input = new boolean[shareCount * shareWidth];
