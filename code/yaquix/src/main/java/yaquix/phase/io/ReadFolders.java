@@ -68,7 +68,7 @@ public class ReadFolders extends SymmetricPhase {
 		logger.info("reading non spam mails");
 		files = localNonSpamFolder.get().listFiles();
 		
-		assert files != null : localSpamFolder.get() + " is no directory";
+		assert files != null : localNonSpamFolder.get() + " is no directory";
 		for(File file : files){
 			mails.addNonSpamMail(readMail(file));
 		}

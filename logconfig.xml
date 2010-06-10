@@ -26,8 +26,10 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="yaquix.circuit.Circuit"
+    <logger name="yaquix.circuit.CircuitBuilder"
             level="trace"/>
+    <logger name="yaquix.circuit.Circuit"
+            level="debug"/>
     <logger name="yaquix.Connection"
             level="debug"/>
 

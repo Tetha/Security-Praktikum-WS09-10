@@ -30,7 +30,7 @@ public class Shuffle extends Circuit {
 		adjacencyList = new LinkedList[nodeCount];
 
 		for (Integer follower : connections.values()) {
-			assert follower < inputCount : String.format("Output %d out of bounds", follower);
+			assert follower < inputCount : String.format("Output %d out of bounds %d", follower, inputCount);
 		}
 
 		for (Integer key : connections.keySet()) {

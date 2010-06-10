@@ -1157,12 +1157,15 @@ public class CircuitBuilder {
 		 }
 
 		 for (int bIndex = 0; bIndex < vectorLength; bIndex++) { // Bi's
-			 int inputOffset = bIndex * shareWidth;
-			 for (int bitIndex = inputOffset; bitIndex < inputOffset + shareWidth; bitIndex++) {
-				 int bitDestination = bitIndex + shareWidth + 2*bIndex*shareWidth;
-				 assert 0 <= bitIndex && bitIndex < 2*vectorLength * shareWidth;
-				 assert 0 <= bitDestination && bitDestination < 2*vectorLength * shareWidth;
-				 shuffleMap.put(bitIndex, bitDestination);
+			 // that many A's * the width of one A + the Bis in front of me * the width of one Bi
+			 int inputOffset = vectorLength * shareWidth + bIndex * shareWidth;
+			 int pairsToSkip = bIndex; 
+			 //   pair of       Ai          Bi           my corresponding Ax
+			 int destinationOffset = pairsToSkip * (shareWidth + shareWidth) + shareWidth;
+			 for (int bitIndex = 0; bitIndex < shareWidth; bitIndex++) {
+				 assert 0 <= inputOffset + bitIndex && inputOffset + bitIndex < 2*vectorLength*shareWidth;				 
+				 assert 0 <= destinationOffset + bitIndex && destinationOffset + bitIndex < 2*vectorLength * shareWidth;
+				 shuffleMap.put(inputOffset+bitIndex, destinationOffset+bitIndex);
 			 }
 		 }
 		 Circuit inputReorderer = new Shuffle(2*vectorLength*shareWidth, shuffleMap);
@@ -1232,9 +1235,14 @@ public class CircuitBuilder {
 		}
 		int inputCount = repeated.getInputCount();
 		HashMap<Integer, Integer> inputShuffle = new HashMap<Integer, Integer>();
+		
+		System.err.println(String.format("wordWidth = %d, inputCount = %d", wordWidth, inputCount));
 		for (int circuitIndex = 0; circuitIndex < wordWidth; circuitIndex++) {
 			for (int inputIndex = 0; inputIndex < inputCount; inputIndex++) {
-				inputShuffle.put(circuitIndex*inputCount+inputIndex, inputIndex*inputCount+circuitIndex);
+				int sourceIndex = circuitIndex*inputCount+inputIndex;
+				int destinationIndex = inputIndex*wordWidth+circuitIndex;
+				System.err.println(String.format("Mapping %d -> %d",sourceIndex, destinationIndex)); 
+				inputShuffle.put(sourceIndex, destinationIndex);
 			}
 		}
 		int timesWidth = wordWidth*inputCount;
