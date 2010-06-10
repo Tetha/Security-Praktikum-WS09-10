@@ -125,13 +125,23 @@ public class MaxGainComputation extends Phase {
 
 	private Attribute decodeOutput(List<Attribute> attributes, boolean[] output) {
 		int attributeIndex = 0;
+		
+		StringBuilder outputContents = new StringBuilder();
+		for (int i = 0; i < output.length; i++) {
+			boolean currentBit = output[i];
+			if (currentBit) {
+				outputContents.append("1");
+			} else {
+				outputContents.append("0");
+			}
+		}
 		for (int bitIndex = 0; bitIndex < output.length; bitIndex++) {
 			attributeIndex = attributeIndex * 2;
 			if (output[bitIndex]) {
 				attributeIndex = attributeIndex+1;
 			}
 		}
-
+		
 		Attribute result = attributes.get(attributeIndex);
 
 		return result;

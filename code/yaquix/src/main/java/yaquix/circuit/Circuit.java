@@ -179,8 +179,6 @@ public class Circuit {
 				assert 0 <= survivingAddedInputs && survivingAddedInputs < result.gateType.length;
 
 				destinationOfAddedGate[addedCircuit.inputs[i]] = survivingAddedInputs;
-				LOG.trace(String.format("mapping added input %d with gateIndex %d to new gate index %d",
-							i, addedCircuit.inputs[i], destinationOfAddedGate[addedCircuit.inputs[i]]));
 				survivingAddedInputs++;
 			}
 		}
@@ -240,10 +238,6 @@ public class Circuit {
 				int destinationIndex = survivingAddedInputs + existingInputs
 												+ addedGates + existingGates
 												+ addedOutputs + survivingAddedOutputs;
-				System.out.println(String.format("%d + %d + %d + %d + %d + %d",
-									survivingAddedInputs, existingInputs,
-									addedGates, existingGates,
-									addedOutputs, survivingAddedOutputs));
 				assert 0 <= destinationIndex && destinationIndex < result.gateType.length :
 							String.format("%d %d", destinationIndex, result.gateType.length);
 				destinationOfExistingOutput.add(destinationIndex);
@@ -382,7 +376,6 @@ public class Circuit {
 	 * @param checkedCircuit
 	 */
 	private void checkCircuit(Circuit checkedCircuit) {
-		LOG.debug(String.format("Checking %s", checkedCircuit));
 		assert checkedCircuit.gateType.length == checkedCircuit.adjacencyList.length;
 		assert checkedCircuit.gateType.length == checkedCircuit.tables.length;
 		for (int i = 0; i < checkedCircuit.adjacencyList.length; i++) {

@@ -310,7 +310,7 @@ public class CircuitBuilder {
 
 
 	/**
-	 * creates a circuit that compares two number a, bof equal bitwidth
+	 * creates a circuit that compares two number a, b of equal bitwidth
 	 * and outputs if a < b, a = b, a > b.
 	 *
 	 * The first bitWidth inputs are the bits for the first number a with
@@ -339,7 +339,7 @@ public class CircuitBuilder {
 		connection.put(0, 2);
 		connection.put(1, 3);
 
-		for (int i = 0; i < bitWidth; i++) {
+		for (int i = 0; i < bitWidth; i++) {			
 			result = result.extendTopLeft(createComparerStateTransition(), connection);
 		}
 
@@ -352,9 +352,8 @@ public class CircuitBuilder {
 		}
 		Circuit pairReversal = new Shuffle(inputWidth, pairReversalShuffle);
 		result = pairReversal.extendTopLeft(result, createIdentityMapping(inputWidth));
-		Circuit interleaver = createInterleavingCircuit(inputWidth);
+		Circuit interleaver = createInterleavingCircuit(bitWidth);
 		result = interleaver.extendTopLeft(result, createIdentityMapping(inputWidth));
-
 		// output 0 is now the first state bit s0
 		// output 1 is now the second state bit s1
 		// from specification: s0s1 == 00 iff a=b
@@ -525,7 +524,12 @@ public class CircuitBuilder {
 			adder=adder.extendTopLeft(createFullAdder(), connection);
 		}
 
-
+		// kick last carry
+		Circuit stop = new Stop();
+		connection.clear();
+		connection.put(0,0);
+		adder = adder.extendTopLeft(stop, connection);
+		
 		//connection represents the identity
 		connection.clear();
 		for (int j = 0; j < bitwidth; j++) {
@@ -535,7 +539,6 @@ public class CircuitBuilder {
 
 		Shuffle shuffle = createInterleavingCircuit(bitwidth);
 		adder=shuffle.extendTopLeft(adder, connection);
-
 		return adder;
 	}
 
@@ -883,7 +886,6 @@ public class CircuitBuilder {
 		Circuit condAssign = new Or();
 		// Inputs condAssign: X Y
 		// Outputs condAssign: X+Y
-
 		Circuit filterAnds = new And();
 		filterAnds = filterAnds.extendLeft(new And());
 		// Inputs filterAnds: A B C D
@@ -928,12 +930,11 @@ public class CircuitBuilder {
 		// Outputs condIndexAssign: [indexWidth x (B*T)+(-B*F)]
 
 		Circuit condSumAssign = times(sumWidth, condAssign);
-
 		// Inputs condSumAssign: [sumWidth x T] [sumWidth x F] [sumWidth x B]
 		// Outputs condSumAssign: [sumWidth * (B*T)+(-B*F)]
 
 		connection.clear();
-		for (int i = 0; i < indexWidth; i++) {
+		for (int i = 0; i < sumWidth; i++) {
 			connection.put(i, i+2*sumWidth);
 		}
 		condSumAssign = new Split(sumWidth).extendTopLeft(condSumAssign,  connection);
@@ -965,7 +966,7 @@ public class CircuitBuilder {
 		// Outputs strictLessThan: (A=B||A>B: 0, A<B: 1)
 
 		connection.clear();
-		connection.put(0, 2*sumWidth + 2*indexWidth + 1);
+		connection.put(0, 2*sumWidth + 2*indexWidth);
 		result = strictLessThan.extendTopLeft(selectLayer, connection);
 
 		// Inputs result: [sumWidth x T] [sumWidth x F] [indexWidth x T] [indexWidth x F] [sumWidth: A] [sumWidth: B]
@@ -1096,18 +1097,22 @@ public class CircuitBuilder {
 		 LOG.trace("Step 1");
 		 // (1)
 		 Circuit stateTransition = createMaxGainStatetransition(sumWidth, indexWidth);
+		 System.err.println(String.format("state transition output count: %d", stateTransition.getOutputCount()));
 		 Circuit result = stateTransition;
 		 for (int i = 0; i < vectorLength-2; i++) {
+			 System.err.println(String.format("Current result output: %d", result.getOutputCount()));
 			 result = result.extendTopLeft(stateTransition, createIdentityMapping(sumWidth+indexWidth));
 		 }
-
+		 System.err.println(String.format("sumwidth = %d + indexWidth = %d, vectorLength=%d",
+				 			sumWidth, indexWidth, vectorLength));
+		 System.err.println(String.format("result inputs: %d outputs: %d", result.getInputCount(), result.getOutputCount()));
 		 LOG.trace("Step 2");
 		 // (2)
 		 for (int indexIndex = 0; indexIndex < vectorLength; indexIndex++) {
 			 connection.clear();
 			 Circuit indexConstantGates = encodeInteger(indexIndex, indexWidth);
 			 for (int indexBitIndex = 0; indexBitIndex < indexWidth; indexBitIndex++) {
-				 int indexOffset = (indexIndex+1)*sumWidth + indexIndex * indexWidth;
+				 int indexOffset = (indexIndex+1)*sumWidth;
 				 connection.put(indexBitIndex, indexOffset+indexBitIndex);
 			 }
 			 result = indexConstantGates.extendTopLeft(result, connection);
@@ -1117,6 +1122,7 @@ public class CircuitBuilder {
 		 // (3)
 		 connection.clear();
 		 Circuit adder = createAdder(sumWidth);
+		 System.err.println(String.format("single adder inputs: %d, outputs: %d", adder.getInputCount(), adder.getOutputCount()));
 		 Circuit adders = null;
 		 for (int i = 0; i < vectorLength; i++) {
 			 if (adders == null) {
@@ -1125,7 +1131,7 @@ public class CircuitBuilder {
 				 adders = adders.extendLeft(adder);
 			 }
 		 }
-		 result = adders.extendTopLeft(adders, createIdentityMapping(vectorLength*sumWidth));
+		 result = adders.extendTopLeft(result, createIdentityMapping(vectorLength*sumWidth));
 
 		 LOG.trace("Step 4");
 		 // (4)
@@ -1141,7 +1147,7 @@ public class CircuitBuilder {
 			 connection.put(i, sumWidth*i);
 		 }
 		 result = zeros.extendTopLeft(adders, connection);
-
+		 
 		 LOG.trace("Step 5");
 		 // (5)
 		 Map<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
@@ -1169,6 +1175,7 @@ public class CircuitBuilder {
 			 }
 		 }
 		 Circuit inputReorderer = new Shuffle(2*vectorLength*shareWidth, shuffleMap);
+		 System.err.println(String.format("inputReorderer, inputs: %d > outputs %d", inputReorderer.getInputCount(), inputReorderer.getOutputCount()));
 		 result = inputReorderer.extendTopLeft(result, createIdentityMapping(2*vectorLength*shareWidth));
 
 		 LOG.trace("Step 6");
@@ -1182,7 +1189,10 @@ public class CircuitBuilder {
 				 stops = stops.extendLeft(stop);
 			 }
 		 }
+		 
+		 
 		 result = result.extendTopLeft(stops, createIdentityMapping(sumWidth));
+		 System.err.println(String.format("result, inputs: %d > outputs %d", result.getInputCount(), result.getOutputCount()));
 		 return result;
 	 }
 
@@ -1241,7 +1251,6 @@ public class CircuitBuilder {
 			for (int inputIndex = 0; inputIndex < inputCount; inputIndex++) {
 				int sourceIndex = circuitIndex*inputCount+inputIndex;
 				int destinationIndex = inputIndex*wordWidth+circuitIndex;
-				System.err.println(String.format("Mapping %d -> %d",sourceIndex, destinationIndex)); 
 				inputShuffle.put(sourceIndex, destinationIndex);
 			}
 		}
