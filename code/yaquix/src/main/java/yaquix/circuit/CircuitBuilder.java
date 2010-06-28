@@ -339,7 +339,7 @@ public class CircuitBuilder {
 		connection.put(0, 2);
 		connection.put(1, 3);
 
-		for (int i = 0; i < bitWidth; i++) {			
+		for (int i = 0; i < bitWidth; i++) {
 			result = result.extendTopLeft(createComparerStateTransition(), connection);
 		}
 
@@ -443,7 +443,7 @@ public class CircuitBuilder {
 	 * bit is the sum of the two bits.
 	 * @return a full adder
 	 */
-	private static Circuit createFullAdder() {
+	public static Circuit createFullAdder() {
 		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
 		Circuit B = new Input();
 		Circuit A = new Input();
@@ -529,7 +529,7 @@ public class CircuitBuilder {
 		connection.clear();
 		connection.put(0,0);
 		adder = adder.extendTopLeft(stop, connection);
-		
+
 		//connection represents the identity
 		connection.clear();
 		for (int j = 0; j < bitwidth; j++) {
@@ -1142,7 +1142,7 @@ public class CircuitBuilder {
 			 connection.put(i, sumWidth*i);
 		 }
 		 result = zeros.extendTopLeft(result, connection);
-		 
+
 		 LOG.trace("Step 5");
 		 // (5)
 		 Map<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
@@ -1160,11 +1160,11 @@ public class CircuitBuilder {
 		 for (int bIndex = 0; bIndex < vectorLength; bIndex++) { // Bi's
 			 // that many A's * the width of one A + the Bis in front of me * the width of one Bi
 			 int inputOffset = vectorLength * shareWidth + bIndex * shareWidth;
-			 int pairsToSkip = bIndex; 
+			 int pairsToSkip = bIndex;
 			 //   pair of       Ai          Bi           my corresponding Ax
 			 int destinationOffset = pairsToSkip * (shareWidth + shareWidth) + shareWidth;
 			 for (int bitIndex = 0; bitIndex < shareWidth; bitIndex++) {
-				 assert 0 <= inputOffset + bitIndex && inputOffset + bitIndex < 2*vectorLength*shareWidth;				 
+				 assert 0 <= inputOffset + bitIndex && inputOffset + bitIndex < 2*vectorLength*shareWidth;
 				 assert 0 <= destinationOffset + bitIndex && destinationOffset + bitIndex < 2*vectorLength * shareWidth;
 				 shuffleMap.put(inputOffset+bitIndex, destinationOffset+bitIndex);
 			 }
@@ -1183,7 +1183,7 @@ public class CircuitBuilder {
 				 stops = stops.extendLeft(stop);
 			 }
 		 }
-		 
+
 		 result = result.extendTopLeft(stops, createIdentityMapping(sumWidth));
 		 return result;
 	}
@@ -1237,7 +1237,7 @@ public class CircuitBuilder {
 		}
 		int inputCount = repeated.getInputCount();
 		HashMap<Integer, Integer> inputShuffle = new HashMap<Integer, Integer>();
-		
+
 		System.err.println(String.format("wordWidth = %d, inputCount = %d", wordWidth, inputCount));
 		for (int circuitIndex = 0; circuitIndex < wordWidth; circuitIndex++) {
 			for (int inputIndex = 0; inputIndex < inputCount; inputIndex++) {

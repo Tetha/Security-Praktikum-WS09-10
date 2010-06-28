@@ -1,16 +1,15 @@
 package yaquix.circuit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.SecureRandom;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements a boolean circuit, the bane of our existence.
@@ -482,7 +481,6 @@ public class Circuit {
 	 * Note that extendRight can be implemented by swapping the
 	 * current circuit and the added circuit.
 	 * @param addedCircuit
-	 * @param connection
 	 * @return
 	 */
 	public Circuit extendLeft(Circuit addedCircuit) {
@@ -559,11 +557,15 @@ public class Circuit {
 	}
 
 
-	private void garbleOutput(GarbledCircuit result, int i,
-			int[] inputWireMapping) {
+	private void garbleOutput(GarbledCircuit result,
+                              int gateIndex,
+			                  int[] inputWireMapping) {
+        int falseOutput = inputWireMapping[0];
+        int trueOutput = inputWireMapping[1];
 		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
-			if (outputs[outputIndex] == i) {
-				result.addOutput(i, outputIndex, inputWireMapping);
+			if (outputs[outputIndex] == gateIndex) {
+				result.addOutput(gateIndex, outputIndex,
+                                 GarbledCircuit.outputGateTable(falseOutput, trueOutput));
 			}
 		}
 
@@ -613,9 +615,11 @@ public class Circuit {
 		return result;
 	}
 
-	private void garbleBinaryGate(GarbledCircuit result, int gateIndex,
-			int[] outputWireMapping, int[] leftInputWireMapping,
-			int[] rightInputWireMapping) {
+	private void garbleBinaryGate(GarbledCircuit result,
+                                  int gateIndex,
+			                      int[] outputWireMapping,
+                                  int[] leftInputWireMapping,
+			                      int[] rightInputWireMapping) {
 		// the input decision table maps 0 x 1 to 0, 1 (it is
 		// in some square-shaped format). In order to use the
 		// function garbleRow, we turn this into a row-like
@@ -627,6 +631,25 @@ public class Circuit {
 		// entry of the new input mapping is the xor of the values of
 		// the two shorter separate input mapping.
 
+        boolean[][] gateTable = tables[gateIndex];
+        int falseFalseOutput = outputWireMapping[boolToInt(gateTable[0][0])];
+        int trueFalseOutput =  outputWireMapping[boolToInt(gateTable[1][0])];
+        int falseTrueOutput = outputWireMapping[boolToInt(gateTable[0][1])];
+        int trueTrueOutput =  outputWireMapping[boolToInt(gateTable[1][1])];
+
+        int leftFalse = leftInputWireMapping[0];
+        int leftTrue = leftInputWireMapping[1];
+        int rightFalse = rightInputWireMapping[0];
+        int rightTrue = rightInputWireMapping[1];
+        int[][] garbledTable =
+            GarbledCircuit.composeTable(
+                GarbledCircuit.binaryTableLine(leftFalse, rightFalse, falseFalseOutput),
+                GarbledCircuit.binaryTableLine(leftFalse, rightTrue, falseTrueOutput),
+                GarbledCircuit.binaryTableLine(leftTrue, rightFalse, trueFalseOutput),
+                GarbledCircuit.binaryTableLine(leftTrue, rightTrue, trueTrueOutput)
+            );
+
+        /*
 		int[] largeInputMapping = new int[4];
 		largeInputMapping[0*2+0] = leftInputWireMapping[0] ^ rightInputWireMapping[0];
 		largeInputMapping[0*2+1] = leftInputWireMapping[0] ^ rightInputWireMapping[1];
@@ -640,12 +663,24 @@ public class Circuit {
 		longTruthTable[1*2+0] = squareTruthTable[1][0];
 		longTruthTable[1*2+1] = squareTruthTable[1][1];
 
+
+        System.out.println("leftIn, rightIn, largeIn, longTruth");
+        System.out.println(String.format("%s %s %s %s", leftInputWireMapping[0], rightInputWireMapping[0], largeInputMapping[0], longTruthTable[0]));
+        System.out.println(String.format("%s %s %s %s", leftInputWireMapping[0], rightInputWireMapping[1], largeInputMapping[1], longTruthTable[1]));
+        System.out.println(String.format("%s %s %s %s", leftInputWireMapping[1], rightInputWireMapping[0], largeInputMapping[2], longTruthTable[2]));
+        System.out.println(String.format("%s %s %s %s", leftInputWireMapping[1], rightInputWireMapping[1], largeInputMapping[3], longTruthTable[3]));
+
+
+        System.out.println("output wire mapping");
+        System.out.println(String.format("%d %d", outputWireMapping[0], outputWireMapping[1]));
 		int[][] directlyGarbled = new int[2][4];
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 0, directlyGarbled);
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 1, directlyGarbled);
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 2, directlyGarbled);
 		garbleRow(outputWireMapping, largeInputMapping, longTruthTable, 3, directlyGarbled);
 
+        System.out.println(String.format("%d %d %d %d", directlyGarbled[0][0],directlyGarbled[0][1],directlyGarbled[0][2],directlyGarbled[0][3]));
+        System.out.println(String.format("%d %d %d %d", directlyGarbled[1][0],directlyGarbled[1][1],directlyGarbled[1][2],directlyGarbled[1][3]));
 		List<Integer> destinationIndexes = new LinkedList<Integer>();
 		for (int ii = 0; ii < 4; ii++) destinationIndexes.add(ii);
 		Collections.shuffle(destinationIndexes);
@@ -654,15 +689,24 @@ public class Circuit {
 			int destinationIndex = destinationIndexes.get(ii);
 			completelyGarbled[0][destinationIndex] = directlyGarbled[0][ii];
 			completelyGarbled[1][destinationIndex] = directlyGarbled[1][ii];
-		}
-		result.addBinaryGate(gateIndex, adjacencyList[gateIndex], completelyGarbled);
+		}*/
+		result.addBinaryGate(gateIndex, adjacencyList[gateIndex], garbledTable);
 	}
 
 	private void garbleUnaryGate(GarbledCircuit result, int i,
 			int[] outputWireMapping, int[] inputWireMapping) {
 		boolean[] truthTable = tables[i][0];
+        int falseOutput = outputWireMapping[boolToInt(truthTable[0])];
+        int trueOutput = outputWireMapping[boolToInt(truthTable[1])];
 
-
+        int falseInput = inputWireMapping[0];
+        int trueInput = inputWireMapping[1];
+        int[][] garbledTable =
+                GarbledCircuit.composeTable(
+                        GarbledCircuit.unaryGateLine(falseInput, falseOutput),
+                        GarbledCircuit.unaryGateLine(trueInput, trueOutput)
+                );
+        /*
 		int[][] directlyGarbled = new int[2][2];
 		garbleRow(outputWireMapping, inputWireMapping, truthTable,
 				0, directlyGarbled);
@@ -686,9 +730,9 @@ public class Circuit {
 
 			completelyGarbled[0][1] = directlyGarbled[0][0];
 			completelyGarbled[1][1] = directlyGarbled[1][0];
-		}
+		}*/
 
-		result.addUnaryGate(i, adjacencyList[i], completelyGarbled);
+		result.addUnaryGate(i, adjacencyList[i], garbledTable);
 	}
 
 	/**
@@ -711,8 +755,11 @@ public class Circuit {
 	private void garbleConstantGate(GarbledCircuit result, int i,
 			int[] outputWireMapping) {
 		int[][] garbledTable;
-		boolean outputValue = tables[i][0][0];
 
+		int outputValue = boolToInt(tables[i][0][0]);
+        garbledTable = GarbledCircuit.constantGateTable(outputValue);
+
+        /*
 		int garbledValue;
 		if (outputValue) {
 			garbledValue = outputWireMapping[1];
@@ -723,6 +770,7 @@ public class Circuit {
 		garbledTable = new int[2][4];
 		garbledTable[0][0] = 0;
 		garbledTable[1][0] = garbledValue;
+        */
 
 		result.addConstantGate(i, adjacencyList[i], garbledTable);
 	}
@@ -873,7 +921,7 @@ public class Circuit {
 	/**
 	 * Adds a binary gate to the graph representation.
 	 * @param result the stringbuilder to append to
-	 * @param gateindex the index of the gate to add
+	 * @param gateIndex the index of the gate to add
 	 */
 	private StringBuilder addBinaryGate(StringBuilder result, int gateIndex) {
 		int falseFalseValue = boolToInt(tables[gateIndex][0][0]);
