@@ -529,6 +529,7 @@ public class Circuit {
 				inputWireMapping = wireGarblings[onlyPredIndex];
 				garbleOutput(result, i, inputWireMapping);
 			break;
+
 			case CONSTANT:
 				outputWireMapping = wireGarblings[i];
 				garbleConstantGate(result, i, outputWireMapping);
@@ -756,7 +757,7 @@ public class Circuit {
 			int[] outputWireMapping) {
 		int[][] garbledTable;
 
-		int outputValue = boolToInt(tables[i][0][0]);
+		int outputValue = outputWireMapping[boolToInt(tables[i][0][0])];
         garbledTable = GarbledCircuit.constantGateTable(outputValue);
 
         /*

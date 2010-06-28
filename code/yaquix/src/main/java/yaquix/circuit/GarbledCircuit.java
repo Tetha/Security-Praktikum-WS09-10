@@ -209,8 +209,8 @@ public class GarbledCircuit implements Serializable {
         int[][] gateTable;
 		switch (gateType[gateIndex]) {
 		case CONSTANT:
-            System.err.println(String.format("Evaluating constant gate %d -> %d",
-                                              gateIndex, constantGateProducedOutput(tables[gateIndex])));
+            //System.err.println(String.format("Evaluating constant gate %d -> %d",
+            //                                  gateIndex, constantGateProducedOutput(tables[gateIndex])));
             outputValues[gateIndex] = constantGateProducedOutput(tables[gateIndex]);
 			break;
 
@@ -220,9 +220,9 @@ public class GarbledCircuit implements Serializable {
 			predOutput = outputValues[predIndex];
             gateTable = tables[gateIndex];
 
-            System.err.println(String.format("evaluating unary gate %d", gateIndex));
-            System.err.println(String.format("\tInput: %d", predOutput));
-            System.err.println(String.format("\ttable: %s", Arrays.deepToString(gateTable)));
+            //System.err.println(String.format("evaluating unary gate %d", gateIndex));
+            //System.err.println(String.format("\tInput: %d", predOutput));
+            //System.err.println(String.format("\ttable: %s", Arrays.deepToString(gateTable)));
 
 			assert unaryGateRequiredInput(gateTable[0]) == predOutput
                     || unaryGateRequiredInput(gateTable[1]) == predOutput
@@ -247,9 +247,9 @@ public class GarbledCircuit implements Serializable {
 
             gateTable = tables[gateIndex];
 			boolean outputWritten = false;
-            System.err.println(String.format("evaluating binary gate %d", gateIndex));
-            System.err.println(String.format("\tInputs: left -> %d | %d <- right", leftInput, rightInput));
-            System.err.println(String.format("\t%s", Arrays.deepToString(gateTable)));
+            //System.err.println(String.format("evaluating binary gate %d", gateIndex));
+            //System.err.println(String.format("\tInputs: left -> %d | %d <- right", leftInput, rightInput));
+            //System.err.println(String.format("\t%s", Arrays.deepToString(gateTable)));
 			for (int i = 0; i < 4; i++) {
                 if (binaryGateLineMatches(gateTable[i], leftInput, rightInput)) {
                     outputWritten = true;
@@ -260,8 +260,8 @@ public class GarbledCircuit implements Serializable {
 		break;
 
 		case IN:
-            System.err.println(String.format("evaluating input gate %d to %d",
-                               gateIndex, inputValues[gateIndex]));
+            //System.err.println(String.format("evaluating input gate %d to %d",
+            //                   gateIndex, inputValues[gateIndex]));
 			outputValues[gateIndex] = inputValues[gateIndex];
 		break;
 

@@ -3,10 +3,17 @@ package yaquix;
 import yaquix.circuit.Circuit;
 import yaquix.circuit.CircuitBuilder;
 import yaquix.circuit.GarbledCircuit;
+import yaquix.circuit.base.And;
+import yaquix.circuit.base.Or;
+import yaquix.circuit.base.Split;
+import yaquix.circuit.base.Xor;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,41 +24,209 @@ import java.util.Map;
 public class CircuitTests {
     private static SecureRandom randomSource;
 
+    private static class CheckCircuit {
+        public Circuit subject;
+        public String description;
+        public boolean[] input;
+        public boolean[] expectation;
+
+        public CheckCircuit(String description,
+                            Circuit subject,
+                            boolean[] input,
+                            boolean[] expectation) {
+            this.description = description;
+            this.subject = subject;
+            this.input = input;
+            this.expectation = expectation;
+        }
+    }
+
+    private static List<CheckCircuit> checks;
+
+    static {
+        checks = new LinkedList<CheckCircuit>();
+
+        addComparerStateTransitionChecks();
+        addBitwiseComparerTests();
+        addCondAssignChecks();
+        checkBaseXor();
+        addTimesChecks();
+        addMaxGainStateTransitionChecks();
+    }
+
+    private static void addMaxGainStateTransitionChecks() {
+        addCheck("Max gain state transition, no update",
+                CircuitBuilder.createMaxGainStatetransition(3, 2),
+                forInput(
+                        true, false, false, // current max sum
+                        false, true, // curretn max index
+                        false, true, false, // current sum
+                        true, false), // current index
+
+                andExpect(true, false, false, // previous max sum, as sum is smaller
+                        false, true)); // previous max index
+
+        addCheck("Max gain state transition, update",
+                CircuitBuilder.createMaxGainStatetransition(3, 2),
+                forInput(
+                        false, false, false, // current max sum
+                        false, false, // current max index
+                        false, true, false, // current sum
+                        true, false), // current index
+                andExpect(false, true, false, // current sum is new max sum
+                          true, false)); // current index is new max index
+    }
+
+    private static void addTimesChecks() {
+        addCheck("Times, xor",
+                 CircuitBuilder.times(4, new Xor()),
+                 forInput(true, true, false, false, // four left inputs
+                          true, false, true, false), // four right inputs
+                 andExpect(false, true, true, false)); // four outputs
+
+        // even indexes and odd indexes input into
+        // even indexes and odd indexes in result
+        addCheck("times, parallel and and or",
+                 CircuitBuilder.times(2, new And().extendLeft(new Or())),
+                 forInput(true, true, // inflated first input bit
+                          true, false, // inflated second input bit
+                          false, true,
+                          false, false),
+                 andExpect(true, true, // inflated first output bit
+                           false, false)); // inflated second output
+
+        addCheck("times, condassign",
+                 CircuitBuilder.times(2, CircuitBuilder.makeCondAssign()),
+                 forInput(true, false,
+                          false, true,
+                          true, false),
+                 andExpect(true, true));
+
+        addCheck("times split",
+                 CircuitBuilder.times(2, new Split(2)),
+                 forInput(true, false),
+                 andExpect(true, false, true, false));
+    }
+
+    private static void checkBaseXor() {
+        addCheck("xor TT",
+                 new Xor(),
+                 forInput(true, true),
+                 andExpect(false));
+        addCheck("xor TF",
+                 new Xor(),
+                 forInput(true, false),
+                 andExpect(true));
+        addCheck("xor FT",
+                 new Xor(),
+                 forInput(false, true),
+                 andExpect(true));
+        addCheck("xor FF",
+                new Xor(),
+                forInput(false, false),
+                andExpect(false));
+    }
+
+    private static void addCondAssignChecks() {
+        addCheck("Condassign, copy truth value true",
+                 CircuitBuilder.makeCondAssign(),
+                 forInput(true, false, true),
+                 andExpect(true));
+        addCheck("Condassign, copy truth value false",
+                 CircuitBuilder.makeCondAssign(),
+                 forInput(false, true, true),
+                 andExpect(false));
+        addCheck("Condassign, copy false value true",
+                 CircuitBuilder.makeCondAssign(),
+                 forInput(false, true, false),
+                 andExpect(true));
+        addCheck("Condassign, copy false value false",
+                 CircuitBuilder.makeCondAssign(),
+                 forInput(true, false, false),
+                 andExpect(false));
+    }
+
+    private static void addBitwiseComparerTests() {
+        addCheck("Bitwise comparer, equals",
+                 CircuitBuilder.createComparer(3),
+                 forInput(false, true, true,
+                          false, true, true),
+                 andExpect(false, false));
+        addCheck("Bitwise comparer, lt",
+                 CircuitBuilder.createComparer(3),
+                 forInput(false, true, false,
+                          false, false, true),
+                 andExpect(true, false));
+        addCheck("Bitwise comparer, gt",
+                 CircuitBuilder.createComparer(3),
+                 forInput(false, true, false,
+                          true, false, true),
+                 andExpect(true, true));
+
+        addCheck("From maxGain state transition check",
+                 CircuitBuilder.createComparer(3),
+                 forInput(true, false, false,
+                          false, true, false),
+                 andExpect(true, false));
+    }
+
+    private static void addComparerStateTransitionChecks() {
+        addCheck("Compare State transition I",
+                 CircuitBuilder.createComparerStateTransition(),
+                 forInput(false, false, false, false),
+                 andExpect(false, false));
+        addCheck("Compare Staten transition II",
+                 CircuitBuilder.createComparerStateTransition(),
+                 forInput(true, true, false, false),
+                 andExpect(false, false));
+        addCheck("Compare state transition III",
+                 CircuitBuilder.createComparerStateTransition(),
+                 forInput(true, false, false, false),
+                 andExpect(true, false));
+        addCheck("Compare state transition IV",
+                 CircuitBuilder.createComparerStateTransition(),
+                 forInput(false, true, false, false),
+                 andExpect(true, true));
+        addCheck("Compare state transition V",
+                 CircuitBuilder.createComparerStateTransition(),
+                 forInput(false, true, true, false),
+                 andExpect(true, false));
+        addCheck("Compare state transition V",
+                 CircuitBuilder.createComparerStateTransition(),
+                 forInput(true, false, true, true),
+                 andExpect(true, true));
+    }
+
+    private static void addCheck(String description, Circuit circuit, boolean[] input, boolean[] expectation) {
+        checks.add(new CheckCircuit(description, circuit, input, expectation));
+    }
     public static void main(String[] arguments) throws NoSuchAlgorithmException {
-        Circuit subject = createSubject();
+        for (CheckCircuit check : checks)
+            checkCircuit(check.description, check.subject, check.input, check.expectation);
+    }
 
-        boolean carry = true;
-        boolean firstBitToAdd = true;
-        boolean secondBitToAdd = true;
+    private static boolean[] forInput(boolean... input) { return input; }
+    private static boolean[] andExpect(boolean... output) { return output; }
 
-        boolean sumWithCarry = (firstBitToAdd ^ secondBitToAdd) ^ carry;
-        boolean newCarryBit = (firstBitToAdd && secondBitToAdd) || (carry && (firstBitToAdd ^ secondBitToAdd));
-
-        boolean[] input = {carry, firstBitToAdd, secondBitToAdd};
-
-        boolean[] expectation = { newCarryBit, sumWithCarry };
-
+    private static void checkCircuit(String description, Circuit subject, boolean[] input, boolean[] expectation) throws NoSuchAlgorithmException {
         boolean[] output = evaluateWith(subject, input);
-        checkExpectation(subject, input, expectation, output);
+        checkExpectation(description, subject, input, expectation, output);
     }
 
-    private static Circuit createSubject() {
-        return CircuitBuilder.createFullAdder();
-    }
-
-    private static void checkExpectation(final Circuit c,
-                                         final boolean[] input,
-                                         final boolean[] expectation,
-                                         final boolean[] output) {
-
-        System.out.println(describeCircuit(c));
+    private static void checkExpectation(String description,
+                                         Circuit c,
+                                         boolean[] input,
+                                         boolean[] expectation,
+                                         boolean[] output) {
+        if (Arrays.equals(expectation, output)) return;
+        System.out.println(describeCircuit(c, description));
         System.out.println(describeInput(input));
         System.out.println(describeExpectation(expectation));
         System.out.println(describeOutputStatus(expectation, output));
     }
 
-    private static String describeCircuit(final Circuit c) {
-        return c.toString();
+    private static String describeCircuit(final Circuit c, String description) {
+        return description + " " + c.toString();
     }
 
     private static String describeInput(final boolean[] input) {
@@ -64,16 +239,23 @@ public class CircuitTests {
 
     private static String describeOutputStatus(final boolean[] expectation,
                                                final boolean[] output) {
-        assert expectation.length == output.length;
         String outputLine = "Output:\t\t" + describeBitString(output);
         String errorLine = "Errors:\t\t";
-        for (int bitIndex = 0; bitIndex < output.length; bitIndex++) {
+        for (int bitIndex = 0;
+             bitIndex < Math.min(output.length, expectation.length); bitIndex++) {
             if (expectation[bitIndex] == output[bitIndex]) {
                 errorLine += " ";
             } else {
                 errorLine += "^";
             }
         }
+
+        if (output.length != expectation.length)
+            for (int bitIndex = 0;
+                 bitIndex < Math.max(output.length, expectation.length)
+                             - Math.min(output.length, expectation.length);
+                 bitIndex++)
+                errorLine += "?";
         return outputLine + "\n" + errorLine;
     }
 

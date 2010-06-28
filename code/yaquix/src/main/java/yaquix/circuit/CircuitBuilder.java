@@ -218,10 +218,11 @@ public class CircuitBuilder {
 	 *    of the encoding of the next state (s1' in the
 	 *    specification)
 	 *
+     * This method appears to work.
 	 * @return a circuit to compute the state transition of the
 	 *         comparision automaton.
 	 */
-	private static Circuit createComparerStateTransition() {
+	public static Circuit createComparerStateTransition() {
 		Circuit result;
 		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
 		// Outputs:
@@ -327,11 +328,11 @@ public class CircuitBuilder {
 	 * must be 0 iff a > b and it must be 1 iff a < b. If the first
 	 * bit of the output is 0, the second bit of the output is not
 	 * defined.
-	 *
+	 * // this method appears to work
 	 * @param bitWidth the bitWidth of the numbers to compare
 	 * @return a circuit to compute the comparision.
 	 */
-	private static Circuit createComparer(int bitWidth) {
+	public static Circuit createComparer(int bitWidth) {
 		Circuit result = new Constant(false);
 		result = result.extendLeft(new Constant(false));
 		int inputWidth = 2*bitWidth;
@@ -441,6 +442,8 @@ public class CircuitBuilder {
 	 * first bit to add and the third bit is the second bit to add.
 	 * The first bit output is the new carry bit while the second
 	 * bit is the sum of the two bits.
+     *
+     * This method appears to work properly.
 	 * @return a full adder
 	 */
 	public static Circuit createFullAdder() {
@@ -511,9 +514,12 @@ public class CircuitBuilder {
 	 * while the second number is required to be the second half of the input.
 	 * We don't care for overflows, as we use bitwidths large enough, so the
 	 * output is as wide as the inputs.
+     *
+     * this method appears to work properly.
+     *
 	 * @return a ripple carry adder
 	 */
-	private static Circuit createAdder(int bitwidth) {
+	public static Circuit createAdder(int bitwidth) {
 		Map<Integer, Integer> connection= new HashMap<Integer, Integer>();
 		connection.put(0, 0);
 		if (bitwidth < 1) {
@@ -879,34 +885,11 @@ public class CircuitBuilder {
 	 * @return a circuit to do a single compare
 	 * and copy.
 	 */
-	private static Circuit createMaxGainStatetransition(int sumWidth, int indexWidth) {
+	public static Circuit createMaxGainStatetransition(int sumWidth, int indexWidth) {
 		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
 		Circuit result = null;
 
-		Circuit condAssign = new Or();
-		// Inputs condAssign: X Y
-		// Outputs condAssign: X+Y
-		Circuit filterAnds = new And();
-		filterAnds = filterAnds.extendLeft(new And());
-		// Inputs filterAnds: A B C D
-		// Outputs filterAnds: A*B C*D
-
-		condAssign = filterAnds.extendTopLeft(condAssign, createIdentityMapping(2));
-
-		// Inputs condAssign: A B C D
-		// Outputs condAssign: (A*B)+(C*D)
-
-		connection.clear();
-		connection.put(0, 3);
-		condAssign = new Negation().extendTopLeft(condAssign, connection);
-
-		// Inputs: A B D C
-		// Outputs condAssign: (A*B)+(-C*D)
-
-		connection.clear();
-		connection.put(0, 0);
-		connection.put(1, 3);
-		condAssign = new Split(2).extendTopLeft(condAssign, connection);
+        Circuit condAssign = makeCondAssign();
 
 		// Inputs: B D C
 		// Outputs condAssign: (C*B)+(-C*D)
@@ -1005,21 +988,72 @@ public class CircuitBuilder {
 		Map<Integer, Integer> shuffleMap = new HashMap<Integer, Integer>();
 		for (int i = 0; i < 2*indexWidth + 2*sumWidth; i++) {
 			if (0 <= i && i < sumWidth) {
-				connection.put(i, i+2*indexWidth+sumWidth);
+				shuffleMap.put(i, i+2*indexWidth+sumWidth);
 			} else if (sumWidth <= i && i < sumWidth + indexWidth) {
-				connection.put(i, i - sumWidth);
-			} else if (sumWidth + indexWidth < i && i < 2*sumWidth + indexWidth) {
-				connection.put(i, i-sumWidth+indexWidth);
+				shuffleMap.put(i, i - sumWidth);
+			} else if (sumWidth + indexWidth <= i && i < 2*sumWidth + indexWidth) {
+				shuffleMap.put(i, i-sumWidth+indexWidth);
 			} else if (2*sumWidth + indexWidth <= i && i < 2*sumWidth + 2*indexWidth) {
-				connection.put(i, i - 2*sumWidth);
+				shuffleMap.put(i, i - 2*sumWidth);
 			}
 		}
-		result = new Shuffle(2*sumWidth+2*indexWidth, shuffleMap).extendTopLeft(result,
+	    result = new Shuffle(2*sumWidth+2*indexWidth, shuffleMap).extendTopLeft(result,
 							 createIdentityMapping(2*sumWidth + 2*indexWidth));
 		return result;
+
 	}
 
-	private static int intLog2(int x) {
+    /**
+     * The cond-assign circuit has three input bits:
+     *  - the first bit is the truth value, that is, the value which is
+     *    selected if the condition is true
+     *  - the second bit is the false value, that is, the value which
+     *    is selected if the condition is false
+     *  - the third bit is the condition code, that is, this bit is 1
+     *    if the truth-value is supposed to be selected and it is 0
+     *    if the false-value is to be selected.
+     *
+     * the output of the cond-assign is a single bit, which is either
+     * truthvalue or false-value depending on the condition.
+     * @return
+     */
+    public static Circuit makeCondAssign() {
+        Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
+        Circuit condAssign = new Or();
+        // Inputs condAssign: X Y
+        // Outputs condAssign: X+Y
+        Circuit filterAnds = new And();
+        filterAnds = filterAnds.extendLeft(new And());
+        // Inputs filterAnds: A B C D
+        // Outputs filterAnds: A*B C*D
+
+        condAssign = filterAnds.extendTopLeft(condAssign, createIdentityMapping(2));
+
+        // Inputs condAssign: A B C D
+        // Outputs condAssign: (A*B)+(C*D)
+
+        connection.clear();
+        connection.put(0, 3);
+        condAssign = new Negation().extendTopLeft(condAssign, connection);
+
+        // Inputs: A B D C
+        // Outputs condAssign: (A*B)+(-C*D)
+
+        connection.clear();
+        connection.put(0, 0);
+        connection.put(1, 3);
+        condAssign = new Split(2).extendTopLeft(condAssign, connection);
+        // Inputs: B D C
+        // Outputs condAssign: (C*B)+(-C*D)
+
+        // RENAME: C -> B, B -> T, D -> F
+        // Inputs condAssign: T F B
+        // Outputs condAssign: (B*T)+(-B*F)
+
+        return condAssign;
+    }
+
+    private static int intLog2(int x) {
 		int currentX = 1;
 		int n = 0;
 		while (currentX <= x) {
@@ -1211,7 +1245,16 @@ public class CircuitBuilder {
 		return result;
 	}
 
-	private static Circuit times(int wordWidth, Circuit repeated) {
+    /**
+     * This applies a single bit circuit to bit words of a certain width by
+     * applying the single bit circuit to each bit of the bit word independently.
+     *
+     *
+     * @param wordWidth the width of the bits to require as input
+     * @param repeated the circuit to repeat
+     * @return a circuit working on the words
+     */
+	public static Circuit times(int wordWidth, Circuit repeated) {
 		/*
 		 * At first, we have a circuit with
 		 *  - inputs i1 i2 i3 ..
@@ -1236,26 +1279,35 @@ public class CircuitBuilder {
 			}
 		}
 		int inputCount = repeated.getInputCount();
-		HashMap<Integer, Integer> inputShuffle = new HashMap<Integer, Integer>();
+        int outputCount = repeated.getOutputCount();
+        System.out.println(String.format("wordWidth=%d, inputCount=%d, outputCount=%d",
+                            wordWidth, inputCount, outputCount));
+        HashMap<Integer, Integer> inputShuffle = new HashMap<Integer, Integer>();
 
-		System.err.println(String.format("wordWidth = %d, inputCount = %d", wordWidth, inputCount));
-		for (int circuitIndex = 0; circuitIndex < wordWidth; circuitIndex++) {
-			for (int inputIndex = 0; inputIndex < inputCount; inputIndex++) {
-				int sourceIndex = circuitIndex*inputCount+inputIndex;
-				int destinationIndex = inputIndex*wordWidth+circuitIndex;
-				inputShuffle.put(sourceIndex, destinationIndex);
-			}
-		}
-		int timesWidth = wordWidth*inputCount;
-		result = new Shuffle(timesWidth, inputShuffle).extendTopLeft(result, createIdentityMapping(timesWidth));
+        for (int blockIndex = 0; blockIndex < inputCount; blockIndex++) {
+            for (int bitIndex = 0; bitIndex < wordWidth; bitIndex++) {
+                int sourceIndex = blockIndex * wordWidth + bitIndex;
+                int destinationIndex = bitIndex * inputCount + blockIndex;
+                inputShuffle.put(sourceIndex, destinationIndex);
 
-		HashMap<Integer, Integer> outputShuffle = new HashMap<Integer, Integer>();
-		int outputCount = repeated.getOutputCount();
+            }
+        }
+        System.out.println(inputShuffle);
+
+        int timesWidth = wordWidth*inputCount;
+        result = new Shuffle(timesWidth, inputShuffle).extendTopLeft(result, createIdentityMapping(timesWidth));
+
+        HashMap<Integer, Integer> outputShuffle = new HashMap<Integer, Integer>();
 		for (int circuitIndex = 0; circuitIndex < wordWidth; circuitIndex++) {
 			for(int outputIndex = 0; outputIndex < outputCount; outputIndex++) {
-				outputShuffle.put(circuitIndex*outputCount+outputIndex, outputIndex*outputCount+circuitIndex);
+                int sourceIndex = circuitIndex * outputCount + outputIndex;
+                int destinationIndex = outputIndex * wordWidth + circuitIndex;
+                assert !outputShuffle.keySet().contains(sourceIndex);
+                assert !outputShuffle.values().contains(destinationIndex);
+                outputShuffle.put(sourceIndex, destinationIndex);
 			}
 		}
+        System.out.println(outputShuffle.toString());
 		result = result.extendTopLeft(new Shuffle(wordWidth*outputCount, outputShuffle), createIdentityMapping(wordWidth*outputCount));
 		return result;
 	}
