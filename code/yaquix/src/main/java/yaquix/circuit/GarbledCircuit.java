@@ -83,6 +83,7 @@ public class GarbledCircuit implements Serializable {
 		tables = new int[gateCount][4][4];
 		inputs = new int[inputCount];
 		inputValues = new int[inputCount];
+        Arrays.fill(inputValues, -1);
 		outputs = new int[outputCount];
 	}
 
@@ -172,6 +173,7 @@ public class GarbledCircuit implements Serializable {
 	public boolean[] evaluate() {
 		int[] outputValues = new int[gateType.length];  // XXX: Too big?
 		boolean[] hasOutput = new boolean[gateType.length]; // XXX: too big?
+        assert allInputsSet() : Arrays.toString(inputValues);
 
 		//setInputOutputs(hasOutput, outputValues);
 
@@ -187,6 +189,16 @@ public class GarbledCircuit implements Serializable {
 		return decodeOutput(outputValues);
 	}
 
+    private boolean allInputsSet() {
+        boolean allInputsSetUntilNow = true;
+        for (Integer i : inputValues)
+            allInputsSetUntilNow = allInputsSetUntilNow && inputSet(i);
+        return allInputsSetUntilNow;
+    }
+
+    private boolean inputSet(Integer i) {
+        return i != -1;
+    }
 	private boolean[] decodeOutput(int[] outputValues) {
 		boolean[] result = new boolean[outputs.length];
 		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
@@ -202,7 +214,7 @@ public class GarbledCircuit implements Serializable {
 	}
 
 	private void evaluateGate(int gateIndex, int[] outputValues, boolean[] hasOutput) {
-		LOG.trace(String.format("Evaluate gate %d", gateIndex));
+		//LOG.trace(String.format("Evaluate gate %d", gateIndex));
 		int[] preds;
 		int predOutput;
 		hasOutput[gateIndex] = true;
@@ -226,8 +238,9 @@ public class GarbledCircuit implements Serializable {
 
 			assert unaryGateRequiredInput(gateTable[0]) == predOutput
                     || unaryGateRequiredInput(gateTable[1]) == predOutput
-                    : String.format("Output %d not in table %s",
-                                    predOutput, Arrays.deepToString(gateTable));
+                    : String.format("Output %d of gate of type %s not in table %s",
+                                    predOutput, gateType[predIndex],
+                                    Arrays.deepToString(gateTable));
 
             int outputValue;
             if (unaryGateRequiredInput(gateTable[0]) == predOutput)

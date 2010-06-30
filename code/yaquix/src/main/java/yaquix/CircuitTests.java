@@ -52,6 +52,44 @@ public class CircuitTests {
         checkBaseXor();
         addTimesChecks();
         addMaxGainStateTransitionChecks();
+        addMaxGainCircuitChecks();
+
+        addCheck("Agreeing label computation",
+                 CircuitBuilder.createAgreeingLabelComputation(2),
+                 forInput(false, true,
+                          false, true),
+                 andExpect(false, true));
+
+        addCheck("Agreeing label computation",
+                 CircuitBuilder.createAgreeingLabelComputation(2),
+                 forInput(false, false,
+                          false, false),
+                 andExpect(true, false));
+
+        addCheck("Agreeing label computation",
+                 CircuitBuilder.createAgreeingLabelComputation(2),
+                 forInput(false, false,
+                          false, true),
+                 andExpect(true, true));
+
+    }
+
+    private static void addMaxGainCircuitChecks() {
+        addCheck("Max gain circuit I",
+                 CircuitBuilder.createMaximumGainCircuit(2, 2),
+                 forInput(false, true,
+                          false, true,
+                          true, false,
+                          false, false),
+                 andExpect(false));
+
+        addCheck("Max gain circuit II",
+                 CircuitBuilder.createMaximumGainCircuit(2, 2),
+                 forInput(false, false,
+                          true, false,
+                          false, true,
+                          false, true),
+                 andExpect(true));
     }
 
     private static void addMaxGainStateTransitionChecks() {
@@ -208,7 +246,28 @@ public class CircuitTests {
     private static boolean[] forInput(boolean... input) { return input; }
     private static boolean[] andExpect(boolean... output) { return output; }
 
-    private static void checkCircuit(String description, Circuit subject, boolean[] input, boolean[] expectation) throws NoSuchAlgorithmException {
+    private static void checkCircuit(String description,
+                                     Circuit subject,
+                                     boolean[] input,
+                                     boolean[] expectation) throws NoSuchAlgorithmException {
+        if (subject.getInputCount() != input.length) {
+            System.out.println("Input count mismatch:");
+            System.out.println(describeCircuit(subject, description));
+            System.out.println(String.format("%d != %d",
+                                             subject.getInputCount(),
+                                             input.length));
+            return;
+        }
+
+        if (subject.getOutputCount() != expectation.length) {
+            System.out.println("Output count mismatch:");
+            System.out.println(describeCircuit(subject, description));
+            System.out.println(String.format("%d != %d",
+                                             subject.getOutputCount(),
+                                             expectation.length));
+            return;
+        }
+
         boolean[] output = evaluateWith(subject, input);
         checkExpectation(description, subject, input, expectation, output);
     }

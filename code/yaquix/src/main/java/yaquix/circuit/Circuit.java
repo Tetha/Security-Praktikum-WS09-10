@@ -375,6 +375,10 @@ public class Circuit {
 	 * @param checkedCircuit
 	 */
 	private void checkCircuit(Circuit checkedCircuit) {
+        assert checkedCircuit != null;
+        assert checkedCircuit.adjacencyList != null;
+        assert checkedCircuit.gateType != null;
+
 		assert checkedCircuit.gateType.length == checkedCircuit.adjacencyList.length;
 		assert checkedCircuit.gateType.length == checkedCircuit.tables.length;
 		for (int i = 0; i < checkedCircuit.adjacencyList.length; i++) {
@@ -574,11 +578,11 @@ public class Circuit {
 
 	private void garbleInput(GarbledCircuit result, int i,
 			int[] outputWireMapping) {
-		for (int inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-			if (inputs[inputIndex] == i) {
-				result.addInput(i, inputIndex, adjacencyList[i], outputWireMapping);
-			}
-		}
+        int gateIndexForInput = findInArray(i,  inputs);
+        result.addInput(i,
+                        gateIndexForInput,
+                        adjacencyList[i],
+                        outputWireMapping);
 	}
 
 	private int[][] garbleAllWires(Map<Integer, int[]> inputMapping) {

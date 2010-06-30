@@ -1,12 +1,7 @@
 package yaquix.phase.classifier;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import yaquix.Connection;
 import yaquix.circuit.Circuit;
 import yaquix.circuit.CircuitBuilder;
@@ -16,10 +11,14 @@ import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
 
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.List;
+
 /**
  * This class computes the class label that occurs most often
  * in the local and remote labels.
- * 
+ *
  * This is done by using the dominating labels circuit. This
  * class is responsible for encoding the input for the circuit,
  * creating the circuit, evaluating it with yaos phase and
@@ -32,44 +31,46 @@ public class DominatingOutputComputation extends Phase {
 	 * contains the list of local mail labels.
 	 */
 	private InputKnowledge<List<MailType>> localLabels;
-	
-	
+
+
 	/**
 	 * contains the maximum number of mails bob will ever
 	 * provide.
 	 */
 	private InputKnowledge<Integer> remoteMailCountLimit;
-	
+
 	/**
 	 * requires the dominating label of the local and remote
 	 * labels to be stored.
 	 */
 	private OutputKnowledge<MailType> concertedDominatingLabel;
-	
+
 	/**
 	 * contains a place to log stuff.
 	 */
 	private Logger logger;
-	
+
 	/**
 	 * contains the random source.
 	 */
 	private SecureRandom randomSource;
-	
+
 	/**
 	 * Creates a new DominatingOutputPhase.
 	 * @param localLabels the local mail labels.
-	 * @param concertedDominatingLabel a place to store the dominating class 
+	 * @param concertedDominatingLabel a place to store the dominating class
 	 * label
 	 */
 	public DominatingOutputComputation(
 			InputKnowledge<List<MailType>> localLabels,
 			InputKnowledge<Integer> remoteMailCountLimit,
-			OutputKnowledge<MailType> concertedDominatingLabel) {
+			OutputKnowledge<MailType> concertedDominatingLabel,
+            SecureRandom randomSource) {
 		this.localLabels = localLabels;
 		this.remoteMailCountLimit = remoteMailCountLimit;
 		this.concertedDominatingLabel = concertedDominatingLabel;
 		logger = LoggerFactory.getLogger(DominatingOutputComputation.class);
+        this.randomSource = randomSource;
 	}
 
 	private int intLog2(int x) {
@@ -86,17 +87,18 @@ public class DominatingOutputComputation extends Phase {
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
 		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
-		localInput.put(encodeLabels(localLabels.get(), 
-					   intLog2(remoteMailCountLimit.get())*2));
-		
+		localInput.put(encodeLabels(localLabels.get(),
+					                /*intLog2(remoteMailCountLimit.get())*/
+                                    0));
+
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 		CircuitEvaluation subPhase = new CircuitEvaluation(localInput, concertedOutput, randomSource);
 		subPhase.clientExecute(connection);
-		
+
 		decodeOutput(concertedOutput);
 		logger.info("Leaving Phase: Dominating Output Computation");
 	}
-	
+
 	@Override
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
@@ -104,20 +106,20 @@ public class DominatingOutputComputation extends Phase {
 		int maximumMailBound = Math.max(labels.size(), remoteMailCountLimit.get());
 		Circuit dominationCircuit =
 			CircuitBuilder.createDominatingOutputCircuit(maximumMailBound);
-		
+
 		Knowledge<Circuit> circuitInput = new Knowledge<Circuit>();
 		circuitInput.put(dominationCircuit);
-		
+
 		Knowledge<boolean[]> localInputKnowledge = new Knowledge<boolean[]>();
 		localInputKnowledge.put(encodeLabels(labels, 0));
-		
+
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
-		
-		CircuitEvaluation subPhase = new CircuitEvaluation(circuitInput, 
+
+		CircuitEvaluation subPhase = new CircuitEvaluation(circuitInput,
 										localInputKnowledge, concertedOutput,
 										randomSource);
 		subPhase.serverExecute(connection);
-		
+
 		decodeOutput(concertedOutput);
 		logger.info("Leaving Phase: Dominating Output Computation");
 	}
@@ -144,15 +146,17 @@ public class DominatingOutputComputation extends Phase {
 		boolean[] localInput;
 		int spamCount = 0;
 		int nonSpamCount = 0;
-		
+
 		localInput = new boolean[intLog2(labels.size())*2];
+        System.err.println(String.format("localInputCount.length = %d", localInput.length));
+        System.err.println(String.format("offset=%d", offset));
 		for (MailType m : labels) {
 			switch (m) {
 				case SPAM: spamCount++; break;
 				case NONSPAM: nonSpamCount++; break;
 			}
 		}
-		
+
 		for (int i = 0; i < intLog2(labels.size()); i++) {
 			if ((spamCount & (1<<i)) > 0) {
 				localInput[intLog2(labels.size())-i-1 + offset] = true;
@@ -160,7 +164,7 @@ public class DominatingOutputComputation extends Phase {
 				localInput[intLog2(labels.size())-i-1 + offset] = false;
 			}
 		}
-		
+
 		for (int i = 0; i < intLog2(labels.size()); i++) {
 			if ((nonSpamCount & (1<<i)) > 0) {
 				localInput[2*intLog2(labels.size())-i-1 + offset] = true;

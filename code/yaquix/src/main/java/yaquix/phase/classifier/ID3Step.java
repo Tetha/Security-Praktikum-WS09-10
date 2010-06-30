@@ -1,14 +1,5 @@
 package yaquix.phase.classifier;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.EnumMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import org.slf4j.LoggerFactory;
-
 import yaquix.Connection;
 import yaquix.classifier.Branch;
 import yaquix.classifier.Classifier;
@@ -23,6 +14,12 @@ import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
 import yaquix.phase.SymmetricPhase;
 import yaquix.phase.classifier.entropy.EntropySharesComputation;
+
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class executes a single step in the ID3 algorithm.
@@ -86,8 +83,10 @@ public class ID3Step extends SymmetricPhase {
 	@Override
 	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: ID3 Step");
+        logger.debug("#local labels: "+ localValues.get().countAllMails());
 		Knowledge<List<MailType>> emailLabels =
 			new Knowledge<List<MailType>>();
+
 		emailLabels.put(buildLabelList());
 
 		Knowledge<MailType> uniqueLabel = new Knowledge<MailType>();
@@ -105,7 +104,10 @@ public class ID3Step extends SymmetricPhase {
 		if (concertedRemainingAttributes.get().isEmpty()) {
 			Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
 			Phase dominationDecider =
-				new DominatingOutputComputation(emailLabels, remoteMailCountLimit, dominatingLabel);
+				new DominatingOutputComputation(emailLabels,
+                                                remoteMailCountLimit,
+                                                dominatingLabel,
+                                                randomSource);
 			executePhase(connection, dominationDecider);
 			Classifier result = new Leaf(dominatingLabel.get());
 			concertedClassifier.put(result);
@@ -138,11 +140,23 @@ public class ID3Step extends SymmetricPhase {
 		Knowledge<Classifier> subResult = new Knowledge<Classifier>();
 		for (Occurrences o : Occurrences.values()) {
 			values.put(localValues.get().partition(bestAttribute.get()).get(o));
-
-			Phase recursion = new ID3Step(recursionAttributes, values,
+            if (values.get().countAllMails() > 0) {
+			    Phase recursion = new ID3Step(recursionAttributes, values,
 										  remoteMailCountLimit, subResult, randomSource);
-			executePhase(connection, recursion);
-			subTrees.put(o, subResult.get());
+			    executePhase(connection, recursion);
+			    subTrees.put(o, subResult.get());
+            } else {
+                Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
+                Phase dominationDecider =
+                    new DominatingOutputComputation(emailLabels,
+                                                    remoteMailCountLimit,
+                                                    dominatingLabel,
+                                                    randomSource);
+                executePhase(connection, dominationDecider);
+                Classifier result = new Leaf(dominatingLabel.get());
+                concertedClassifier.put(result);
+                subTrees.put(o, new Leaf(dominatingLabel.get()));
+            }
 		}
 
 		Classifier result = new Branch(bestAttribute.get(), subTrees);
@@ -165,6 +179,7 @@ public class ID3Step extends SymmetricPhase {
 		for (int i = 0; i < localValues.get().countNonSpamMails(); i++) {
 			localLabels.add(MailType.NONSPAM);
 		}
+
 		return localLabels;
 	}
 }

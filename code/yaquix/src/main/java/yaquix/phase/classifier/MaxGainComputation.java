@@ -1,12 +1,7 @@
 package yaquix.phase.classifier;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import yaquix.Connection;
 import yaquix.circuit.Circuit;
 import yaquix.circuit.CircuitBuilder;
@@ -15,6 +10,11 @@ import yaquix.phase.InputKnowledge;
 import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
+
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This phase computes the attribute, which provides the
@@ -108,10 +108,13 @@ public class MaxGainComputation extends Phase {
 	@Override
 	public void serverExecute(Connection connection) throws ClassNotFoundException, IOException {
 		LOG.info("Starting Phase: Max Gain Computation");
-		
+
 		int[] shares = localEntropyShares.get();
 
 		int shareCount = shares.length;
+        assert shareCount == concertedAttributes.get().size();
+        LOG.trace(String.format("creating max gain circuit. shareCount=%d, shareWidth=%d",
+                                shareCount, shareWidth));
 		Circuit maxGain = CircuitBuilder.createMaximumGainCircuit(shareCount, shareWidth);
 		LOG.trace("circuit created");
 		Knowledge<Circuit> evaluatedCircuit = new Knowledge<Circuit>();
@@ -127,7 +130,7 @@ public class MaxGainComputation extends Phase {
 
 	private Attribute decodeOutput(List<Attribute> attributes, boolean[] output) {
 		int attributeIndex = 0;
-		
+
 		StringBuilder outputContents = new StringBuilder();
 		for (int i = 0; i < output.length; i++) {
 			boolean currentBit = output[i];
@@ -144,21 +147,22 @@ public class MaxGainComputation extends Phase {
 				attributeIndex = attributeIndex+1;
 			}
 		}
-		
+
 		Attribute result = attributes.get(attributeIndex);
 
 		return result;
 	}
 
 	private boolean[] encodeInput() {
-		//int[] localShares = localEntropyShares.get();
-		int[] localShares = {0};
+		int[] localShares = localEntropyShares.get();
 		int shareCount = localShares.length;
 
 		boolean[] input = new boolean[shareCount * shareWidth];
 		for (int shareIndex = 0; shareIndex < shareCount; shareIndex ++) {
 			encodeShare(input, localShares[shareIndex], shareIndex * shareWidth, shareWidth);
 		}
+
+        System.err.println(Arrays.toString(input));
 		return input;
 	}
 

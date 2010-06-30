@@ -1,27 +1,16 @@
 package yaquix.phase.classifier;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.RSAKeyGenParameterSpec;
-import java.util.Random;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * This phase implements 1-out-of-2 oblivious transfer.
@@ -122,7 +111,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("entering phase");
 		logger.debug(String.format("Selecting %s", clientBit.get() ? "1" : "0"));
-		
+
 //		Key publicKey = connection.receiveKey();
 //		int x0 = connection.receiveInteger();
 //		int x1 = connection.receiveInteger();
@@ -168,10 +157,10 @@ class OneOfTwoObliviousTransfer extends Phase {
 //			result = l1 - kPrime;
 //		}
 //		clientReceivedMessage.put(result);
-		
+
 		int firstMessage = connection.receiveInteger(); // (1)
 		int secondMessage = connection.receiveInteger(); // (2)
-		
+
 		int result;
 		if (clientBit.get()) {
 			result = secondMessage;
@@ -199,7 +188,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 //		int m0 = serverMessages.get()[0];
 //		int m1 = serverMessages.get()[1];
 //		logger.debug(String.format("server messages: %d %d", m0, m1));
-//		
+//
 //		Key privateKey = keys.getPrivate();
 //		Key publicKey = keys.getPublic();
 //		int x0 = randomSource.nextInt();
@@ -224,7 +213,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 //			byte[] k1Bytes = intToByteArray(v - x1);
 //
 //			k0 = byteArrayToInt(cipher.doFinal(k0Bytes));
-//			k1 = byteArrayToInt(cipher.doFinal(k1Bytes));			
+//			k1 = byteArrayToInt(cipher.doFinal(k1Bytes));
 //		} catch (IllegalBlockSizeException exc) {
 //			throw new RuntimeException(exc);
 //		} catch (BadPaddingException exc) {

@@ -1,12 +1,7 @@
 package yaquix.phase.classifier;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.List;
-
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
+import org.slf4j.LoggerFactory;
 import yaquix.Connection;
 import yaquix.circuit.Circuit;
 import yaquix.circuit.CircuitBuilder;
@@ -16,15 +11,20 @@ import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
 
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * This class checks if the labels of mails are unique. 
- * 
+ * This class checks if the labels of mails are unique.
+ *
  * In order to do this, this class creates a circuit which
  * walks through all labels and checks if the labels are unique,
- * encodes the labels for the circuit, executes it with yaos 
+ * encodes the labels for the circuit, executes it with yaos
  * protocol and eventually decodes and returns the output of
  * the circuit.
- * 
+ *
  * @author hk
  *
  */
@@ -33,19 +33,19 @@ public class AgreedLabelComputation extends Phase {
 	 * contains the labels of mails.
 	 */
 	private InputKnowledge<List<MailType>> localLabels;
-	
+
 	/**
 	 * contains the remote number of mails
 	 */
 	private InputKnowledge<Integer> remoteMailCount;
-	
-	
+
+
 	/**
 	 * requires the common attribute or null if none exists
 	 * to be set.
 	 */
 	private OutputKnowledge<MailType> concertedUniqueLabel;
-	
+
 	/**
 	 * contains the logger instance for this class.
 	 */
@@ -54,7 +54,7 @@ public class AgreedLabelComputation extends Phase {
 	 * contains the source of random bits.
 	 */
 	private SecureRandom randomSource;
-	
+
 	/**
 	 * Constructs a new AgreedLabelComputation
 	 * @param localLabels the local email labels
@@ -75,9 +75,10 @@ public class AgreedLabelComputation extends Phase {
 		logger.info("entering phase");
 		List<MailType> localMailLabels = localLabels.get();
 		Knowledge<boolean[]> inputLabels = new Knowledge<boolean[]>();
-		LOG.trace(String.format("%d", localMailLabels.size()));
+		LOG.trace(String.format("client local mails: %d", localMailLabels.size()));
+        connection.sendInteger(localMailLabels.size());
 		inputLabels.put(encodeLabels(localMailLabels));
-		
+
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 		CircuitEvaluation subphase = new CircuitEvaluation(inputLabels, concertedOutput,
 														   randomSource);
@@ -91,16 +92,21 @@ public class AgreedLabelComputation extends Phase {
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("entering phase");
 		List<MailType> localMailLabels = localLabels.get();
-		int mailCount = remoteMailCount.get() + localMailLabels.size();
-		Circuit agreedLabel = CircuitBuilder.createAgreeingLabelComputation(mailCount);
+        System.err.println(localMailLabels);
+        int remoteMailCount = connection.receiveInteger();
+
+		int mailCount = remoteMailCount + localMailLabels.size();
+        System.err.println(String.format("total mail count -> %d = %d + %d <- remote + local",
+                                         mailCount, remoteMailCount, localMailLabels.size()));
+  		Circuit agreedLabel = CircuitBuilder.createAgreeingLabelComputation(mailCount);
 		Knowledge<boolean[]> inputLabels = new Knowledge<boolean[]>();
 		inputLabels.put(encodeLabels(localMailLabels));
-		
+
 		Knowledge<Circuit> inputCircuit = new Knowledge<Circuit>();
 		inputCircuit.put(agreedLabel);
-		
+
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
-		
+
 		CircuitEvaluation subphase = new CircuitEvaluation(inputCircuit, inputLabels, concertedOutput,
 														   randomSource);
 		subphase.serverExecute(connection);
@@ -128,10 +134,10 @@ public class AgreedLabelComputation extends Phase {
 		} else if (!circuitOutput[0] && circuitOutput[1]) {
 			//spam
 			result=MailType.SPAM;
-		} 
+		}
 		return result;
 	}
-	
+
 	private boolean[] encodeLabels(List<MailType> mails) {
 		boolean[] labels = new boolean[2*mails.size()];
 		for (int i=0; i<mails.size(); i++) {
@@ -139,7 +145,7 @@ public class AgreedLabelComputation extends Phase {
 			int firstBitIndex = 2*i;
 			int secondBitIndex = firstBitIndex+1;
 			switch (m) {
-				case SPAM: 
+				case SPAM:
 					labels[firstBitIndex]=false;
 					labels[secondBitIndex]=true;
 					break;
@@ -149,8 +155,8 @@ public class AgreedLabelComputation extends Phase {
 			}
 		}
 		return labels;
-	
+
 	}
-		
+
 
 }

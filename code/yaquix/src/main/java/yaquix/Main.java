@@ -1,5 +1,18 @@
 package yaquix;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import yaquix.phase.Knowledge;
+import yaquix.phase.Phase;
+import yaquix.phase.ReadLearnWrite;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,26 +22,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-
-import javax.jnlp.FileContents;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.OptionGroup;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.Parser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import yaquix.phase.InputKnowledge;
-import yaquix.phase.Knowledge;
-import yaquix.phase.Phase;
-import yaquix.phase.ReadLearnWrite;
-
-import ch.qos.logback.classic.BasicConfigurator;
 
 /**
  * This class parses the command line arguments and sets up
@@ -78,9 +71,17 @@ public class Main {
 								   .withDescription("the host the client has to connect to")
 								   .create('h');
 		options.addOption(host);
+
+        Option output = OptionBuilder.withLongOpt("output")
+                                    .hasArg()
+                                    .withArgName("FILE")
+                                    .withDescription("a file to write the classifier to")
+                                    .create('o');
+        options.addOption(output);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+            throws IOException {
 		LOG.info("Starting application");
 
 		CommandLine arguments;
@@ -99,7 +100,8 @@ public class Main {
 		runApplication(arguments);
 	}
 
-	private static void runApplication(CommandLine arguments) {
+	private static void runApplication(CommandLine arguments)
+            throws IOException {
 		if (arguments.hasOption("server") || arguments.hasOption("client")) {
 			if (arguments.hasOption("server")) {
 				LOG.info("Server mode selected");
@@ -184,6 +186,7 @@ public class Main {
 				return;
 			}
 
+            localOutput.get().close();
 		} else if (arguments.hasOption("classifier")) {
 			LOG.info("Classifier mode selected");
 		} else {

@@ -755,7 +755,9 @@ public class CircuitBuilder {
 	/**
 	 * This constructs a circuit which checks if all mail labels are the same.
 	 * The input has to be structured as follows:
-	 *  - every even and odd bit encode a mail label. The encoding is defined in the specification
+	 *  - every even and odd bit encode a mail label. A spam label is encoded with
+     * 01, a nonspam label is encoded with 00 and an absent label is encoded with 11.
+     * The encoding is defined in the specification
 	 * The output has to be structured as follows:
 	 *  - if the labels agree "Spam", then the first bit of the output must be 0 and the second
 	 *    bit of the output must be 1
@@ -1056,7 +1058,7 @@ public class CircuitBuilder {
     private static int intLog2(int x) {
 		int currentX = 1;
 		int n = 0;
-		while (currentX <= x) {
+		while (currentX < x) {
 			currentX *= 2;
 			n++;
 		}
@@ -1075,7 +1077,7 @@ public class CircuitBuilder {
 	 * long binary encoded integer which is the index of the attribute with maximum
 	 * information gain.
 	 *
-	 * @param vectorlength the number of shares to search
+	 * @param vectorLength the number of shares to search
 	 * @param shareWidth the bitwidth of each share
 	 * @return a circuit to perform this computation.
 	 */
@@ -1127,11 +1129,9 @@ public class CircuitBuilder {
 		 Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
 		 int sumWidth = shareWidth +1;
 		 int indexWidth = intLog2(vectorLength);
-
 		 LOG.trace("Step 1");
 		 // (1)
 		 Circuit stateTransition = createMaxGainStatetransition(sumWidth, indexWidth);
-		 System.err.println(String.format("state transition output count: %d", stateTransition.getOutputCount()));
 		 Circuit result = stateTransition;
 		 for (int i = 0; i < vectorLength-2; i++) {
 			 result = result.extendTopLeft(stateTransition, createIdentityMapping(sumWidth+indexWidth));
@@ -1240,7 +1240,6 @@ public class CircuitBuilder {
 				result = result.extendLeft(newBit);
 			}
 		}
-		System.out.println(String.format("%d -> %s", indexIndex, tortureChamber));
 
 		return result;
 	}
@@ -1255,6 +1254,8 @@ public class CircuitBuilder {
      * @return a circuit working on the words
      */
 	public static Circuit times(int wordWidth, Circuit repeated) {
+        assert 0 < wordWidth;
+        assert repeated != null;
 		/*
 		 * At first, we have a circuit with
 		 *  - inputs i1 i2 i3 ..
@@ -1278,10 +1279,9 @@ public class CircuitBuilder {
 				result = result.extendLeft(repeated);
 			}
 		}
+        assert result != null;
 		int inputCount = repeated.getInputCount();
         int outputCount = repeated.getOutputCount();
-        System.out.println(String.format("wordWidth=%d, inputCount=%d, outputCount=%d",
-                            wordWidth, inputCount, outputCount));
         HashMap<Integer, Integer> inputShuffle = new HashMap<Integer, Integer>();
 
         for (int blockIndex = 0; blockIndex < inputCount; blockIndex++) {
@@ -1292,7 +1292,6 @@ public class CircuitBuilder {
 
             }
         }
-        System.out.println(inputShuffle);
 
         int timesWidth = wordWidth*inputCount;
         result = new Shuffle(timesWidth, inputShuffle).extendTopLeft(result, createIdentityMapping(timesWidth));
@@ -1307,7 +1306,6 @@ public class CircuitBuilder {
                 outputShuffle.put(sourceIndex, destinationIndex);
 			}
 		}
-        System.out.println(outputShuffle.toString());
 		result = result.extendTopLeft(new Shuffle(wordWidth*outputCount, outputShuffle), createIdentityMapping(wordWidth*outputCount));
 		return result;
 	}
