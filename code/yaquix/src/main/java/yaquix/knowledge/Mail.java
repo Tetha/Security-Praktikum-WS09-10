@@ -1,5 +1,8 @@
 package yaquix.knowledge;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +19,7 @@ public class Mail {
 	 * contains the string content of the mail
 	 */
 	private String content;
-	
+
 	public Mail(String content) {
 		this.content = content;
 	}
@@ -40,7 +43,7 @@ public class Mail {
 					currentWord.append(currentChar);
 				} else {
 					// word ended
-					words.add(currentWord.toString());			
+					words.add(currentWord.toString());
 					inWord = false;
 				}
 			} else {
@@ -58,7 +61,7 @@ public class Mail {
 		if (inWord) words.add(currentWord.toString()); // last word has no following non-wordy-character
 		return words;
 	}
-	
+
 	/**
 	 * returns the set of words contained in this mail.
 	 * @return the set of words in the mail
@@ -66,7 +69,7 @@ public class Mail {
 	public Set<String> getWords() {
 		return new HashSet<String>(parseWords());
 	}
-	
+
 	/**
 	 * counts the number of words in the mail content. Note that this is
 	 * different from the magnitude of getWords(), because getWords
@@ -76,7 +79,7 @@ public class Mail {
 	public int countWords() {
 		return parseWords().size();
 	}
-	
+
 	/**
 	 * This counts the number of occurrences of the word in the email content.
 	 * @param needle the word to count
@@ -91,4 +94,23 @@ public class Mail {
 		}
 		return occurrences;
 	}
+
+    /**
+     * reads a single mail from the file.
+     * @param filename the file to read
+     * @return the mail containing the file contents.
+     * @throws java.io.IOException
+     */
+    public static Mail readMail(File filename) throws IOException {
+
+        FileReader reader = new FileReader(filename);
+String tmpString;
+
+char[] tempChars = new char[(int) filename.length()];
+
+reader.read(tempChars);
+tmpString = new String(tempChars);
+
+return new Mail(tmpString);
+    }
 }

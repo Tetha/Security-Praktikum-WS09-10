@@ -9,14 +9,19 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import yaquix.classifier.Classifier;
+import yaquix.classifier.ClassifierParser;
+import yaquix.knowledge.Mail;
 import yaquix.phase.Knowledge;
 import yaquix.phase.Phase;
 import yaquix.phase.ReadLearnWrite;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -189,10 +194,27 @@ public class Main {
             localOutput.get().close();
 		} else if (arguments.hasOption("classifier")) {
 			LOG.info("Classifier mode selected");
+            runClassifier(arguments);
 		} else {
 			assert false : "No mode selected";
 		}
 	}
+
+    private static void runClassifier(CommandLine arguments)
+            throws IOException {
+        Classifier classifier = readClassifier(arguments);
+        for (File mailFile : new AllFilesIn(arguments.getArgs()[0])) {
+            Mail readMail = Mail.readMail(mailFile);
+            System.out.println(String.format("%s %s",
+                                             mailFile, classifier.classify(readMail)));
+        }
+    }
+
+    private static Classifier readClassifier(CommandLine arguments)
+            throws IOException {
+        Reader input = new FileReader(arguments.getOptionValue('c'));
+        return new ClassifierParser(input).parse();
+    }
 
 	private static boolean validateArguments(CommandLine arguments) {
 		boolean valid = true;
@@ -246,13 +268,13 @@ public class Main {
 	}
 
 	private static boolean requireMode(CommandLine arguments) {
-		if (!arguments.hasOption("server")
-				&& !arguments.hasOption("client")
-				&& !arguments.hasOption("classifier))")) {
-			LOG.error("no mode selected");
-			return false;
-		} else {
-			return true;
-		}
-	}
+        if (arguments.hasOption("server")
+                || arguments.hasOption("client")
+                || arguments.hasOption("classifier")) {
+            return true;
+        } else {
+            LOG.error("no mode selected");
+            return false;
+        }
+    }
 }

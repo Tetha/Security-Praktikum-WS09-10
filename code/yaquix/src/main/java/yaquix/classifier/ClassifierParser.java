@@ -1,8 +1,5 @@
 package yaquix.classifier;
 
-import java.util.EnumMap;
-import java.util.Vector;
-
 import yaquix.classifier.error.ClassifierParseException;
 import yaquix.classifier.error.LimitTooLargeException;
 import yaquix.classifier.error.LimitsUnsortedException;
@@ -12,6 +9,11 @@ import yaquix.classifier.error.TooManySubtreesException;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.MailType;
 import yaquix.knowledge.Occurrences;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.util.EnumMap;
+import java.util.Vector;
 
 /**
  * This parses a classifier in the format defined in the
@@ -74,10 +76,25 @@ public class ClassifierParser {
 
 	/**
 	 * This creates a new Parser that parses the entire contents from
-	 * the
-	public ClassifierParser(Reader input) {
-
+	 * the input stream.
+     */
+	public ClassifierParser(Reader input)
+            throws IOException {
+        this(allContents(input));
 	}
+
+    private static String allContents(Reader input)
+        throws IOException {
+        StringBuilder result = new StringBuilder();
+        while (true) {
+            int currentChar = input.read();
+            if (currentChar == -1) {
+                return result.toString();
+            } else {
+                result.append((char)currentChar);
+            }
+        }
+    }
 	/**
 	 * This creates a new Parser to parse the given input.
 	 * @param input the string to parse
@@ -127,37 +144,37 @@ public class ClassifierParser {
 
 			Attribute attribute = parseAttribute();
 			EnumMap<Occurrences, Classifier> map = new EnumMap<Occurrences, Classifier>(Occurrences.class);
-			
+
 			if(!matchLiteral(",")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {","});
-			
+
 			map.put(Occurrences.RARE, parseTree());
-			
+
 			if(map.get(Occurrences.RARE) == null)
 				throw new NotEnoughSubtreesException(line, column, 3, new Classifier[] {map.get(Occurrences.RARE)});
-			
+
 			if(!matchLiteral(",")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {","});
-			
+
 			map.put(Occurrences.MEDIUM, parseTree());
-			
+
 			if(map.get(Occurrences.MEDIUM) == null)
-				throw new NotEnoughSubtreesException(line, column, 3, 
+				throw new NotEnoughSubtreesException(line, column, 3,
 						new Classifier[] {map.get(Occurrences.RARE), map.get(Occurrences.MEDIUM)});
-			
+
 			if(!matchLiteral(",")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {","});
-			
+
 			map.put(Occurrences.OFTEN, parseTree());
-			
+
 			Vector<Classifier> testClassifier = new Vector<Classifier>();
-			
+
 			while(matchLiteral(",")){
 				testClassifier.add(parseTree());
 			}
-			
-			if(testClassifier != null) throw new TooManySubtreesException(line, column, 3, (Classifier[]) testClassifier.toArray());
-			
+
+			if(testClassifier.size() > 3) throw new TooManySubtreesException(line, column, 3, testClassifier);
+
 			if(!matchLiteral(")")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {")"});
 
@@ -170,7 +187,7 @@ public class ClassifierParser {
 
 			lable = parseClass();
 			if(lable == null)
-					throw(new ClassifierParseException(line, column, "Something went wrong while parsing a lable."));
+					throw(new ClassifierParseException(line, column, "Something went wrong while parsing a label."));
 
 			if(!matchLiteral(")")) throw new SyntaxException(line, column,
 					Character.toString(input.charAt(positionInInput)), new String[] {")"});
@@ -192,7 +209,9 @@ public class ClassifierParser {
 		}
 		else if(matchLiteral("Not Spam")){
 			lable = MailType.NONSPAM;
-		}
+		} else {
+            throw new ClassifierParseException(line, column, "Label not <Spam> or <Not Spam>");
+        }
 		return lable;
 	}
 

@@ -1,9 +1,9 @@
 package yaquix.classifier;
 
-import java.util.Formatter;
-
 import yaquix.knowledge.Mail;
 import yaquix.knowledge.MailType;
+
+import java.util.Formatter;
 
 /**
  * This is a leaf of a decision tree. It contains a class
@@ -13,8 +13,8 @@ import yaquix.knowledge.MailType;
  */
 public class Leaf implements Classifier {
 	private MailType label;
-	
-	
+
+
 	/**
 	 * Constructs a new Leaf with the given label
 	 * @param label the label the leaf is supposed to output.
@@ -33,9 +33,16 @@ public class Leaf implements Classifier {
 			int precision) {
 		formatter.format(this.toString());
 	}
-	
+
 	public String toString() {
-		return String.format("Output(%s)", this.label);
+		return String.format("Output(%s)", formatLabel(this.label));
 	}
 
+    private String formatLabel(MailType label) {
+        switch(label) {
+            case SPAM: return "Spam";
+            case NONSPAM: return  "Not Spam ";
+        }
+        throw new IllegalArgumentException(label.toString());
+    }
 }
