@@ -12,8 +12,9 @@ import yaquix.knowledge.Occurrences;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This parses a classifier in the format defined in the
@@ -167,7 +168,7 @@ public class ClassifierParser {
 
 			map.put(Occurrences.OFTEN, parseTree());
 
-			Vector<Classifier> testClassifier = new Vector<Classifier>();
+			List<Classifier> testClassifier = new ArrayList<Classifier>();
 
 			while(matchLiteral(",")){
 				testClassifier.add(parseTree());

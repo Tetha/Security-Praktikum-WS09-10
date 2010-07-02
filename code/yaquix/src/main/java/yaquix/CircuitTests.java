@@ -36,8 +36,8 @@ public class CircuitTests {
                             boolean[] expectation) {
             this.description = description;
             this.subject = subject;
-            this.input = input;
-            this.expectation = expectation;
+            this.input = Arrays.copyOf(input, input.length);
+            this.expectation = Arrays.copyOf(expectation, expectation.length);
         }
     }
 

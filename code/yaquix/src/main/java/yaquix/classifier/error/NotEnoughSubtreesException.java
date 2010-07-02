@@ -2,6 +2,8 @@ package yaquix.classifier.error;
 
 import yaquix.classifier.Classifier;
 
+import java.util.Arrays;
+
 /**
  * This error is raised if a tree defines too little subtrees.
  * @author hk
@@ -18,6 +20,6 @@ public class NotEnoughSubtreesException extends ClassifierParseException {
 	public NotEnoughSubtreesException(int line, int column, int requiredNumberOfSubtrees, Classifier[] subTrees) {
 		super(line, column, "error: there are not enough subtrees" +
 							"\n \t --> min required: " + requiredNumberOfSubtrees + ", found only: " + subTrees.length +
-							"\n \t --> found: " + subTrees.toString());
+							"\n \t --> found: " + Arrays.toString(subTrees));
 	}
 }

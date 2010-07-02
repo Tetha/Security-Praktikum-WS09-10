@@ -31,12 +31,13 @@ public class BiVariantPolynomial {
 			}
 		}
 	}
-	
+
 	private int intPow(int base, int exponent) {
 		int multiplicationsStillNecessary = exponent;
 		int result = 1;
 		while (multiplicationsStillNecessary > 0) {
 			result = result*base;
+            multiplicationsStillNecessary--;
 		}
 		return result;
 	}

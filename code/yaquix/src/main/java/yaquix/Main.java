@@ -125,72 +125,76 @@ public class Main {
 
 			String host = arguments.getOptionValue('h');
 
-			Connection connection = null; // TODO: fill
-			if (arguments.hasOption("server")) {
-				try {
-					ServerSocket server = new ServerSocket(port);
-					connection = new Connection(server);
-				} catch (IOException e) {
-					LOG.error("Cannot start server socket " + e);
-					return;
-				}
-			} else {
-				try {
-					Socket client = new Socket(host, port);
-					connection = new Connection(client);
-				} catch (IOException e) {
-					LOG.error("Cannot start client socket " + e);
-					return;
-				}
-			}
 
-			String mailDir = arguments.getArgs()[0];
-			Knowledge<File> localSpamFolder = new Knowledge<File>();
-			localSpamFolder.put(new File(mailDir, "spam"));
+            String mailDir = arguments.getArgs()[0];
+            Knowledge<File> localSpamFolder = new Knowledge<File>();
+            localSpamFolder.put(new File(mailDir, "spam"));
 
-			Knowledge<File> localNonSpamFolder = new Knowledge<File>();
-			localNonSpamFolder.put(new File(mailDir, "non_spam"));
+            Knowledge<File> localNonSpamFolder = new Knowledge<File>();
+            localNonSpamFolder.put(new File(mailDir, "non_spam"));
 
-			Writer output;
-			if (arguments.hasOption('o')) {
-				String outFileName = arguments.getOptionValue('o');
-				try {
-					output = new FileWriter(outFileName);
-				} catch (IOException e) {
-					LOG.error("cannot open file " + outFileName + " for writing: " + e);
-					return;
-				}
-			} else {
-				output = new OutputStreamWriter(System.out);
-			}
-			Knowledge<Writer> localOutput = new Knowledge<Writer>();
-			localOutput.put(output);
+            Writer output;
+            if (arguments.hasOption('o')) {
+                String outFileName = arguments.getOptionValue('o');
+                try {
+                    output = new FileWriter(outFileName);
+                } catch (IOException e) {
+                    LOG.error("cannot open file " + outFileName + " for writing: " + e);
+                    return;
+                }
+            } else {
+                output = new OutputStreamWriter(System.out);
+            }
+            Knowledge<Writer> localOutput = new Knowledge<Writer>();
+            localOutput.put(output);
 
-			SecureRandom randomSource;
-			try {
-				randomSource = SecureRandom.getInstance("SHA1PRNG");
-			} catch (NoSuchAlgorithmException e) {
-				LOG.error("Cannot select secure random algorithm. " + e);
-				return;
-			}
+            SecureRandom randomSource;
+            try {
+                randomSource = SecureRandom.getInstance("SHA1PRNG");
+            } catch (NoSuchAlgorithmException e) {
+                LOG.error("Cannot select secure random algorithm. " + e);
+                return;
+            }
 
-			Phase executedPhase = new ReadLearnWrite(localSpamFolder, localNonSpamFolder, localOutput, randomSource);
+            Phase executedPhase = new ReadLearnWrite(localSpamFolder, localNonSpamFolder, localOutput, randomSource);
 
-			try {
-				if (arguments.hasOption("server")) {
-					executedPhase.serverExecute(connection);
-				} else {
-					executedPhase.clientExecute(connection);
-				}
-			} catch (ClassNotFoundException e) {
-				LOG.error("Transmitting data failed." + e);
-				return;
-			} catch (IOException e) {
-				LOG.error("IO failed " + e);
-				e.printStackTrace();
-				return;
-			}
+            Connection connection = null; // TODO: fill
+            try {
+                if (arguments.hasOption("server")) {
+                    try {
+                        ServerSocket server = new ServerSocket(port);
+                        connection = new Connection(server);
+                    } catch (IOException e) {
+                        LOG.error("Cannot start server socket " + e);
+                        return;
+                    }
+                } else {
+                    try {
+                        Socket client = new Socket(host, port);
+                        connection = new Connection(client);
+                    } catch (IOException e) {
+                        LOG.error("Cannot start client socket " + e);
+                        return;
+                    }
+                }
 
+                try {
+                    if (arguments.hasOption("server")) {
+                        executedPhase.serverExecute(connection);
+                    } else {
+                        executedPhase.clientExecute(connection);
+                    }
+                } catch (ClassNotFoundException e) {
+                    LOG.error("Transmitting data failed." + e);
+                    return;
+                } catch (IOException e) {
+                    LOG.error("IO failed " + e);
+                    e.printStackTrace();
+                    return;
+                }
+            } finally {
+                connection.close();
+            }
             localOutput.get().close();
 		} else if (arguments.hasOption("classifier")) {
 			LOG.info("Classifier mode selected");

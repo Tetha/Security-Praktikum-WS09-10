@@ -284,6 +284,8 @@ public class GarbledCircuit implements Serializable {
 			predOutput = outputValues[onlyPredIndex];
 			outputValues[gateIndex] = predOutput;
 		break;
+
+        default: throw new IllegalArgumentException(gateType[gateIndex].toString());
 		}
 	}
 

@@ -154,6 +154,7 @@ public class DominatingOutputComputation extends Phase {
 			switch (m) {
 				case SPAM: spamCount++; break;
 				case NONSPAM: nonSpamCount++; break;
+                default: throw new IllegalArgumentException(m.toString());
 			}
 		}
 

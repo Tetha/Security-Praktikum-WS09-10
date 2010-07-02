@@ -1,7 +1,5 @@
 package yaquix.polynomial;
 
-import java.util.Map;
-
 /**
  * This models a polynomial in one variable, defined by a
  * vector of coefficients.
@@ -14,7 +12,7 @@ public class CoefficientDefinedPolynomial implements UnivariantPolynomial {
 	 * is stored as coefficients[i] * x^i.
 	 */
 	private int[] coefficients;
-	
+
 	/**
 	 * This initializes the polynomial. The parameter array is
 	 * copied so no modification side effects will happen.
@@ -26,25 +24,26 @@ public class CoefficientDefinedPolynomial implements UnivariantPolynomial {
 			this.coefficients[i] = coefficients[i];
 		}
 	}
-	
+
 	@Override
 	public int degree() {
 		return coefficients.length;
 	}
-	
+
 	private int intPow(int base, int exponent) {
 		int multiplicationsStillNecessary = exponent;
 		int result = 1;
 		while (multiplicationsStillNecessary > 0) {
 			result = result*base;
+            multiplicationsStillNecessary--;
 		}
 		return result;
 	}
-	
+
 	@Override
 	public int evaluate(int x) {
 		int result = 0;
-		
+
 		for (int i = 0; i < coefficients.length; i++) {
 			result = result + coefficients[i] * intPow(x, i);
 		}

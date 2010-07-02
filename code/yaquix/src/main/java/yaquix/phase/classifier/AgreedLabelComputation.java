@@ -152,6 +152,8 @@ public class AgreedLabelComputation extends Phase {
 				case NONSPAM:
 					labels[firstBitIndex]=false;
 					labels[secondBitIndex]=false;
+
+                default: throw new IllegalArgumentException(m.toString());
 			}
 		}
 		return labels;

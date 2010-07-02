@@ -42,7 +42,7 @@ public class Leaf implements Classifier {
         switch(label) {
             case SPAM: return "Spam";
             case NONSPAM: return  "Not Spam";
+            default: throw new IllegalArgumentException(label.toString());
         }
-        throw new IllegalArgumentException(label.toString());
     }
 }

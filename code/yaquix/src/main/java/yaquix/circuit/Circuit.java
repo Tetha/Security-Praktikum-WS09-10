@@ -555,6 +555,8 @@ public class Circuit {
 
 				garbleBinaryGate(result, i, outputWireMapping, leftInputWireMapping, rightInputWireMapping);
 			break;
+
+            default: throw new IllegalArgumentException(gateType[i].toString());
 			}
 		}
 
