@@ -256,7 +256,6 @@ public class GarbledCircuit implements Serializable {
 			int rightPredIndex = preds[1];
 			int leftInput = outputValues[leftPredIndex];
 			int rightInput = outputValues[rightPredIndex];
-			int inputTag = leftInput ^ rightInput;
 
             gateTable = tables[gateIndex];
 			boolean outputWritten = false;
@@ -314,16 +313,13 @@ public class GarbledCircuit implements Serializable {
 	}
 
 	private boolean someOutputHasNoOutput(boolean[] hasOutput) {
-		int newFinishedGates = 0;
 		boolean result = false;
 		for (int outputIndex = 0; outputIndex < outputs.length; outputIndex++) {
 			int gateIndex = outputs[outputIndex];
-			if (hasOutput[gateIndex]) {
-				newFinishedGates++;
-			} else {
-				result = true;
-			}
-		}
+            if (!hasOutput[gateIndex]) {
+                result = true;
+            }
+        }
 		return result;
 	}
 

@@ -567,8 +567,7 @@ public class CircuitBuilder {
 			shuffleMap.put(bitwidth+j, 2*j+1);
 		}
 
-		Shuffle shuffle = new Shuffle(2*bitwidth, shuffleMap);
-		return shuffle;
+        return new Shuffle(2*bitwidth, shuffleMap);
 	}
 
 

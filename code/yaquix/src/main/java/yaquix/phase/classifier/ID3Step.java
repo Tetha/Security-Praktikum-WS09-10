@@ -205,8 +205,7 @@ public class ID3Step extends SymmetricPhase {
 
     private void checkForUnanimousResult() throws IOException, ClassNotFoundException {
         Phase uniqueDecider = new AgreedLabelComputation(localEmailLabels,
-                                                         Knowledge.withContent(remoteMailCountLimit),
-                                                         concertedUnanimousLabel,
+                concertedUnanimousLabel,
                                                          randomSource);
         executePhase(connection, uniqueDecider);
     }

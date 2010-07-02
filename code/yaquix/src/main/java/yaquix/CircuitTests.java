@@ -299,13 +299,14 @@ public class CircuitTests {
     private static String describeOutputStatus(final boolean[] expectation,
                                                final boolean[] output) {
         String outputLine = "Output:\t\t" + describeBitString(output);
-        String errorLine = "Errors:\t\t";
+        StringBuilder errorLine = new StringBuilder();
+        errorLine.append("Errors:\t\t");
         for (int bitIndex = 0;
              bitIndex < Math.min(output.length, expectation.length); bitIndex++) {
             if (expectation[bitIndex] == output[bitIndex]) {
-                errorLine += " ";
+                errorLine.append(" ");
             } else {
-                errorLine += "^";
+                errorLine.append("^");
             }
         }
 
@@ -314,7 +315,7 @@ public class CircuitTests {
                  bitIndex < Math.max(output.length, expectation.length)
                              - Math.min(output.length, expectation.length);
                  bitIndex++)
-                errorLine += "?";
+                errorLine.append("?");
         return outputLine + "\n" + errorLine;
     }
 

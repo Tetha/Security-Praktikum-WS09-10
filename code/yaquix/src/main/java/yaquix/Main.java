@@ -247,6 +247,7 @@ public class Main {
 	}
 
 	private static boolean validateClassifier(CommandLine arguments) {
+        // TODO?
 		return true;
 	}
 

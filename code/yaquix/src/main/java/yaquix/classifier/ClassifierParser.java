@@ -260,7 +260,7 @@ public class ClassifierParser {
 	 * @return a string or null on failure
 	 */
 	private String parseWord() {
-		String tmpString = "";
+		StringBuilder tmpString = new StringBuilder();
 		boolean found = false;
 		char tmpChar;
 
@@ -271,12 +271,11 @@ public class ClassifierParser {
 				positionInInput++;
 				column++;
 				found = true;
-				tmpString += tmpChar;
+				tmpString.append(tmpChar);
 			}
 			else break;
 		}
-		if(!found) tmpString = null;
-		return tmpString;
+        if(found) return tmpString.toString(); else return null;
 	}
 
 	/**
@@ -316,7 +315,7 @@ public class ClassifierParser {
 	 * @return an integer on success or -1 on failure.
 	 */
 	private int parseNumber() {
-		String tmpString = "";
+		StringBuilder tmpString = new StringBuilder();
 		char tmpChar;
 		boolean found = false;
 
@@ -326,12 +325,14 @@ public class ClassifierParser {
 				found = true;
 				positionInInput++;
 				column++;
-				tmpString += tmpChar;
+				tmpString.append(tmpChar);
 			}
 			else break;
 		}
-		if(!found) tmpString = "-1";
-		return Integer.parseInt(tmpString);
+        if (found)
+            return Integer.parseInt(tmpString.toString());
+        else
+            return -1;
 	}
 
 	/**

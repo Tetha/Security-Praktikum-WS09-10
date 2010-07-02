@@ -91,7 +91,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 		return cipher;
 	}
 
-	private static final byte[] intToByteArray(int value) {
+	private static byte[] intToByteArray(int value) {
         return new byte[] {
                 (byte)(value >>> 24),
                 (byte)(value >>> 16),
@@ -100,7 +100,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	}
 
 
-	private static final int byteArrayToInt(byte [] b) {
+	private static int byteArrayToInt(byte [] b) {
         return (b[0] << 24)
                 + ((b[1] & 0xFF) << 16)
                 + ((b[2] & 0xFF) << 8)

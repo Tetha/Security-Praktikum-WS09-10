@@ -13,7 +13,6 @@ import yaquix.phase.Phase;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,12 +34,6 @@ public class AgreedLabelComputation extends Phase {
 	private InputKnowledge<List<MailType>> localLabels;
 
 	/**
-	 * contains the remote number of mails
-	 */
-	private InputKnowledge<Integer> remoteMailCount;
-
-
-	/**
 	 * requires the common attribute or null if none exists
 	 * to be set.
 	 */
@@ -58,14 +51,12 @@ public class AgreedLabelComputation extends Phase {
 	/**
 	 * Constructs a new AgreedLabelComputation
 	 * @param localLabels the local email labels
-	 * @param concertedUniqueLabel a place to store the common label or null on error.
-	 */
+     * @param concertedUniqueLabel a place to store the common label or null on error.
+     */
 	public AgreedLabelComputation(InputKnowledge<List<MailType>> localLabels,
-			InputKnowledge<Integer> remoteMailCount,
-			OutputKnowledge<MailType> concertedUniqueLabel,
-			SecureRandom randomSource) {
+                                  OutputKnowledge<MailType> concertedUniqueLabel,
+                                  SecureRandom randomSource) {
 		this.localLabels = localLabels;
-		this.remoteMailCount = remoteMailCount;
 		this.concertedUniqueLabel = concertedUniqueLabel;
 		this.randomSource = randomSource;
 	}

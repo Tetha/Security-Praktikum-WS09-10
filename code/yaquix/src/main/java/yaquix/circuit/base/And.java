@@ -8,10 +8,6 @@ package yaquix.circuit.base;
 public class And extends BinaryGateBase {
 	@Override
 	protected boolean getTableValue(int firstInput, int secondInput) {
-		if (firstInput == 1 && secondInput == 1) {
-			return true;
-		} else {
-			return false;
-		}
+        return firstInput == 1 && secondInput == 1;
 	}
 }

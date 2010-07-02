@@ -1,11 +1,5 @@
 package yaquix.phase.classifier;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import yaquix.Connection;
 import yaquix.circuit.Circuit;
 import yaquix.circuit.GarbledCircuit;
@@ -14,13 +8,18 @@ import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
 
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This implements Yaos protocol for private circuit evaluation such
  * that each party only learns the output (and whatever they can
  * deduce from the output), but not the input of the other party.
- * 
+ *
  * In order to do this, the phase constructs selects an input mapping
- * for the circuit, constructs a garbled circuit using this, 
+ * for the circuit, constructs a garbled circuit using this,
  * sends the circut to the client, encodes the own input, encodes
  * the remote input using 1-2-OT, evaluates the circuit on the clietn
  * and sends the output back to the server.
@@ -32,23 +31,23 @@ public class CircuitEvaluation extends Phase {
 	 * is called, this contains the circuit to evaluate.
 	 */
 	private InputKnowledge<Circuit> serverCircuit;
-	
+
 	/**
 	 * this contains the local input for the circuit.
 	 */
 	private InputKnowledge<boolean[]> localInput;
-	
+
 	/**
 	 * This contains the overall output of the circuit.
 	 */
 	private OutputKnowledge<boolean[]> concertedOutput;
-	
-	
+
+
 	/**
 	 * contains the source of random bits.
 	 */
 	private SecureRandom random;
-	
+
 	/**
 	 * This is the server side constructor for the circuit evaluation
 	 * phase. Note that if you call this constructor, you must call
@@ -69,7 +68,7 @@ public class CircuitEvaluation extends Phase {
 		this.random = randomSource;
 	}
 
-	
+
 	/**
 	 * This is the client side constructor for the circuit evaluation
 	 * phase. Note that if you call this constructor, you must
@@ -90,18 +89,18 @@ public class CircuitEvaluation extends Phase {
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		Circuit inputCircuit = serverCircuit.get();
 		Map<Integer, int[]> inputMapping = buildInputMapping(inputCircuit.getInputCount());
-		
+
 		GarbledCircuit transmittedCircuit = inputCircuit.garble(inputMapping, random);
 		connection.sendGarbledCircuit(transmittedCircuit); // (1)
-		
 
-		
+
+
 		boolean[] aliceInput = localInput.get();
 		int[] encodedAliceInput = encodeInput(inputMapping, aliceInput);
 		connection.sendIntegers(encodedAliceInput); // (2)
-		
+
 		int bobInputLength = connection.receiveInteger(); // (3)
-		
+
 		Knowledge<int[]> aliceMessages = new Knowledge<int[]>();
 		Phase ot = new OneOfTwoObliviousTransfer(aliceMessages, random);
 		final int bobInputOffset = aliceInput.length;
@@ -109,7 +108,7 @@ public class CircuitEvaluation extends Phase {
 			aliceMessages.put(inputMapping.get(bobInIndex+bobInputOffset));
 			ot.serverExecute(connection); // (4)
 		}
-		
+
 		boolean[] output = connection.receiveBitstring(); // (5)
 		concertedOutput.put(output);
 	}
@@ -118,27 +117,27 @@ public class CircuitEvaluation extends Phase {
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		GarbledCircuit transmittedCircuit = connection.receiveGarbledCircuit(); // (1)
 		int[] encodedAliceInput = connection.receiveIntegers(); // (2)
-		
+
 		boolean[] bobInput = localInput.get();
 		int bobInputLength = bobInput.length;
 		connection.sendInteger(bobInputLength); // (3)
-		
+
 		Knowledge<Boolean> input = new Knowledge<Boolean>();
 		Knowledge<Integer> receivedMessage = new  Knowledge<Integer>();
 		Phase ot = new OneOfTwoObliviousTransfer(input, receivedMessage, random);
-		
+
 		int[] encodedBobInput = new int[bobInputLength];
 		for (int bobInIndex = 0; bobInIndex < bobInput.length; bobInIndex++) {
 			input.put(bobInput[bobInIndex]);
 			ot.clientExecute(connection); // (4)
 			encodedBobInput[bobInIndex] = receivedMessage.get();
 		}
-		
+
 		setInputs(transmittedCircuit, encodedAliceInput, encodedBobInput);
 		boolean[] output = transmittedCircuit.evaluate();
-		
+
 		connection.sendBitstring(output); // (5)
-		
+
 		concertedOutput.put(output);
 	}
 
@@ -153,13 +152,13 @@ public class CircuitEvaluation extends Phase {
 			trueValue = random.nextInt();
 			falseValue = random.nextInt();
 		} while (trueValue == falseValue);
-		
+
 		int[] result = new int[2];
 		result[0] = falseValue;
 		result[1] = trueValue;
 		return result;
 	}
-	
+
 	/**
 	 * Constructs a random mapping for INPUT_COUNT inputs.
 	 * @param inputCount the number of inputs to garble
@@ -172,7 +171,7 @@ public class CircuitEvaluation extends Phase {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Encodes INPUT according to INPUTMAPPING so the result can be used
 	 * for yaos circuit.
@@ -184,7 +183,7 @@ public class CircuitEvaluation extends Phase {
 	 */
 	private int[] encodeInput(Map<Integer, int[]> inputMapping, boolean[] input) {
 		int[] result = new int[input.length];
-		
+
 		for (int inputIndex = 0; inputIndex < input.length; inputIndex++) {
 			int[] currentInputMapping = inputMapping.get(inputIndex);
 			if (input[inputIndex]) {
@@ -195,7 +194,7 @@ public class CircuitEvaluation extends Phase {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Set inputs of TRANSMITTED_CIRCUIT such that the first
 	 * inputs are set to the contents of ENCODED_ALICE_INPUT
@@ -215,6 +214,6 @@ public class CircuitEvaluation extends Phase {
 		for (int bobIndex = 0; bobIndex < encodedBobInput.length; bobIndex++) {
 			int inputIndex = bobIndex + aliceInputLength;
 			transmittedCircuit.setInput(inputIndex, encodedBobInput[bobIndex]);
-		}		
+		}
 	}
 }

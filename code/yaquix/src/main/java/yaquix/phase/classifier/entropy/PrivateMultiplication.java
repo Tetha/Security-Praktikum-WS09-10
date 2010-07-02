@@ -1,14 +1,13 @@
 package yaquix.phase.classifier.entropy;
 
-import java.security.SecureRandom;
-import java.util.Random;
-
 import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.Phase;
 import yaquix.polynomial.CoefficientDefinedPolynomial;
 import yaquix.polynomial.UnivariantPolynomial;
+
+import java.security.SecureRandom;
 
 /**
  * This class takes one factor from each of the two users and
@@ -54,7 +53,7 @@ class PrivateMultiplication extends Phase {
 
 	@Override
 	public void serverExecute(Connection connection) {
-		// XXX 
+		// XXX
 		InputKnowledge<CoefficientDefinedPolynomial> serverPol =
 			new InputKnowledge<CoefficientDefinedPolynomial>() {
 				@Override

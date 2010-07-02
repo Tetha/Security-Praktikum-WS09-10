@@ -1,21 +1,20 @@
 package yaquix.phase.attribute.wordlist;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-import java.util.logging.Logger;
-
 import yaquix.Connection;
 import yaquix.phase.InputKnowledge;
 import yaquix.phase.OutputKnowledge;
 import yaquix.phase.SymmetricPhase;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
- * This phase takes two local word lists and merges them into 
+ * This phase takes two local word lists and merges them into
  * a common global word list. This is implemented by exchanging
- * the word lists via the connection and joining them with the 
+ * the word lists via the connection and joining them with the
  * set union operation.
  * @author hk
  *
@@ -23,7 +22,7 @@ import yaquix.phase.SymmetricPhase;
 class WordlistMerging extends SymmetricPhase {
 	private InputKnowledge<List<String>> localWordlist;
 	private OutputKnowledge<List<String>> concertedWordlist;
-		
+
 	/**
 	 * Constructs a new word list merging phase
 	 * @param localWordlist the local input of the merging phase
@@ -36,16 +35,16 @@ class WordlistMerging extends SymmetricPhase {
 	}
 
 	@Override
-	protected void execute(Connection connection) 
+	protected void execute(Connection connection)
 						throws IOException, ClassNotFoundException {
-		
+
 		logger.info("entering phase");
 
 		List<String> wordlist = localWordlist.get();
 		List<String> remoteWordlist = connection.exchangeWordlist(wordlist);
 		concertedWordlist.put(mergeWordlists(wordlist, remoteWordlist));
 		logger.info("leaving phase");
-		
+
 	}
 
 	/**
@@ -55,11 +54,11 @@ class WordlistMerging extends SymmetricPhase {
 	 * @return the joined word list.
 	 */
 	private List<String> mergeWordlists(List<String> localWordlist,
-									    List<String> remoteWordlist) {		
+									    List<String> remoteWordlist) {
 		Set<String> set = new HashSet<String>();
 		set.addAll(localWordlist);
 		set.addAll(remoteWordlist);
-		
-		return new Vector<String>(set);
+
+		return new ArrayList<String>(set);
 	}
 }

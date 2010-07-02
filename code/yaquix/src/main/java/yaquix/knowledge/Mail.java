@@ -102,15 +102,18 @@ public class Mail {
      * @throws java.io.IOException
      */
     public static Mail readMail(File filename) throws IOException {
-
         FileReader reader = new FileReader(filename);
-String tmpString;
+        try {
+            String tmpString;
 
-char[] tempChars = new char[(int) filename.length()];
+            char[] tempChars = new char[(int) filename.length()];
 
-reader.read(tempChars);
-tmpString = new String(tempChars);
+            reader.read(tempChars);
+            tmpString = new String(tempChars);
 
-return new Mail(tmpString);
+            return new Mail(tmpString);
+        } finally {
+            reader.close();
+        }
     }
 }

@@ -1,38 +1,34 @@
 package yaquix.phase.classifier.entropy;
 
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Random;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xml.internal.bind.v2.model.annotation.RuntimeAnnotationReader;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Occurs;
-
 import yaquix.Connection;
 import yaquix.knowledge.Attribute;
 import yaquix.knowledge.AttributeValueTable;
 import yaquix.knowledge.MailType;
 import yaquix.knowledge.Occurrences;
-import yaquix.phase.Knowledge;
-import yaquix.phase.Phase;
 import yaquix.phase.InputKnowledge;
+import yaquix.phase.Knowledge;
 import yaquix.phase.OutputKnowledge;
+import yaquix.phase.Phase;
 import yaquix.phase.SymmetricPhase;
+
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Random;
 
 /**
  * This class takes the attributes and attribute values and computes
  * a vector of shares such that the point wise sum of this share
  * vector is an approximation to the information gain obtained
  * if splitting the data according to this attribute.
- * 
+ *
  * This is achieved by computing a first approximation of ln(x),
  * improving this approximation with the taylor expansion of ln(x)
- * and finally multiplying this with x, all in private. These 
+ * and finally multiplying this with x, all in private. These
  * steps are implemented as separate sub phases.
- * 
+ *
  * @author hk
  *
  */
@@ -42,17 +38,17 @@ public class EntropySharesComputation extends SymmetricPhase {
 	 * entropies from.
 	 */
 	private InputKnowledge<AttributeValueTable> localAttributeValues;
-	
+
 	/**
 	 * contains the attribute list to compute the entropies from.
 	 */
 	private InputKnowledge<List<Attribute>> concertedAttributes;
-	
+
 	/**
 	 * contains a place to store the computed shares.
 	 */
 	private OutputKnowledge<int[]> localShares;
-	
+
 	private static final Logger log = LoggerFactory.getLogger(EntropySharesComputation.class);
 	/**
 	 * Creates a new entropy share computation phase.
@@ -80,7 +76,7 @@ public class EntropySharesComputation extends SymmetricPhase {
 		AttributeValueTable values = localAttributeValues.get();
 		int[][] attributeSetShares = new int[attributeCount][3]; // 3 possible attribute values: rare, medium, often
 		int[][][] attributeClassSetShares = new int [attributeCount][3][2]; // 2 Classes only: spam, not spam
-		
+
 		Knowledge<Integer> localInput = new Knowledge<Integer>();
 		Knowledge<Integer> localOutput = new Knowledge<Integer>();
 		Phase xlnx = new XLnXProtocol(localInput, localOutput);
@@ -92,18 +88,18 @@ public class EntropySharesComputation extends SymmetricPhase {
 				localInput.put(mailsWithValue.countAllMails());
 				executePhase(connection, xlnx);
 				attributeSetShares[a][aj] = localOutput.get();
-			
+
 				for (int cj = 0; cj < MailType.values().length; cj++) {
 					int amount;
 					switch(MailType.values()[cj]) {
 					case SPAM:
 						amount = mailsWithValue.countSpamMails();
 					break;
-					
+
 					case NONSPAM:
 						amount = mailsWithValue.countNonSpamMails();
 					break;
-					
+
 					default:
 						throw new IllegalStateException("Unexpected mailtype " + MailType.values()[cj]);
 					}
@@ -113,7 +109,7 @@ public class EntropySharesComputation extends SymmetricPhase {
 			}
 			log.info("leaving phase");
 		}
-		
+
 		int[] shares = new int[attributes.size()];
 		for (int a = 0; a < attributes.size(); a++) {
 			int share = 0;
