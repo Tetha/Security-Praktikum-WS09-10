@@ -9,7 +9,7 @@ package yaquix.phase;
  */
 public class Knowledge<C> implements InputKnowledge<C>, OutputKnowledge<C> {
 	private C value;
-	
+
 	@Override
 	public C get() {
 		return value;
@@ -19,4 +19,10 @@ public class Knowledge<C> implements InputKnowledge<C>, OutputKnowledge<C> {
 	public void put(C knowledge) {
 		value = knowledge;
 	}
+
+    public static <C> Knowledge<C> withContent(C value) {
+        Knowledge<C> result = new Knowledge<C>();
+        result.put(value);
+        return result;
+    }
 }

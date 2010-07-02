@@ -41,7 +41,7 @@ public class Leaf implements Classifier {
     private String formatLabel(MailType label) {
         switch(label) {
             case SPAM: return "Spam";
-            case NONSPAM: return  "Not Spam ";
+            case NONSPAM: return  "Not Spam";
         }
         throw new IllegalArgumentException(label.toString());
     }

@@ -17,6 +17,7 @@ import yaquix.phase.classifier.entropy.EntropySharesComputation;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,14 +43,14 @@ public class ID3Step extends SymmetricPhase {
 	 * contains the remaining attributes that can still be used in the
 	 * decision tree.
 	 */
-	private InputKnowledge<List<Attribute>> concertedRemainingAttributes;
+	private List<Attribute> concertedRemainingAttributes;
 
 	/**
 	 * contains the values of mails for these attributes.
 	 */
-	private InputKnowledge<AttributeValueTable> localValues;
+	private AttributeValueTable localValues;
 
-	private InputKnowledge<Integer> remoteMailCountLimit;
+	private Integer remoteMailCountLimit;
 	/**
 	 * requires the resulting classifier to be set.
 	 */
@@ -59,8 +60,10 @@ public class ID3Step extends SymmetricPhase {
 	 * contains a source of randomness.
 	 */
 	private SecureRandom randomSource;
-
-	/**
+    private Knowledge<List<MailType>> localEmailLabels;
+    private Knowledge<MailType> concertedUnanimousLabel;
+    private Connection connection;
+    /**
 	 * constructs a new ID3 step computation phase.
 	 * @param concertedRemainingAttributes the remaining attributes
 	 * @param localValues the values to consider
@@ -73,98 +76,142 @@ public class ID3Step extends SymmetricPhase {
 			InputKnowledge<Integer> remoteMailCountLimit,
 			OutputKnowledge<Classifier> concertedClassifier,
 			SecureRandom randomSource) {
-		this.concertedRemainingAttributes = concertedRemainingAttributes;
-		this.localValues = localValues;
-		this.remoteMailCountLimit = remoteMailCountLimit;
+		this.concertedRemainingAttributes = concertedRemainingAttributes.get();
+		this.localValues = localValues.get();
+        this.localEmailLabels = Knowledge.withContent(buildLabelList());
+		this.remoteMailCountLimit = remoteMailCountLimit.get();
 		this.concertedClassifier = concertedClassifier;
 		this.randomSource = randomSource;
+        this.concertedUnanimousLabel = new Knowledge<MailType>();
 	}
 
 	@Override
-	protected void execute(Connection connection) throws IOException, ClassNotFoundException {
-		logger.info("Entering Phase: ID3 Step");
-        logger.debug("#local labels: "+ localValues.get().countAllMails());
-		Knowledge<List<MailType>> emailLabels =
-			new Knowledge<List<MailType>>();
-
-		emailLabels.put(buildLabelList());
-
-		Knowledge<MailType> uniqueLabel = new Knowledge<MailType>();
-
-		Phase uniqueDecider =
-			new AgreedLabelComputation(emailLabels, remoteMailCountLimit, uniqueLabel, randomSource);
-		executePhase(connection, uniqueDecider);
-		if (uniqueLabel.get() != null) {
-			Classifier result = new Leaf(uniqueLabel.get());
-			concertedClassifier.put(result);
-			return;
-		}
-
-
-		if (concertedRemainingAttributes.get().isEmpty()) {
-			Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
-			Phase dominationDecider =
-				new DominatingOutputComputation(emailLabels,
-                                                remoteMailCountLimit,
-                                                dominatingLabel,
-                                                randomSource);
-			executePhase(connection, dominationDecider);
-			Classifier result = new Leaf(dominatingLabel.get());
-			concertedClassifier.put(result);
-			return;
-		}
-
-
-		Knowledge<int[]> entropyShares = new Knowledge<int[]>();
-		Phase entropyShareComputation =
-			new EntropySharesComputation(localValues,
-					concertedRemainingAttributes, entropyShares, randomSource);
-		executePhase(connection, entropyShareComputation);
-
-		Knowledge<Attribute> bestAttribute = new Knowledge<Attribute>();
-		Phase maxGainPhase = new MaxGainComputation(entropyShares,
-									concertedRemainingAttributes,
-									bestAttribute, randomSource);
-		executePhase(connection, maxGainPhase);
-
-
-		Knowledge<List<Attribute>> recursionAttributes = new Knowledge<List<Attribute>>();
-		List<Attribute> unusedAttributes = new LinkedList<Attribute>();
-		unusedAttributes.addAll(concertedRemainingAttributes.get());
-		unusedAttributes.remove(bestAttribute.get());
-		recursionAttributes.put(unusedAttributes);
-
-		EnumMap<Occurrences, Classifier> subTrees =
-			new EnumMap<Occurrences, Classifier>(Occurrences.class);
-		Knowledge<AttributeValueTable> values = new Knowledge<AttributeValueTable>();
-		Knowledge<Classifier> subResult = new Knowledge<Classifier>();
-		for (Occurrences o : Occurrences.values()) {
-			values.put(localValues.get().partition(bestAttribute.get()).get(o));
-            if (values.get().countAllMails() > 0) {
-			    Phase recursion = new ID3Step(recursionAttributes, values,
-										  remoteMailCountLimit, subResult, randomSource);
-			    executePhase(connection, recursion);
-			    subTrees.put(o, subResult.get());
-            } else {
-                Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
-                Phase dominationDecider =
-                    new DominatingOutputComputation(emailLabels,
-                                                    remoteMailCountLimit,
-                                                    dominatingLabel,
-                                                    randomSource);
-                executePhase(connection, dominationDecider);
-                Classifier result = new Leaf(dominatingLabel.get());
-                concertedClassifier.put(result);
-                subTrees.put(o, new Leaf(dominatingLabel.get()));
-            }
-		}
-
-		Classifier result = new Branch(bestAttribute.get(), subTrees);
-		concertedClassifier.put(result);
+	protected void execute(Connection connection)
+            throws IOException, ClassNotFoundException {
+        logger.info("Entering Phase: ID3 Step");
+        this.connection = connection;
+        Classifier result;
+        checkForUnanimousResult();
+        if (labelsAreUnanimous()) {
+			result = makeClassifierForUnanimousLabels();
+		} else if (allAttributesAreUsed()) {
+            result = makeMajorityClassifier();
+		} else {
+            result = makeRecursiveClassifier();
+        }
+        concertedClassifier.put(result);
 		logger.info("Leaving Phase: ID3 Step");
 	}
 
-	/**
+    private Classifier makeRecursiveClassifier()
+            throws IOException, ClassNotFoundException {
+        Attribute bestAttribute = selectMostInformativeAttribute();
+        return new Branch(bestAttribute, computeSubtreesForPartitionsBy(bestAttribute));
+    }
+
+    private EnumMap<Occurrences, Classifier> computeSubtreesForPartitionsBy(Attribute bestAttribute)
+            throws IOException, ClassNotFoundException {
+        EnumMap<Occurrences, Classifier> result = new EnumMap<Occurrences, Classifier>(Occurrences.class);
+
+        List<Attribute> remainingAttributes = unusedAttributesWithout(bestAttribute);
+
+        for (Occurrences o : Occurrences.values()) {
+            AttributeValueTable valuesInPartition = localValues.partitionByAndGet(bestAttribute, o);
+            result.put(o, computeClassifierFor(remainingAttributes, valuesInPartition));
+        }
+        return result;
+    }
+
+    private Classifier computeClassifierFor(List<Attribute> remainingAttributes,
+                                            AttributeValueTable valuesInPartition)
+            throws IOException, ClassNotFoundException {
+        int remoteMailsInPartitionCount = connection.exchangeInteger(valuesInPartition.countAllMails());
+        Classifier subResult;
+        if (oneMailSetIsEmpty(valuesInPartition, remoteMailsInPartitionCount)) {
+            subResult = makeMajorityClassifier();
+        } else {
+            subResult = computeClassifierByRecursion(remainingAttributes, valuesInPartition);
+        }
+        return subResult;
+    }
+
+    private boolean oneMailSetIsEmpty(AttributeValueTable valuesInPartition, int remoteMailsInPartitionCount) {
+        return valuesInPartition.countAllMails() == 0
+                || remoteMailsInPartitionCount == 0;
+    }
+
+    private Classifier computeClassifierByRecursion(List<Attribute> attributesInRecursion,
+                                                    AttributeValueTable valuesInPartition)
+            throws IOException, ClassNotFoundException {
+        Knowledge<Classifier> subResultMediator = new Knowledge<Classifier>();
+        Phase recursion = new ID3Step(Knowledge.withContent(attributesInRecursion),
+                                      Knowledge.withContent(valuesInPartition),
+                                      Knowledge.withContent(remoteMailCountLimit),
+                                      subResultMediator,
+                                      randomSource);
+        executePhase(connection, recursion);
+        return subResultMediator.get();
+    }
+
+    private List<Attribute> unusedAttributesWithout(Attribute bestAttribute) {
+        List<Attribute> unusedAttributes = new LinkedList<Attribute>();
+        unusedAttributes.addAll(concertedRemainingAttributes);
+        unusedAttributes.remove(bestAttribute);
+        return unusedAttributes;
+    }
+
+    private Attribute selectMostInformativeAttribute()
+            throws IOException, ClassNotFoundException {
+        Knowledge<int[]> entropyShares = new Knowledge<int[]>();
+        Phase entropyShareComputation =
+            new EntropySharesComputation(Knowledge.withContent(localValues),
+                                         Knowledge.withContent(concertedRemainingAttributes),
+                                         entropyShares,
+                                         randomSource);
+        executePhase(connection, entropyShareComputation);
+
+        Knowledge<Attribute> bestAttribute = new Knowledge<Attribute>();
+        Phase maxGainPhase = new MaxGainComputation(entropyShares,
+                                                    Knowledge.withContent(concertedRemainingAttributes),
+                                                    bestAttribute,
+                                                    randomSource);
+        executePhase(connection, maxGainPhase);
+        return bestAttribute.get();
+    }
+
+    private Classifier makeMajorityClassifier()
+            throws IOException, ClassNotFoundException {
+        Knowledge<MailType> dominatingLabel = new Knowledge<MailType>();
+        Phase dominationDecider =
+            new DominatingOutputComputation(localEmailLabels,
+                                            Knowledge.withContent(remoteMailCountLimit),
+                                            dominatingLabel,
+                                            randomSource);
+        executePhase(connection, dominationDecider);
+        return new Leaf(dominatingLabel.get());
+    }
+
+    private boolean allAttributesAreUsed() {
+        return concertedRemainingAttributes.isEmpty();
+    }
+
+    private Leaf makeClassifierForUnanimousLabels() {
+        return new Leaf(concertedUnanimousLabel.get());
+    }
+
+    private boolean labelsAreUnanimous() {
+        return this.concertedUnanimousLabel.get() != null;
+    }
+
+    private void checkForUnanimousResult() throws IOException, ClassNotFoundException {
+        Phase uniqueDecider = new AgreedLabelComputation(localEmailLabels,
+                                                         Knowledge.withContent(remoteMailCountLimit),
+                                                         concertedUnanimousLabel,
+                                                         randomSource);
+        executePhase(connection, uniqueDecider);
+    }
+
+    /**
 	 * This extracts the email labels from the attribute value table
 	 * and puts them into a list. For now, they are just put in there
 	 * tightly packed from the beginning.
@@ -172,14 +219,8 @@ public class ID3Step extends SymmetricPhase {
 	 */
 	private List<MailType> buildLabelList() {
 		List<MailType> localLabels = new LinkedList<MailType>();
-		for (int i = 0; i < localValues.get().countSpamMails(); i++) {
-			localLabels.add(MailType.SPAM);
-		}
-
-		for (int i = 0; i < localValues.get().countNonSpamMails(); i++) {
-			localLabels.add(MailType.NONSPAM);
-		}
-
+        localLabels.addAll(Collections.nCopies(localValues.countSpamMails(), MailType.SPAM));
+        localLabels.addAll(Collections.nCopies(localValues.countNonSpamMails(), MailType.NONSPAM));
 		return localLabels;
 	}
 }
