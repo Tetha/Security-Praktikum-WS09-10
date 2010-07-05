@@ -143,7 +143,7 @@ public class AgreedLabelComputation extends Phase {
 				case NONSPAM:
 					labels[firstBitIndex]=false;
 					labels[secondBitIndex]=false;
-
+                    break;
                 default: throw new IllegalArgumentException(m.toString());
 			}
 		}

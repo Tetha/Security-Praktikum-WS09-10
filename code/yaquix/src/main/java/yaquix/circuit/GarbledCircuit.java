@@ -73,6 +73,8 @@ public class GarbledCircuit implements Serializable {
 
 	protected int[] inputValues;
 
+    private int[][] predecessors;
+
 	private static final Logger LOG = LoggerFactory
 			.getLogger(GarbledCircuit.class);
 
@@ -173,10 +175,12 @@ public class GarbledCircuit implements Serializable {
 	public boolean[] evaluate() {
 		int[] outputValues = new int[gateType.length];  // XXX: Too big?
 		boolean[] hasOutput = new boolean[gateType.length]; // XXX: too big?
-        assert allInputsSet() : Arrays.toString(inputValues);
+        assert allInputsSet() : "Unset input in: " + Arrays.toString(inputValues);
 
 		//setInputOutputs(hasOutput, outputValues);
 
+        System.err.println(gateType.length);
+        LOG.trace(String.valueOf(gateType.length));
 		while(someOutputHasNoOutput(hasOutput)) {
 			for (int gateIndex = 0; gateIndex <  gateType.length; gateIndex++) {
 				if (gateType[gateIndex] == GateType.IN  ||
@@ -297,19 +301,21 @@ public class GarbledCircuit implements Serializable {
 		return true;
 	}
 
+    private void computePredecessors() {
+        predecessors = new int[gateType.length][2];
+        int[] predecessorsFoundCount = new int[gateType.length];
+        for (int predIndex = 0; predIndex < gateType.length; predIndex++) {
+            for (Integer follower : adjacencyList[predIndex]) {
+                int firstFreeIndex = predecessorsFoundCount[follower];
+                assert 0 <= firstFreeIndex && firstFreeIndex < 2;
+                predecessors[follower][firstFreeIndex] = predIndex;
+                predecessorsFoundCount[follower]++;
+            }
+        }
+    }
 	private int[] computePredecessors(int gateIndex) {
-		int[] preds = new int[2];
-		int predCount = 0;
-
-		for (int predIndex = 0; predIndex < gateType.length; predIndex++) {
-			for (Integer follower : adjacencyList[predIndex]) {
-				if (follower == gateIndex) {
-					preds[predCount] = predIndex;
-					predCount++;
-				}
-			}
-		}
-		return preds;
+        if (predecessors == null) computePredecessors();
+        return predecessors[gateIndex];
 	}
 
 	private boolean someOutputHasNoOutput(boolean[] hasOutput) {
