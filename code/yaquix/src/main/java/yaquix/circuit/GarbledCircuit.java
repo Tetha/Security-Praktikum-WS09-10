@@ -179,7 +179,6 @@ public class GarbledCircuit implements Serializable {
 
 		//setInputOutputs(hasOutput, outputValues);
 
-        System.err.println(gateType.length);
         LOG.trace(String.valueOf(gateType.length));
 		while(someOutputHasNoOutput(hasOutput)) {
 			for (int gateIndex = 0; gateIndex <  gateType.length; gateIndex++) {

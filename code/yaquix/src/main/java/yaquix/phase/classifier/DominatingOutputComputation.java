@@ -86,6 +86,8 @@ public class DominatingOutputComputation extends Phase {
 	@Override
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
+        int remoteMailCount = connection.exchangeInteger(localLabels.get().size());
+
 		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
 		localInput.put(encodeLabels(localLabels.get(),
 					                /*intLog2(remoteMailCountLimit.get())*/
@@ -103,12 +105,14 @@ public class DominatingOutputComputation extends Phase {
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
 		List<MailType> labels = localLabels.get();
-		int maximumMailBound = Math.max(labels.size(), remoteMailCountLimit.get());
+        int remoteMailCount = connection.exchangeInteger(labels.size());
+		int maximumMailBound = Math.max(remoteMailCount, labels.size());
 		Circuit dominationCircuit =
 			CircuitBuilder.createDominatingOutputCircuit(maximumMailBound);
 
-		Knowledge<Circuit> circuitInput = new Knowledge<Circuit>();
-		circuitInput.put(dominationCircuit);
+        logger.info(String.format("inputs of circuit: %d", dominationCircuit.getInputCount()));
+        logger.info(String.format("maximum mail bound: %d", maximumMailBound));
+		Knowledge<Circuit> circuitInput = Knowledge.withContent(dominationCircuit);
 
 		Knowledge<boolean[]> localInputKnowledge = new Knowledge<boolean[]>();
 		localInputKnowledge.put(encodeLabels(labels, 0));

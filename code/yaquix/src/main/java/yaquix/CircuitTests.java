@@ -53,7 +53,26 @@ public class CircuitTests {
         addTimesChecks();
         addMaxGainStateTransitionChecks();
         addMaxGainCircuitChecks();
+        addAgreeingLabelChecks();
 
+        addCheck("DominatingLabelCircuit Spam dominates",
+                 CircuitBuilder.createDominatingOutputCircuit(4),
+                 forInput(false, true,
+                          false, false,
+                          false, true,
+                          false, false),
+                 andExpect(true));
+
+        addCheck("DominatingLabelCircuit Non Spam dominates",
+                 CircuitBuilder.createDominatingOutputCircuit(4),
+                 forInput(false, false,
+                          false, true,
+                          false, false,
+                          false, true),
+                 andExpect(false));
+    }
+
+    private static void addAgreeingLabelChecks() {
         addCheck("Agreeing label computation",
                  CircuitBuilder.createAgreeingLabelComputation(2),
                  forInput(false, true,
@@ -71,7 +90,6 @@ public class CircuitTests {
                  forInput(false, false,
                           false, true),
                  andExpect(true, true));
-
     }
 
     private static void addMaxGainCircuitChecks() {

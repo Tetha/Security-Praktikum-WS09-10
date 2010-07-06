@@ -14,7 +14,6 @@ import yaquix.circuit.base.Or;
 import yaquix.circuit.base.Shuffle;
 import yaquix.circuit.base.Split;
 import yaquix.circuit.base.Stop;
-import yaquix.circuit.base.Times;
 import yaquix.circuit.base.Xor;
 
 /**
@@ -377,17 +376,20 @@ public class CircuitBuilder {
 		return identity;
 	}
 
+    private static boolean inBounds(int lower, int value, int upper) {
+        return lower <= value && value < upper;
+    }
 	/**
 	 * This constructs the dominating output circuit. Compare to the
 	 * specification for details.
 	 *  We require the following input structure:
-	 *   - at first, log2(aliceMails) bits in order to encode the number
+	 *   - at first,log2(mailCountBound) bits in order to encode the number
 	 *     of spam-mails alice has
-	 *   - second, log2(aliceMails) bits in order to encode the number of
+	 *   - second, log2(mailCountBound) bits in order to encode the number of
 	 *     non-spam-mails alice has
-	 *   - third, log2(bobmails) bits in order to encode the number of
+	 *   - third, log2(mailCountBound) bits in order to encode the number of
 	 *     spam-mails bob has
-	 *   - fourth, log2(bobmails) bits in order to encode the number of nonspam
+	 *   - fourth, log2(mailCountBound) bits in order to encode the number of nonspam
 	 *     mails bob has.
 	 * The logarithms must be rounded up if they are not natural numbers.
 	 * The only output bit of the circuit must be 0 if the nonspam mails dominate
@@ -397,42 +399,50 @@ public class CircuitBuilder {
 	 * @return A circuit which does this
 	 */
 	public static Circuit createDominatingOutputCircuit(int mailCountBound) {
-		int inputSize = 4*mailCountBound;
+        int chunkSize = intLog2(mailCountBound);
+		int inputSize = 4*chunkSize;
 		// swap bits from mailCountBound until mailCountBound*2-1 with
 		// bits from mailCountBound*2 until mailCountBound*3-1
 		Map<Integer, Integer> sortByType = new HashMap<Integer, Integer>();
 		for (int i = 0; i < inputSize; i++) {
-			if (0 <= i && i < mailCountBound) {
+			if (0 <= i && i < chunkSize) {
+                assert inBounds(0, i, inputSize);
 				sortByType.put(i,i);
-			} else if (mailCountBound <= i && i < mailCountBound*2) {
-				sortByType.put(i, i+mailCountBound);
-			} else if (mailCountBound * 2 <= i &&  i < mailCountBound * 3) {
-				sortByType.put(i, i-mailCountBound);
-			} else if (3*mailCountBound <= i && i < 4*mailCountBound) {
+			} else if (mailCountBound <= i && i < chunkSize*2) {
+                assert inBounds(0, i, inputSize);
+                assert inBounds(0, i+chunkSize, inputSize);
+				sortByType.put(i, i+chunkSize);
+			} else if (2 * chunkSize <= i &&  i < 3 * chunkSize) {
+                assert inBounds(0, i, inputSize);
+                assert inBounds(0, i-chunkSize, inputSize);
+				sortByType.put(i, i-chunkSize);
+			} else if (3*chunkSize <= i && i < 4*chunkSize) {
+                assert inBounds(0, i, inputSize);
 				sortByType.put(i,i);
 			}
 		}
 
 		Map<Integer, Integer> putNonSpamFirst = new HashMap<Integer, Integer>();
 		for (int i = 0; i < inputSize; i++) {
-			if (0 <= i && i < 2*mailCountBound) {
-				putNonSpamFirst.put(i, i+2*mailCountBound);
+			if (0 <= i && i < 2*chunkSize) {
+                assert inBounds(0, i, inputSize);
+                assert inBounds(0, i+2*chunkSize, inputSize);
+				putNonSpamFirst.put(i, i+2*chunkSize);
 			} else {
-				putNonSpamFirst.put(i, i-2*mailCountBound);
+                assert inBounds(0, i, inputSize);
+                assert inBounds(0, i-2*chunkSize, inputSize);
+				putNonSpamFirst.put(i, i-2*chunkSize);
 			}
 		}
 
 		Circuit result = new Shuffle(inputSize, sortByType);
 		result = result.extendTopLeft(new Shuffle(inputSize, putNonSpamFirst),
 								createIdentityMapping(inputSize));
-
-		Circuit parallelAdders = createAdder(mailCountBound);
-		parallelAdders = parallelAdders.extendLeft(createAdder(mailCountBound));
-
+		Circuit parallelAdders = createAdder(chunkSize);
+		parallelAdders = parallelAdders.extendLeft(createAdder(chunkSize));
 		result = result.extendTopLeft(parallelAdders, createIdentityMapping(inputSize));
-		result = result.extendTopLeft(createComparer(mailCountBound), createIdentityMapping(mailCountBound*2));
+		result = result.extendTopLeft(createComparer(chunkSize), createIdentityMapping(chunkSize*2));
 		result = result.extendTopLeft(new Stop(), createIdentityMapping(1));
-
 		return result;
 	}
 
