@@ -100,12 +100,16 @@ public class CircuitEvaluation extends Phase {
 		connection.sendIntegers(encodedAliceInput); // (2)
 
 		int bobInputLength = connection.receiveInteger(); // (3)
-
 		Knowledge<int[]> aliceMessages = new Knowledge<int[]>();
 		Phase ot = new OneOfTwoObliviousTransfer(aliceMessages, random);
 		final int bobInputOffset = aliceInput.length;
+        System.err.println("inputs: " + inputCircuit.getInputCount());
+        System.err.println("bob input length: " + bobInputLength);
+        System.err.println("bob offset: " + bobInputOffset);
+
 		for (int bobInIndex = 0; bobInIndex < bobInputLength; bobInIndex++) {
-			aliceMessages.put(inputMapping.get(bobInIndex+bobInputOffset));
+            assert inputMapping.get(bobInIndex + bobInputOffset) != null : String.format("inputMapping  for %s null", bobInIndex + bobInputOffset);
+            aliceMessages.put(inputMapping.get(bobInIndex+bobInputOffset));
 			ot.serverExecute(connection); // (4)
 		}
 

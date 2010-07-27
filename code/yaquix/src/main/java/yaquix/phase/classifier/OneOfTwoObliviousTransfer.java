@@ -175,6 +175,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	@Override
 	public void serverExecute(Connection connection) throws IOException {
 		logger.info("entering phase");
+        assert serverMessages.get() != null : "Input messages not set";
 		logger.info(String.format("serverExecute(%s, %s)", serverMessages.get()[0], serverMessages.get()[1]));
 //		KeyPairGenerator keyGenerator;
 //		try {

@@ -76,7 +76,7 @@ public class DominatingOutputComputation extends Phase {
 	private int intLog2(int x) {
 		int currentX = 1;
 		int n = 0;
-		while (currentX <= x) {
+		while (currentX < x) {
 			currentX *= 2;
 			n++;
 		}
@@ -87,10 +87,10 @@ public class DominatingOutputComputation extends Phase {
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("Entering Phase: Dominating Output Computation");
         int remoteMailCount = connection.exchangeInteger(localLabels.get().size());
-
+        int maxLabelBound = Math.max(remoteMailCount, localLabels.get().size());
 		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
 		localInput.put(encodeLabels(localLabels.get(),
-					                /*intLog2(remoteMailCountLimit.get())*/
+					                maxLabelBound,
                                     0));
 
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
@@ -107,15 +107,14 @@ public class DominatingOutputComputation extends Phase {
 		List<MailType> labels = localLabels.get();
         int remoteMailCount = connection.exchangeInteger(labels.size());
 		int maximumMailBound = Math.max(remoteMailCount, labels.size());
-		Circuit dominationCircuit =
-			CircuitBuilder.createDominatingOutputCircuit(maximumMailBound);
-
-        logger.info(String.format("inputs of circuit: %d", dominationCircuit.getInputCount()));
         logger.info(String.format("maximum mail bound: %d", maximumMailBound));
+        Circuit dominationCircuit =
+			CircuitBuilder.createDominatingOutputCircuit(maximumMailBound);
+        logger.info(String.format("inputs of circuit: %d", dominationCircuit.getInputCount()));
 		Knowledge<Circuit> circuitInput = Knowledge.withContent(dominationCircuit);
 
 		Knowledge<boolean[]> localInputKnowledge = new Knowledge<boolean[]>();
-		localInputKnowledge.put(encodeLabels(labels, 0));
+		localInputKnowledge.put(encodeLabels(labels, maximumMailBound, 0));
 
 		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
 
@@ -146,12 +145,14 @@ public class DominatingOutputComputation extends Phase {
 	 * array according to the input specification of the circuit.
 	 * @param labels the labels to encode
 	 */
-	private boolean[] encodeLabels(List<MailType> labels, int offset) {
+	private boolean[] encodeLabels(List<MailType> labels, int maxLabelBound, int offset) {
 		boolean[] localInput;
 		int spamCount = 0;
 		int nonSpamCount = 0;
 
-		localInput = new boolean[intLog2(labels.size())*2];
+		localInput = new boolean[intLog2(maxLabelBound)*2];
+        System.err.println("Max label bound: " + maxLabelBound);
+        System.err.println(intLog2(maxLabelBound));
         System.err.println(String.format("localInputCount.length = %d", localInput.length));
         System.err.println(String.format("offset=%d", offset));
 		for (MailType m : labels) {
@@ -162,19 +163,19 @@ public class DominatingOutputComputation extends Phase {
 			}
 		}
 
-		for (int i = 0; i < intLog2(labels.size()); i++) {
+		for (int i = 0; i < intLog2(maxLabelBound); i++) {
 			if ((spamCount & (1<<i)) > 0) {
-				localInput[intLog2(labels.size())-i-1 + offset] = true;
+				localInput[intLog2(maxLabelBound)-i-1 + offset] = true;
 			} else {
-				localInput[intLog2(labels.size())-i-1 + offset] = false;
+				localInput[intLog2(maxLabelBound)-i-1 + offset] = false;
 			}
 		}
 
-		for (int i = 0; i < intLog2(labels.size()); i++) {
+		for (int i = 0; i < intLog2(maxLabelBound); i++) {
 			if ((nonSpamCount & (1<<i)) > 0) {
-				localInput[2*intLog2(labels.size())-i-1 + offset] = true;
+				localInput[2*intLog2(maxLabelBound)-i-1 + offset] = true;
 			} else {
-				localInput[2*intLog2(labels.size())-i-1 + offset] = false;
+				localInput[2*intLog2(maxLabelBound)-i-1 + offset] = false;
 			}
 		}
 		return localInput;
