@@ -897,6 +897,7 @@ public class CircuitBuilder {
 	 * and copy.
 	 */
 	public static Circuit createMaxGainStatetransition(int sumWidth, int indexWidth) {
+		assert 0 < indexWidth;
 		Map<Integer, Integer> connection = new HashMap<Integer, Integer>();
 		Circuit result = null;
 
@@ -1091,6 +1092,7 @@ public class CircuitBuilder {
 	 * @return a circuit to perform this computation.
 	 */
 	 public static Circuit createMaximumGainCircuit(int vectorLength, int shareWidth) {
+		 assert 1 < vectorLength;
 		 /*
 		  * We construct this circuit in several layers from output to input.
 		  *

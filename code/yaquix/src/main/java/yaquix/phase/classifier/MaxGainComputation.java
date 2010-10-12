@@ -79,12 +79,15 @@ public class MaxGainComputation extends Phase {
 	@Override
 	public void clientExecute(Connection connection) throws ClassNotFoundException, IOException {
 		LOG.info("Starting Phase: Max Gain Computation");
-		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
-		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
-		Phase usedPhase = new CircuitEvaluation(localInput, concertedOutput, randomSource);
+		if (concertedAttributes.get().size() == 1) {
+			concertedBestAttribute.put(concertedAttributes.get().get(0));
+		} else {
+			Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
+			Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
+			Phase usedPhase = new CircuitEvaluation(localInput, concertedOutput, randomSource);
 
-		evaluateCircuit(connection, localInput, concertedOutput, usedPhase, false);
-
+			evaluateCircuit(connection, localInput, concertedOutput, usedPhase, false);
+		}
 		LOG.info("Ending Phase: Max Gain Computation");
 	}
 
@@ -113,18 +116,22 @@ public class MaxGainComputation extends Phase {
 
 		int shareCount = shares.length;
         assert shareCount == concertedAttributes.get().size();
-        LOG.trace(String.format("creating max gain circuit. shareCount=%d, shareWidth=%d",
-                                shareCount, shareWidth));
-		Circuit maxGain = CircuitBuilder.createMaximumGainCircuit(shareCount, shareWidth);
-		LOG.trace("circuit created");
-		Knowledge<Circuit> evaluatedCircuit = new Knowledge<Circuit>();
-		evaluatedCircuit.put(maxGain);
+        if (shareCount == 1) {
+        	concertedBestAttribute.put(concertedAttributes.get().get(0));
+        } else {
+        	LOG.trace(String.format("creating max gain circuit. shareCount=%d, shareWidth=%d",
+        			shareCount, shareWidth));
+        	Circuit maxGain = CircuitBuilder.createMaximumGainCircuit(shareCount, shareWidth);
+        	LOG.trace("circuit created");
+        	Knowledge<Circuit> evaluatedCircuit = new Knowledge<Circuit>();
+        	evaluatedCircuit.put(maxGain);
 
-		Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
-		Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
-		Phase evaluationPhase = new CircuitEvaluation(evaluatedCircuit, localInput, concertedOutput, randomSource);
+        	Knowledge<boolean[]> localInput = new Knowledge<boolean[]>();
+        	Knowledge<boolean[]> concertedOutput = new Knowledge<boolean[]>();
+        	Phase evaluationPhase = new CircuitEvaluation(evaluatedCircuit, localInput, concertedOutput, randomSource);
 
-		evaluateCircuit(connection, localInput, concertedOutput, evaluationPhase, true);
+        	evaluateCircuit(connection, localInput, concertedOutput, evaluationPhase, true);
+        }
 		LOG.info("Ending Phase: Max Gain Computation");
 	}
 

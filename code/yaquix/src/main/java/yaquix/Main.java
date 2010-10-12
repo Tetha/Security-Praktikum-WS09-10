@@ -9,6 +9,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.BasicConfigurator;
+import ch.qos.logback.core.ConsoleAppender;
+import yaquix.AllFilesIn;
 import yaquix.classifier.Classifier;
 import yaquix.classifier.ClassifierParser;
 import yaquix.knowledge.Mail;
@@ -56,7 +60,7 @@ public class Main {
 		mode.addOption(client);
 		mode.addOption(classifier);
 		options.addOptionGroup(mode);
-		Option classifierFile = OptionBuilder.withLongOpt("classifier-file")
+		Option classifierFile = OptionBuilder.withLongOpt("classifierfile")
 										     .hasArg()
 										     .withArgName("FILE")
 										     .withDescription("in classifier mode: a file to load the classifier from, in server or client mode: a file to store the classifier to")

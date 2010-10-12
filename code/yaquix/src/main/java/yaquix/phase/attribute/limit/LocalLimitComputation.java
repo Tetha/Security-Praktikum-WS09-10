@@ -13,7 +13,7 @@ import yaquix.phase.OutputKnowledge;
 import yaquix.phase.SymmetricPhase;
 
 /**
- * This class computes the local limits. In order to to this, it 
+ * This class computes the local limits. In order to to this, it
  * computes the average number of occurrences of each word in the
  * list of important words and uses this as the own local limit.
  * @author hk
@@ -24,12 +24,12 @@ class LocalLimitComputation extends SymmetricPhase {
 	 * contains the list of words to compute limits for.
 	 */
 	private InputKnowledge<List<String>> concertedWordlist;
-	
+
 	/**
 	 * contains the mails to compute the limits from.
 	 */
 	private InputKnowledge<Mails> localMails;
-	
+
 	/**
 	 * requires the mapping from words to own local limit.
 	 */
@@ -43,7 +43,7 @@ class LocalLimitComputation extends SymmetricPhase {
 	 */
 	public LocalLimitComputation(InputKnowledge<List<String>> concertedWordlist,
 			InputKnowledge<Mails> localMails,
-			OutputKnowledge<Map<String, Double>> localLimits) {			
+			OutputKnowledge<Map<String, Double>> localLimits) {
 		this.concertedWordlist = concertedWordlist;
 		this.localMails = localMails;
 		this.localLimits = localLimits;
@@ -51,16 +51,16 @@ class LocalLimitComputation extends SymmetricPhase {
 
 	@Override
 	protected void execute(Connection connection) {
-		
-		
-		
+
+
+
 		logger.info("entering phase");
 		HashMap<String, Double> map = new HashMap<String, Double>();
 		for(String word : concertedWordlist.get()){
-			
+
 			double summedAverages = 0;
 			double averageInOneMail;
-						
+
 			List<Mail> mails = localMails.get().getAllMails();
 			for(Mail mail : mails){
 				if (mail.countWords() == 0) {
@@ -74,6 +74,7 @@ class LocalLimitComputation extends SymmetricPhase {
 			map.put(word, summedAverages/(double)mails.size());
 		}
 		localLimits.put(map);
+		System.err.println(map);
 		logger.trace("Local limits: " + map);
 		logger.info("leaving phase");
 	}
