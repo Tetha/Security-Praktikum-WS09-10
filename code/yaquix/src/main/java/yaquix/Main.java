@@ -124,6 +124,7 @@ public class Main {
 	}
 
 	private static boolean configureLogging(CommandLine arguments) {
+		if (!arguments.hasOption('l')) return true;
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 		try {
 			JoranConfigurator config = new JoranConfigurator();

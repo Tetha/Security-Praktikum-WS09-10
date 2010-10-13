@@ -319,6 +319,7 @@ public class ClassifierParser {
 		char tmpChar;
 		boolean found = false;
 
+		skipWhitespace();
 		for(int i = positionInInput;i < input.length(); i++){
 			tmpChar = input.charAt(i);
 			if(Character.isDigit(tmpChar)){
@@ -342,14 +343,14 @@ public class ClassifierParser {
 	 */
 	private void skipWhitespace() {
 		for(int i = positionInInput; i < input.length(); i++){
-			if(input.charAt(i) == ' ' || input.charAt(i) == '\t'){
-				positionInInput++;
-				column++;
-			}
-			else if(input.charAt(i) == '\n'){
+			char current = input.charAt(i);
+			if (current == '\n') {
 				positionInInput++;
 				column = 0;
 				line++;
+			} else if (Character.isWhitespace(current)) {
+				positionInInput++;
+				column++;
 			}
 			else break;
 		}
