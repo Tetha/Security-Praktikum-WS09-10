@@ -74,7 +74,6 @@ class LocalLimitComputation extends SymmetricPhase {
 			map.put(word, summedAverages/(double)mails.size());
 		}
 		localLimits.put(map);
-		System.err.println(map);
 		logger.trace("Local limits: " + map);
 		logger.info("leaving phase");
 	}

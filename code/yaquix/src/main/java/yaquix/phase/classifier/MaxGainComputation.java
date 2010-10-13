@@ -147,7 +147,7 @@ public class MaxGainComputation extends Phase {
 				outputContents.append("0");
 			}
 		}
-		System.err.println(outputContents);
+		logger.debug(outputContents.toString());
 		for (int bitIndex = 0; bitIndex < output.length; bitIndex++) {
 			attributeIndex = attributeIndex * 2;
 			if (output[bitIndex]) {
@@ -169,7 +169,7 @@ public class MaxGainComputation extends Phase {
 			encodeShare(input, localShares[shareIndex], shareIndex * shareWidth, shareWidth);
 		}
 
-        System.err.println(Arrays.toString(input));
+		logger.debug(Arrays.toString(input));
 		return input;
 	}
 

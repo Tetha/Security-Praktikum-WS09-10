@@ -58,7 +58,6 @@ class OneOfTwoObliviousTransfer extends Phase {
 		this.serverMessages = serverMessages;
 		this.randomSource = randomSource;
 		logger = LoggerFactory.getLogger("yaquix.phase.classifier.OneOfTwoObliviousTransfer");
-
 	}
 
 	/**
@@ -176,7 +175,7 @@ class OneOfTwoObliviousTransfer extends Phase {
 	public void serverExecute(Connection connection) throws IOException {
 		logger.info("entering phase");
         assert serverMessages.get() != null : "Input messages not set";
-		logger.info(String.format("serverExecute(%s, %s)", serverMessages.get()[0], serverMessages.get()[1]));
+		logger.debug(String.format("serverExecute(%s, %s)", serverMessages.get()[0], serverMessages.get()[1]));
 //		KeyPairGenerator keyGenerator;
 //		try {
 //			keyGenerator = KeyPairGenerator.getInstance("RSA");

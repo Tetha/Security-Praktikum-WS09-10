@@ -76,19 +76,19 @@ public class AgreedLabelComputation extends Phase {
 		subphase.clientExecute(connection);
 		MailType result = decodeOutput(concertedOutput);
 		concertedUniqueLabel.put(result);
-		logger.info("entering phase");
+		logger.info("leaving phase");
 	}
 
 	@Override
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
 		logger.info("entering phase");
 		List<MailType> localMailLabels = localLabels.get();
-        System.err.println(localMailLabels);
+		logger.debug(localMailLabels.toString());
         int remoteMailCount = connection.receiveInteger();
 
 		int mailCount = remoteMailCount + localMailLabels.size();
-        System.err.println(String.format("total mail count -> %d = %d + %d <- remote + local",
-                                         mailCount, remoteMailCount, localMailLabels.size()));
+        logger.debug(String.format("total mail count -> %d = %d + %d <- remote + local",
+                                   mailCount, remoteMailCount, localMailLabels.size()));
   		Circuit agreedLabel = CircuitBuilder.createAgreeingLabelComputation(mailCount);
 		Knowledge<boolean[]> inputLabels = new Knowledge<boolean[]>();
 		inputLabels.put(encodeLabels(localMailLabels));

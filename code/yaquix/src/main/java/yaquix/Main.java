@@ -11,7 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.BasicConfigurator;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 import yaquix.AllFilesIn;
 import yaquix.classifier.Classifier;
 import yaquix.classifier.ClassifierParser;
@@ -87,17 +91,27 @@ public class Main {
                                     .withDescription("a file to write the classifier to")
                                     .create('o');
         options.addOption(output);
+
+        Option logging = OptionBuilder.withLongOpt("logconfiguration")
+        							  .hasArg()
+        							  .withArgName("FILE")
+        							  .withDescription("the logback configuration")
+        							  .create('l');
+        options.addOption(logging);
 	}
 
 	public static void main(String[] args)
             throws IOException {
-		LOG.info("Starting application");
-
 		CommandLine arguments;
 		try {
 			arguments = new GnuParser().parse(options, args);
 		} catch (ParseException e) {
-			LOG.error("Error while parsing command line arguments: " + e.toString());
+			System.err.println("Error while parsing command line arguments: " + e.toString());
+			return;
+		}
+
+		if (!configureLogging(arguments)) {
+			System.err.println("Error while configuring logging.");
 			return;
 		}
 
@@ -109,6 +123,19 @@ public class Main {
 		runApplication(arguments);
 	}
 
+	private static boolean configureLogging(CommandLine arguments) {
+		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		try {
+			JoranConfigurator config = new JoranConfigurator();
+			config.setContext(lc);
+			lc.reset();
+			config.doConfigure(arguments.getOptionValue('l'));
+		} catch (JoranException je) {
+			StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+			return false;
+		}
+		return true;
+	}
 	private static void runApplication(CommandLine arguments)
             throws IOException {
 		if (arguments.hasOption("server") || arguments.hasOption("client")) {

@@ -22,17 +22,25 @@
         </layout>
     </appender>
 
-    <root level="trace">
+    <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
 
+    <!--
     <logger name="yaquix.circuit.CircuitBuilder"
             level="trace"/>
     <logger name="yaquix.circuit.Circuit"
             level="debug"/>
     <logger name="yaquix.Connection"
             level="debug"/>
+    -->
+    
+    <logger name="yaquix.phase.classifier.OneOfTwoObliviousTransfer"
+            level="error"/>
 
+    <logger name="yaquix.phase.classifier.entropy.XLnXProtocol"
+            level="error"/>
+            
     <logger name="yaquix.circuit.CircuitBuilder.AgreeingLabelComputation">
         <appender-ref ref="FIRST-DOTFILE"/>
     </logger>

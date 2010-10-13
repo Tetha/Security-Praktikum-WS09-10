@@ -107,7 +107,6 @@ public class EntropySharesComputation extends SymmetricPhase {
 					attributeClassSetShares[a][aj][cj] = localOutput.get();
 				}
 			}
-			log.info("leaving phase");
 		}
 
 		int[] shares = new int[attributes.size()];
@@ -122,6 +121,7 @@ public class EntropySharesComputation extends SymmetricPhase {
 			shares[a] = share;
 		}
 		localShares.put(shares);
+		log.info("leaving phase");
 	}
 
 }

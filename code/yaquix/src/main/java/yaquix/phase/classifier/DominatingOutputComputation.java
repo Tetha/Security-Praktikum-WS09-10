@@ -151,10 +151,10 @@ public class DominatingOutputComputation extends Phase {
 		int nonSpamCount = 0;
 
 		localInput = new boolean[intLog2(maxLabelBound)*2];
-        System.err.println("Max label bound: " + maxLabelBound);
-        System.err.println(intLog2(maxLabelBound));
-        System.err.println(String.format("localInputCount.length = %d", localInput.length));
-        System.err.println(String.format("offset=%d", offset));
+        logger.debug("Max label bound: " + maxLabelBound);
+        logger.debug(Integer.toString(intLog2(maxLabelBound)));
+        logger.debug(String.format("localInputCount.length = %d", localInput.length));
+        logger.debug(String.format("offset=%d", offset));
 		for (MailType m : labels) {
 			switch (m) {
 				case SPAM: spamCount++; break;

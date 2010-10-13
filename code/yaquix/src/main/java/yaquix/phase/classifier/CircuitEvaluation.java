@@ -87,6 +87,7 @@ public class CircuitEvaluation extends Phase {
 
 	@Override
 	public void serverExecute(Connection connection) throws IOException, ClassNotFoundException {
+		logger.info("entering phase");
 		Circuit inputCircuit = serverCircuit.get();
 		Map<Integer, int[]> inputMapping = buildInputMapping(inputCircuit.getInputCount());
 
@@ -103,9 +104,9 @@ public class CircuitEvaluation extends Phase {
 		Knowledge<int[]> aliceMessages = new Knowledge<int[]>();
 		Phase ot = new OneOfTwoObliviousTransfer(aliceMessages, random);
 		final int bobInputOffset = aliceInput.length;
-        System.err.println("inputs: " + inputCircuit.getInputCount());
-        System.err.println("bob input length: " + bobInputLength);
-        System.err.println("bob offset: " + bobInputOffset);
+        logger.debug("inputs: " + inputCircuit.getInputCount());
+        logger.debug("bob input length: " + bobInputLength);
+        logger.debug("bob offset: " + bobInputOffset);
 
 		for (int bobInIndex = 0; bobInIndex < bobInputLength; bobInIndex++) {
             assert inputMapping.get(bobInIndex + bobInputOffset) != null : String.format("inputMapping  for %s null", bobInIndex + bobInputOffset);
@@ -115,10 +116,12 @@ public class CircuitEvaluation extends Phase {
 
 		boolean[] output = connection.receiveBitstring(); // (5)
 		concertedOutput.put(output);
+		logger.info("leaving phase");
 	}
 
 	@Override
 	public void clientExecute(Connection connection) throws IOException, ClassNotFoundException {
+		logger.info("Entering phase");
 		GarbledCircuit transmittedCircuit = connection.receiveGarbledCircuit(); // (1)
 		int[] encodedAliceInput = connection.receiveIntegers(); // (2)
 
@@ -143,6 +146,7 @@ public class CircuitEvaluation extends Phase {
 		connection.sendBitstring(output); // (5)
 
 		concertedOutput.put(output);
+		logger.info("Leaving Phase");
 	}
 
 	/**

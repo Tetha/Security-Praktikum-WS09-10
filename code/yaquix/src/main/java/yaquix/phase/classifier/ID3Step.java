@@ -105,6 +105,7 @@ public class ID3Step extends SymmetricPhase {
 
     private Classifier makeRecursiveClassifier()
             throws IOException, ClassNotFoundException {
+    	logger.info("Computing recursive classifier");
         Attribute bestAttribute = selectMostInformativeAttribute();
         return new Branch(bestAttribute, computeSubtreesForPartitionsBy(bestAttribute));
     }
