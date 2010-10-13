@@ -3,7 +3,9 @@ package yaquix.classifier;
 import yaquix.knowledge.Mail;
 import yaquix.knowledge.MailType;
 
+import java.util.Collections;
 import java.util.Formatter;
+import java.util.List;
 
 /**
  * This is a leaf of a decision tree. It contains a class
@@ -36,6 +38,11 @@ public class Leaf implements Classifier {
 
 	public String toString() {
 		return String.format("Output(%s)", formatLabel(this.label));
+	}
+
+	@Override
+	public List<String> toReadableString() {
+		return Collections.singletonList(toString());
 	}
 
     private String formatLabel(MailType label) {
